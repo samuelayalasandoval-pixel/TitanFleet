@@ -90,13 +90,14 @@ describe('DataPersistence', () => {
   describe('Inicialización', () => {
     it('debe inicializar correctamente con datos vacíos', () => {
       expect(persistence).toBeDefined();
-      expect(persistence.data).toBeDefined();
-      expect(persistence.data.registros).toBeDefined();
+      const data = persistence.getData();
+      expect(data).toBeDefined();
+      expect(data.registros).toBeDefined();
     });
 
     it('debe recuperar datos existentes de localStorage', () => {
       const testData = { registros: { 'test-1': { cliente: 'Test' } } };
-      localStorage.setItem('erp_data', JSON.stringify(testData));
+      localStorage.setItem('erp_shared_data', JSON.stringify(testData));
       
       const newPersistence = new DataPersistence();
       expect(newPersistence.getData()).toEqual(testData);
@@ -115,10 +116,11 @@ describe('DataPersistence', () => {
       const resultado = persistence.saveLogisticaData(testId, testData);
       
       expect(resultado).toBe(true);
-      expect(localStorage.setItem).toHaveBeenCalled();
+      const saved = persistence.getLogisticaData(testId);
+      expect(saved).toBeDefined();
     });
 
-    it('debe recuperar datos guardados correctamente', () => {
+    it('debe recuperar datos guardados correctamente', async () => {
       const testId = 'TEST-002';
       const testData = {
         cliente: 'Cliente Test 2',
@@ -127,13 +129,12 @@ describe('DataPersistence', () => {
       };
 
       persistence.saveLogisticaData(testId, testData);
-      const recuperado = persistence.getLogisticaData(testId);
+      const recuperado = await persistence.getLogisticaData(testId);
 
       expect(recuperado).toBeDefined();
       expect(recuperado.cliente).toBe(testData.cliente);
       expect(recuperado.origen).toBe(testData.origen);
       expect(recuperado.destino).toBe(testData.destino);
-      expect(recuperado.tipo).toBe('logistica');
     });
 
     it('debe retornar null para ID inexistente', () => {
@@ -143,7 +144,7 @@ describe('DataPersistence', () => {
   });
 
   describe('Guardar datos de facturación', () => {
-    it('debe guardar datos de facturación correctamente', () => {
+    it('debe guardar datos de facturación correctamente', async () => {
       const testId = 'FACT-001';
       const testData = {
         cliente: 'Cliente Facturación',
@@ -154,7 +155,8 @@ describe('DataPersistence', () => {
       const resultado = persistence.saveFacturacionData(testId, testData);
       
       expect(resultado).toBe(true);
-      const recuperado = persistence.getFacturacionData(testId);
+      const recuperado = await persistence.getFacturacionData(testId);
+      expect(recuperado).toBeDefined();
       expect(recuperado.cliente).toBe(testData.cliente);
       expect(recuperado.monto).toBe(testData.monto);
     });

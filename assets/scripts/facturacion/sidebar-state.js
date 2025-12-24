@@ -9,21 +9,21 @@
   // Leer estado del sidebar inmediatamente
   try {
     const savedState = localStorage.getItem('sidebarCollapsed');
+    // Función para aplicar clases inmediatamente cuando el DOM esté disponible
+    function applySidebarState() {
+      const sidebar = document.getElementById('sidebar');
+      const mainContent = document.getElementById('mainContent');
+      if (sidebar && mainContent) {
+        sidebar.classList.add('collapsed');
+        mainContent.classList.add('sidebar-collapsed');
+        return true;
+      }
+      return false;
+    }
+
     if (savedState === 'true') {
       // Aplicar estilo inline directamente al body para que se ejecute antes del render
       document.documentElement.style.setProperty('--sidebar-initial-state', 'collapsed');
-
-      // Función para aplicar clases inmediatamente cuando el DOM esté disponible
-      function applySidebarState() {
-        const sidebar = document.getElementById('sidebar');
-        const mainContent = document.getElementById('mainContent');
-        if (sidebar && mainContent) {
-          sidebar.classList.add('collapsed');
-          mainContent.classList.add('sidebar-collapsed');
-          return true;
-        }
-        return false;
-      }
 
       // Intentar aplicar inmediatamente si el DOM ya está disponible
       if (document.body) {

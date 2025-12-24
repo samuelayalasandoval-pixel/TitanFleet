@@ -46,6 +46,24 @@
   }
 
   /**
+   * Función helper para limpiar formato de moneda y obtener valor numérico
+   */
+  function limpiarMonedaParaInput(valor) {
+    if (!valor && valor !== 0) {
+      return '';
+    }
+    if (typeof valor === 'number') {
+      return valor;
+    }
+    if (typeof valor === 'string') {
+      const limpio = valor.replace(/[$,]/g, '').trim();
+      const numero = parseFloat(limpio);
+      return isNaN(numero) ? '' : numero;
+    }
+    return '';
+  }
+
+  /**
    * Editar un registro de Facturación
    */
   window.editarRegistroFacturacion = async function (regId) {
@@ -124,22 +142,6 @@
 
       if (nombreCliente === 'N/A') {
         nombreCliente = registro.cliente || registro.Cliente || 'N/A';
-      }
-
-      // Función helper para limpiar formato de moneda y obtener valor numérico
-      function limpiarMonedaParaInput(valor) {
-        if (!valor && valor !== 0) {
-          return '';
-        }
-        if (typeof valor === 'number') {
-          return valor;
-        }
-        if (typeof valor === 'string') {
-          const limpio = valor.replace(/[$,]/g, '').trim();
-          const numero = parseFloat(limpio);
-          return isNaN(numero) ? '' : numero;
-        }
-        return '';
       }
 
       // Obtener valores de montos con búsqueda exhaustiva en múltiples variantes

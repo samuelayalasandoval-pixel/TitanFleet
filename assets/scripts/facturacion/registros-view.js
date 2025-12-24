@@ -232,7 +232,7 @@
           rfcCliente = clienteNombre;
         }
         // Mostrar el RFC temporalmente mientras se busca el nombre
-        clienteNombre = clienteNombre; // Mantener el RFC visible temporalmente
+        // clienteNombre ya tiene el valor correcto, no necesita reasignación
       }
 
       // MOSTRAR EL MODAL INMEDIATAMENTE con los datos básicos

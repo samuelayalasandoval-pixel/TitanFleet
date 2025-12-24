@@ -99,7 +99,7 @@ class FilterManager {
         `;
         break;
 
-      case 'select':
+      case 'select': {
         const options = filter.options || [];
         inputHTML = `
           <select class="form-select form-select-sm" 
@@ -116,6 +116,7 @@ class FilterManager {
           </select>
         `;
         break;
+      }
 
       case 'number':
         inputHTML = `
