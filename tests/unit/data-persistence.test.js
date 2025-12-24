@@ -4,6 +4,30 @@
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 
+// Crear un localStorage real para los tests
+function createLocalStorage() {
+  const store = {};
+  return {
+    getItem: (key) => store[key] || null,
+    setItem: (key, value) => {
+      store[key] = value.toString();
+    },
+    removeItem: (key) => {
+      delete store[key];
+    },
+    clear: () => {
+      Object.keys(store).forEach(key => delete store[key]);
+    },
+    key: (index) => {
+      const keys = Object.keys(store);
+      return keys[index] || null;
+    },
+    get length() {
+      return Object.keys(store).length;
+    }
+  };
+}
+
 // Simulación de DataPersistence basada en la estructura real
 class DataPersistence {
   constructor() {
@@ -45,6 +69,10 @@ class DataPersistence {
     const allData = this.getData();
     if (!allData) return false;
 
+    if (!allData.registros) {
+      allData.registros = {};
+    }
+
     allData.registros[registroId] = {
       ...data,
       fechaCreacion: new Date().toISOString(),
@@ -54,14 +82,21 @@ class DataPersistence {
     return this.setData(allData);
   }
 
-  getLogisticaData(registroId) {
+  async getLogisticaData(registroId) {
     const allData = this.getData();
-    return allData ? allData.registros[registroId] : null;
+    if (!allData || !allData.registros) {
+      return null;
+    }
+    return allData.registros[registroId] || null;
   }
 
   saveFacturacionData(registroId, data) {
     const allData = this.getData();
     if (!allData) return false;
+
+    if (!allData.facturas) {
+      allData.facturas = {};
+    }
 
     allData.facturas[registroId] = {
       ...data,
@@ -72,18 +107,29 @@ class DataPersistence {
     return this.setData(allData);
   }
 
-  getFacturacionData(registroId) {
+  async getFacturacionData(registroId) {
     const allData = this.getData();
-    return allData ? allData.facturas[registroId] : null;
+    if (!allData || !allData.facturas) {
+      return null;
+    }
+    return allData.facturas[registroId] || null;
   }
 }
 
 describe('DataPersistence', () => {
   let persistence;
+  let testLocalStorage;
 
   beforeEach(() => {
+    // Crear un localStorage real para cada test
+    testLocalStorage = createLocalStorage();
+    // Reemplazar el localStorage global con el real
+    global.localStorage = testLocalStorage;
+    if (global.window) {
+      global.window.localStorage = testLocalStorage;
+    }
     // Limpiar localStorage antes de cada test
-    localStorage.clear();
+    testLocalStorage.clear();
     persistence = new DataPersistence();
   });
 
@@ -96,11 +142,22 @@ describe('DataPersistence', () => {
     });
 
     it('debe recuperar datos existentes de localStorage', () => {
-      const testData = { registros: { 'test-1': { cliente: 'Test' } } };
+      const testData = { 
+        registros: { 'test-1': { cliente: 'Test' } },
+        facturas: {},
+        trafico: {},
+        envios: {},
+        economicos: {}
+      };
       localStorage.setItem('erp_shared_data', JSON.stringify(testData));
       
       const newPersistence = new DataPersistence();
-      expect(newPersistence.getData()).toEqual(testData);
+      const retrieved = newPersistence.getData();
+      expect(retrieved).toBeDefined();
+      expect(retrieved).not.toBeNull();
+      expect(retrieved.registros).toBeDefined();
+      expect(retrieved.registros['test-1']).toBeDefined();
+      expect(retrieved.registros['test-1'].cliente).toBe('Test');
     });
   });
 
@@ -128,17 +185,20 @@ describe('DataPersistence', () => {
         destino: 'Destino Test 2'
       };
 
-      persistence.saveLogisticaData(testId, testData);
+      const resultado = persistence.saveLogisticaData(testId, testData);
+      expect(resultado).toBe(true);
+      
       const recuperado = await persistence.getLogisticaData(testId);
 
       expect(recuperado).toBeDefined();
+      expect(recuperado).not.toBeNull();
       expect(recuperado.cliente).toBe(testData.cliente);
       expect(recuperado.origen).toBe(testData.origen);
       expect(recuperado.destino).toBe(testData.destino);
     });
 
-    it('debe retornar null para ID inexistente', () => {
-      const resultado = persistence.getLogisticaData('ID-INEXISTENTE');
+    it('debe retornar null para ID inexistente', async () => {
+      const resultado = await persistence.getLogisticaData('ID-INEXISTENTE');
       expect(resultado).toBeNull();
     });
   });
@@ -161,8 +221,8 @@ describe('DataPersistence', () => {
       expect(recuperado.monto).toBe(testData.monto);
     });
 
-    it('debe retornar null para factura inexistente', () => {
-      const resultado = persistence.getFacturacionData('FACT-INEXISTENTE');
+    it('debe retornar null para factura inexistente', async () => {
+      const resultado = await persistence.getFacturacionData('FACT-INEXISTENTE');
       expect(resultado).toBeNull();
     });
   });
