@@ -46,7 +46,4 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
           projectBaseDir: .
-          args: >
-            -Dsonar.projectKey=samuelayalasandoval-pixel
-            -Dsonar.organization=73e9197e77a68993653f1cf3264bce7a717aa5a5
 
