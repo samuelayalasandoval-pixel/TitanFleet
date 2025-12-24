@@ -4772,7 +4772,7 @@ function loadSistemaConfig() {
     const config = JSON.parse(localStorage.getItem('sistema_config') || '{}');
 
     // Mostrar información actual
-    const _currentPassword = config.passwordAprobacion || 'ASD123';
+    const _currentPassword = config.passwordAprobacion || null;
     const lastUpdate = config.lastUpdate || 'Nunca';
 
     const currentPasswordDisplay = document.getElementById('currentPasswordDisplay');
@@ -4832,10 +4832,14 @@ function saveSistemaConfig() {
 function getPasswordAprobacion() {
   try {
     const config = JSON.parse(localStorage.getItem('sistema_config') || '{}');
-    return config.passwordAprobacion || 'ASD123';
+    const password = config.passwordAprobacion;
+    if (!password) {
+      console.warn('⚠️ Password de aprobación no configurado. Configúralo en Configuración > Sistema.');
+    }
+    return password || null;
   } catch (error) {
     console.error('❌ Error obteniendo contraseña:', error);
-    return 'ASD123';
+    return null;
   }
 }
 

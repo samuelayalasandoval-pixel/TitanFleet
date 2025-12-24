@@ -5292,7 +5292,13 @@ async function _aprobarSolicitud(id) {
   }
 
   // Obtener contraseña configurada
-  const correctPassword = window.getPasswordAprobacion ? window.getPasswordAprobacion() : 'ASD123';
+  const correctPassword = window.getPasswordAprobacion ? window.getPasswordAprobacion() : null;
+  
+  if (!correctPassword) {
+    alert('Error: Contraseña de aprobación no configurada. Por favor, configúrala en Configuración > Sistema.');
+    console.error('❌ Password de aprobación no configurado');
+    return;
+  }
 
   const pass = prompt('Ingrese contraseña de aprobación:');
   if (pass !== correctPassword) {
@@ -5711,7 +5717,13 @@ async function _aprobarSolicitudesSeleccionadas() {
   }
 
   // Obtener contraseña configurada
-  const correctPassword = window.getPasswordAprobacion ? window.getPasswordAprobacion() : 'ASD123';
+  const correctPassword = window.getPasswordAprobacion ? window.getPasswordAprobacion() : null;
+  
+  if (!correctPassword) {
+    alert('Error: Contraseña de aprobación no configurada. Por favor, configúrala en Configuración > Sistema.');
+    console.error('❌ Password de aprobación no configurado');
+    return;
+  }
 
   const pass = prompt(
     `Ingrese contraseña de aprobación para ${seleccionadas.length} solicitud(es):`
