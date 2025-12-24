@@ -1,0 +1,140 @@
+/**
+ * Estilos para Searchable Select (Lista Desplegable con Búsqueda)
+ * Componente reutilizable para formularios
+ */
+
+/* Contenedor principal */
+.searchable-select-container {
+    position: relative;
+}
+
+/* Wrapper del input de búsqueda */
+.search-input-wrapper {
+    position: relative;
+}
+
+.search-input-wrapper input {
+    padding-right: 90px;
+}
+
+/* Icono de búsqueda */
+.search-input-wrapper .search-icon {
+    position: absolute;
+    right: 50px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6c757d;
+    pointer-events: none;
+}
+
+/* Botón de limpiar (X) */
+.btn-clear {
+    position: absolute !important;
+    right: 8px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    padding: 0 !important;
+    font-size: 0.875rem;
+    width: 32px !important;
+    height: 32px !important;
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    z-index: 10;
+    border: 1px solid #adb5bd !important;
+    color: #6c757d;
+    background-color: transparent !important;
+    margin: 0 !important;
+    line-height: 1 !important;
+    vertical-align: middle;
+    box-sizing: border-box !important;
+}
+
+.btn-clear:hover {
+    border-color: #868e96 !important;
+    color: #495057 !important;
+    background-color: #f8f9fa !important;
+    transform: translateY(-50%) !important;
+    top: 50% !important;
+    border: 1px solid #868e96 !important;
+}
+
+.btn-clear:focus {
+    border-color: #868e96 !important;
+    color: #495057 !important;
+    box-shadow: 0 0 0 0.2rem rgba(173, 181, 189, 0.25) !important;
+    transform: translateY(-50%) !important;
+    top: 50% !important;
+    border: 1px solid #868e96 !important;
+    outline: none !important;
+}
+
+.btn-clear:active {
+    transform: translateY(-50%) !important;
+    top: 50% !important;
+    border: 1px solid #868e96 !important;
+}
+
+/* Lista desplegable de opciones */
+.filtered-select {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 1055 !important;
+    background: white;
+    border: 1px solid #ced4da;
+    border-radius: 0.375rem;
+    border-top: none;
+    max-height: 300px;
+    overflow-y: auto;
+    display: none;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    margin-top: 2px;
+}
+
+/* Cuando está en el body (position: fixed) - z-index más alto que modales de Bootstrap */
+body > .filtered-select {
+    z-index: 1060 !important;
+}
+
+.filtered-select.show {
+    display: block;
+}
+
+/* Opciones individuales */
+.filtered-select .option-item {
+    padding: 10px 15px;
+    cursor: pointer;
+    border-bottom: 1px solid #f0f0f0;
+    transition: background-color 0.2s;
+}
+
+.filtered-select .option-item:hover,
+.filtered-select .option-item.highlighted {
+    background-color: #e7f3ff;
+}
+
+.filtered-select .option-item:last-child {
+    border-bottom: none;
+}
+
+/* Mensaje cuando no hay resultados */
+.filtered-select .no-results {
+    padding: 15px;
+    text-align: center;
+    color: #6c757d;
+    font-style: italic;
+}
+
+/* Display del valor seleccionado (opcional) */
+.selected-value-display {
+    margin-top: 10px;
+    padding: 10px;
+    background-color: #e7f3ff;
+    border-radius: 0.375rem;
+    border-left: 4px solid #007bff;
+}
+
+

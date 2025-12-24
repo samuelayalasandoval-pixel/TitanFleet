@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="../assets/img/Logo TF.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/img/Logo TF.png">
+  <link rel="icon" type="image/png" sizes="64x64" href="../assets/img/Logo TF.png">
+  <title>Inventario</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="../styles/styles.css">
+  <link rel="stylesheet" href="../styles/inventario.css">
+  <link rel="stylesheet" href="../styles/backend-indicator.css">
+  
+  <!-- Bootstrap JavaScript (requerido para modales) - SIN defer para que cargue inmediatamente -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Verificar que Bootstrap se cargó correctamente
+    if (typeof bootstrap === 'undefined') {
+      console.error('❌ Bootstrap no se cargó correctamente');
+    } else {
+      console.log('✅ Bootstrap cargado correctamente');
+    }
+  </script>
+  
+  <!-- CRÍTICO: Ocultar elementos del sidebar INMEDIATAMENTE para evitar parpadeo -->
+  <style>
+    /* Ocultar todos los módulos del sidebar inicialmente (solo dentro del sidebar) */
+    .sidebar .nav-item:not(#nav-menu),
+    .sidebar-nav .nav-item:not(#nav-menu) {
+      display: none !important;
+      visibility: hidden !important;
+      opacity: 0 !important;
+      height: 0 !important;
+      overflow: hidden !important;
+    }
+    /* Permitir que auth.js muestre los elementos con permisos */
+    .sidebar .nav-item.permission-granted,
+    .sidebar-nav .nav-item.permission-granted {
+      display: list-item !important;
+      visibility: visible !important;
+      opacity: 1 !important;
+      height: auto !important;
+      overflow: visible !important;
+    }
+  </style>
+  
+  <!-- Performance Optimizations y Loaders Comunes -->
+  <script src="../assets/scripts/performance/performance-init.js" defer></script>
+  
+  <!-- CRÍTICO: auth.js DEBE cargarse ANTES de common-head-loader.js -->
+  <!-- para que los permisos se apliquen antes de que se oculten elementos -->
+  <script src="../assets/scripts/auth.js"></script>
+  
+  <!-- Ahora cargar common-head-loader.js que esperará a que auth.js esté listo -->
+  <script src="../assets/scripts/performance/common-head-loader.js"></script>
+  <script src="../assets/scripts/script-loader.js" defer></script>
+  
+  <!-- Scripts críticos específicos de la página -->
+  <!-- Script crítico: Restaurar estado del sidebar ANTES de renderizar para evitar parpadeo -->
+  <script src="../assets/scripts/menu/sidebar-state.js"></script>
+  <!-- Script para actualizar período automáticamente -->
+  <script src="../assets/scripts/periodo.js"></script>
+  <!-- Handler del sidebar para inventario -->
+  <script src="../assets/scripts/inventario/sidebar-handler.js"></script>
+  
+  <!-- ===== FASE 3: Scripts Base del Sistema (SIN defer) ===== -->
+  <!-- CRÍTICO: main.js debe cargarse SIN defer para que funciones base estén disponibles -->
+  <script src="../assets/scripts/main.js"></script>
+  <!-- CRÍTICO: cache-manager.js debe cargarse ANTES de otros scripts que usan caché -->
+  <script src="../assets/scripts/cache-manager.js"></script>
+  <!-- CRÍTICO: firebase-init.js debe cargarse PRIMERO para inicializar Firebase -->
+  <script type="module" src="../assets/scripts/firebase-init.js"></script>
+  <!-- CRÍTICO: firebase-ready.js debe cargarse DESPUÉS de firebase-init.js para verificar disponibilidad -->
+  <script src="../assets/scripts/firebase-ready.js"></script>
+  <!-- CRÍTICO: firebase-repo-base.js debe cargarse para que FirebaseRepoBase esté disponible -->
+  <script src="../assets/scripts/firebase-repo-base.js" defer></script>
+  <!-- CRÍTICO: firebase-repos.js debe cargarse DESPUÉS de firebase-repo-base.js para crear los repositorios -->
+  <script src="../assets/scripts/firebase-repos.js" defer></script>
+  
+  <!-- Sistema de limpieza automática de localStorage -->
+  <script src="../assets/scripts/localstorage-cleanup.js" defer></script>
+</head>
+
+<body>
+<!-- Sidebar -->
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="logo">
+        <img src="../assets/img/Logo TF.png" alt="TitanFleet" style="height: 50px; width: auto;">
+        <span class="logo-text">TitanFleet</span>
+      </div>
+      <button class="btn-close-sidebar" id="closeSidebar"><i class="fas fa-times"></i></button>
+    </div>
+    <nav class="sidebar-nav">
+      <ul class="nav-menu">
+        <li class="nav-item" id="nav-menu"><a href="menu.html" class="nav-link"><i class="fa-solid fa-house-chimney"></i><span>Menú</span></a></li>
+        <li class="nav-item" id="nav-logistica"><a href="logistica.html" class="nav-link"><i class="fas fa-truck"></i><span>Logística</span></a></li>
+        <li class="nav-item" id="nav-facturacion"><a href="facturacion.html" class="nav-link"><i class="fas fa-file-invoice"></i><span>Facturación</span></a></li>
+        <li class="nav-item" id="nav-trafico"><a href="trafico.html" class="nav-link"><i class="fas fa-route"></i><span>Tráfico</span></a></li>
+        <li class="nav-item"><a href="operadores.html" class="nav-link"><i class="fas fa-user"></i><span>Operadores</span></a></li>
+        <li class="nav-item" id="nav-diesel"><a href="diesel.html" class="nav-link"><i class="fa-solid fa-gas-pump"></i><span>Diesel</span></a></li>
+        <li class="nav-item" id="nav-mantenimiento"><a href="mantenimiento.html" class="nav-link"><i class="fa-solid fa-screwdriver-wrench"></i><span>Mantenimiento</span></a></li>
+        <li class="nav-item" id="nav-tesoreria"><a href="tesoreria.html" class="nav-link"><i class="fa-solid fa-money-bill"></i><span>Tesoreria</span></a></li>
+        <li class="nav-item" id="nav-cxc"><a href="CXC.html" class="nav-link"><i class="fas fa-hand-holding-usd"></i><span>Cuentas x Cobrar</span></a></li>
+        <li class="nav-item" id="nav-cxp"><a href="CXP.html" class="nav-link"><i class="fas fa-credit-card"></i><span>Cuentas x Pagar</span></a></li>
+        <li class="nav-item active" id="nav-inventario"><a href="inventario.html" class="nav-link"><i class="fa-solid fa-cart-flatbed"></i><span>Inventario</span></a></li>
+        <li class="nav-item" id="nav-configuracion"><a href="configuracion.html" class="nav-link"><i class="fa-solid fa-gears"></i><span>Configuración</span></a></li>
+        <li class="nav-item" id="nav-reportes"><a href="reportes.html" class="nav-link"><i class="fas fa-chart-line"></i><span>Reportes</span></a></li>
+      </ul>
+    </nav>
+  </div>
+
+<!-- Main Content -->
+  <div class="main-content" id="mainContent">
+<!-- Top Bar -->
+    <div class="top-bar">
+      <button class="btn-toggle-sidebar" id="toggleSidebar">
+        <i class="fas fa-bars"></i>
+      </button>
+               <div class="top-bar-content">
+           <div class="page-title-section">
+             <h1 class="page-title">
+               <i class="fa-solid fa-cart-flatbed"></i>
+               Inventario
+               <span id="backendReadyIndicator" class="backend-loading-indicator" style="display: none;">
+                 <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                 <span class="ms-2">Cargando datos...</span>
+               </span>
+               <span id="backendReadyBadge" class="backend-ready-badge" style="display: none;">
+                 <i class="fas fa-check-circle"></i>
+                 <span class="ms-2">Listo para trabajar</span>
+               </span>
+             </h1>
+             <div class="current-period">
+                        <small class="text-muted">Período: </small>
+                        <span class="period-info" id="currentPeriod"></span>
+                    </div>
+                    </div>
+                    <div class="user-info">
+           <div class="user-details">
+             <i class="fas fa-user-circle"></i>
+             <span id="currentUserName">Demo</span>
+           </div>
+           <div class="user-actions">
+             <button class="btn btn-outline-light btn-sm logout-btn" data-action="logout">
+               <i class="fas fa-sign-out-alt"></i> <span class="logout-text">Cerrar Sesión</span>
+             </button>
+           </div>
+         </div>
+         </div>
+    </div>
+
+<!-- Content Area -->
+    <div class="content-wrapper" style="padding: 8px;">
+      <div class="container-fluid">
+        <!-- Page Header -->
+        <div class="page-header">
+          <div class="row align-items-center">
+            <div class="col-md-8">
+              <h2 class="mb-2">
+                Control de Inventario
+              </h2>
+              <p class="text-muted mb-0">Gestión de stock y refacciones</p>
+            </div>
+            <div class="col-md-4 text-end">
+              <!-- Botones removidos según solicitud -->
+            </div>
+          </div>
+        </div>
+
+      <div class="row">
+        <div class="col-12">
+          <ul class="nav nav-tabs" id="invTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+              <button class="nav-link active" id="general-tab" data-bs-toggle="tab" data-bs-target="#general" type="button" role="tab">General</button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link" id="plataforma-tab" data-bs-toggle="tab" data-bs-target="#plataforma" type="button" role="tab">Plataforma</button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link" id="refacciones-tab" data-bs-toggle="tab" data-bs-target="#refacciones" type="button" role="tab">Refacciones</button>
+            </li>
+          </ul>
+
+          <div class="tab-content" id="invTabsContent">
+            <div class="tab-pane fade show active" id="general" role="tabpanel">
+              <div class="card mb-4">
+                <div class="card-header" style="background-color: #2e4154; color: #ffffff;">
+                  <h4 class="card-title mb-0" style="color: #ffffff;">
+                    <i class="fas fa-chart-bar" style="color: #ffffff;"></i> Vista General del Inventario
+                  </h4>
+                </div>
+                <div class="card-body">
+              <!-- KPIs por Estancia -->
+              <div class="row mb-4">
+                <div class="col-md-3">
+                  <div class="card">
+                    <div class="card-body text-center">
+                      <i class="fas fa-warehouse fa-2x text-primary mb-2"></i>
+                      <h6 class="text-muted">Total Plataformas</h6>
+                      <h3 class="mb-0" id="kpiTotalPlataformas">0</h3>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <div class="card">
+                    <div class="card-body text-center">
+                      <i class="fas fa-check-circle fa-2x text-success mb-2"></i>
+                      <h6 class="text-muted">Vacías</h6>
+                      <h3 class="mb-0" id="kpiVacias">0</h3>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <div class="card">
+                    <div class="card-body text-center">
+                      <i class="fas fa-box fa-2x text-warning mb-2"></i>
+                      <h6 class="text-muted">Cargadas</h6>
+                      <h3 class="mb-0" id="kpiCargadas">0</h3>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <div class="card">
+                    <div class="card-body text-center">
+                      <i class="fas fa-wrench fa-2x text-warning mb-2"></i>
+                      <h6 class="text-muted">En Mantenimiento</h6>
+                      <h3 class="mb-0" id="kpiMantenimiento">0</h3>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Panel de Alertas: Stock Bajo de Refacciones -->
+              <div class="card mt-3 border-danger">
+                <div class="card-header bg-danger text-white d-flex justify-content-between align-items-center">
+                  <h5 class="mb-0">
+                    <i class="fas fa-exclamation-triangle"></i> Alertas de Stock Bajo - Refacciones
+                    <span class="badge bg-light text-dark ms-2" id="badgeStockBajo">0</span>
+                  </h5>
+                  <button type="button" class="btn btn-outline-light btn-sm exportar-btn-header" data-action="exportarAlertasStockBajoExcel" title="Exportar a Excel">
+                    <i class="fas fa-file-excel"></i> Exportar
+                  </button>
+                </div>
+                <div class="card-body">
+                  <div id="alertasStockBajo">
+                    <p class="text-muted"><i class="fas fa-info-circle"></i> Cargando alertas de stock bajo...</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Panel de Alertas: Plataformas Cargadas -->
+              <div class="card mt-3 border-warning">
+                <div class="card-header bg-warning text-dark d-flex justify-content-between align-items-center">
+                  <h5 class="mb-0">
+                    <i class="fas fa-exclamation-triangle"></i> Plataformas Esperando Descarga
+                    <span class="badge bg-danger ms-2" id="badgePlataformasCargadas">0</span>
+                  </h5>
+                  <button type="button" class="btn btn-outline-light btn-sm exportar-btn-header" data-action="exportarPlataformasDescargaExcel" title="Exportar a Excel">
+                    <i class="fas fa-file-excel"></i> Exportar
+                  </button>
+                </div>
+                <div class="card-body">
+                  <!-- Filtros -->
+                  <div class="row g-2 mb-3">
+                    <div class="col-md-3">
+                      <label for="filtroRegistroDescarga" class="form-label small">Registro</label>
+                      <input type="text" class="form-control form-control-sm" id="filtroRegistroDescarga" placeholder="Buscar por registro..." data-action="aplicarFiltrosPlataformasDescarga">
+                    </div>
+                    <div class="col-md-3">
+                      <label for="filtroPlataformaDescarga" class="form-label small">Plataforma</label>
+                      <input type="text" class="form-control form-control-sm" id="filtroPlataformaDescarga" placeholder="Buscar por plataforma..." data-action="aplicarFiltrosPlataformasDescarga">
+                    </div>
+                    <div class="col-md-3">
+                      <label for="filtroEstanciaDescarga" class="form-label small">Estancia</label>
+                      <input type="text" class="form-control form-control-sm" id="filtroEstanciaDescarga" placeholder="Buscar por estancia..." data-action="aplicarFiltrosPlataformasDescarga">
+                    </div>
+                    <div class="col-md-3">
+                      <label for="filtroDiasDescarga" class="form-label small">Días Esperando</label>
+                      <select class="form-select form-select-sm" id="filtroDiasDescarga" data-action="aplicarFiltrosPlataformasDescarga">
+                        <option value="">Todos</option>
+                        <option value="0">Hoy</option>
+                        <option value="1">1 día</option>
+                        <option value="2">2 días</option>
+                        <option value="3+">3+ días</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div id="panelPlataformasCargadas">
+                  <p class="text-muted"><i class="fas fa-info-circle"></i> Las plataformas cargadas aparecerán aquí...</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Filtros y Vista por Estancia -->
+              <div class="card mt-3">
+                <div class="card-header" style="background-color: #2e4154; color: #ffffff;">
+                  <div class="row align-items-center">
+                    <div class="col-md-6">
+                      <h5 class="mb-0" style="color: #ffffff;"><i class="fas fa-warehouse" style="color: #ffffff;"></i> Inventario de Plataformas por Estancia</h5>
+                    </div>
+                    <div class="col-md-6 text-end">
+                      <button class="btn btn-sm btn-outline-light exportar-btn-header" data-action="exportarInventarioPlataformasExcel" title="Exportar a Excel">
+                        <i class="fas fa-file-excel"></i> Exportar
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <div class="card-body">
+                  <!-- Filtros -->
+                  <div class="row g-3 mb-3">
+                    <div class="col-md-4">
+                      <label for="filtroEstanciaInventario" class="form-label">Filtrar por Estancia</label>
+                      <select class="form-select" id="filtroEstanciaInventario" data-action="actualizarTablaInventario">
+                        <option value="">-- Todas las Estancias --</option>
+                      </select>
+                    </div>
+                    <div class="col-md-4">
+                      <label for="filtroEstadoPlataforma" class="form-label">Filtrar por Estado</label>
+                      <select class="form-select" id="filtroEstadoPlataforma" data-action="actualizarTablaInventario">
+                        <option value="">-- Todos los Estados --</option>
+                        <option value="vacio">Vacío</option>
+                        <option value="cargado">Cargado</option>
+                        <option value="mantenimiento">Mantenimiento</option>
+                      </select>
+                    </div>
+                    <div class="col-md-4">
+                      <label for="buscarPlataforma" class="form-label">Buscar Plataforma</label>
+                      <input type="text" class="form-control" id="buscarPlataforma" placeholder="Número o placas..." data-action="actualizarTablaInventario">
+                    </div>
+                  </div>
+
+                  <!-- Tabla de Plataformas -->
+                  <div class="table-responsive">
+                    <table class="table table-hover">
+                      <thead class="table-dark">
+                        <tr>
+                          <th>Plataforma</th>
+                          <th>Placas</th>
+                          <th>Estancia Actual</th>
+                          <th>Estado</th>
+                          <th>Último Movimiento</th>
+                          <th>Fecha Movimiento</th>
+                          <th>Acciones</th>
+                        </tr>
+                      </thead>
+                      <tbody id="tbodyInventarioPlataformas">
+                        <tr>
+                          <td colspan="7" class="text-center text-muted">
+                            <i class="fas fa-info-circle"></i> Cargando inventario...
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Modal para Transferir Plataforma -->
+              <div class="modal fade" id="modalTransferirPlataforma" tabindex="-1" aria-labelledby="modalTransferirPlataformaLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                  <div class="modal-content">
+                    <div class="modal-header" style="background-color: #2e4154; color: #ffffff;">
+                      <h5 class="modal-title" id="modalTransferirPlataformaLabel" style="color: #ffffff;">
+                        <i class="fas fa-exchange-alt"></i> Transferir Plataforma
+                      </h5>
+                      <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                      <div class="mb-3">
+                        <label class="form-label"><strong>Plataforma:</strong></label>
+                        <p class="form-control-plaintext" id="modalPlataformaNumero">-</p>
+                      </div>
+                      <div class="mb-3">
+                        <label class="form-label"><strong>Placas:</strong></label>
+                        <p class="form-control-plaintext" id="modalPlataformaPlacas">-</p>
+                      </div>
+                      <div class="mb-3">
+                        <label class="form-label"><strong>Estancia Actual:</strong></label>
+                        <p class="form-control-plaintext" id="modalPlataformaEstanciaActual">-</p>
+                      </div>
+                      <div class="mb-3">
+                        <label for="modalNuevaEstancia" class="form-label"><strong>Nueva Estancia:</strong></label>
+                        <select class="form-select" id="modalNuevaEstancia" required>
+                          <option value="">-- Seleccione una estancia --</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                      <button type="button" class="btn btn-primary" data-action="confirmarTransferenciaPlataforma">
+                        <i class="fas fa-check"></i> Confirmar Transferencia
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="card mt-3">
+                <div class="card-header" style="background-color: #2e4154; color: #ffffff;">
+                  <h5 class="mb-0" style="color: #ffffff;"><i class="fas fa-chart-line" style="color: #ffffff;"></i> Refacciones con Mayor Rotación</h5>
+                </div>
+                <div class="card-body">
+                  <div class="table-responsive">
+                    <table class="table table-hover">
+                      <thead>
+                        <tr>
+                          <th>#</th>
+                          <th>Código</th>
+                          <th>Descripción</th>
+                          <th>Movimientos</th>
+                          <th>Stock</th>
+                          <th>Último Movimiento</th>
+                        </tr>
+                      </thead>
+                      <tbody id="tbodyGenTopRotacion"></tbody>
+                    </table>
+                  </div>
+                </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="tab-pane fade" id="plataforma" role="tabpanel">
+              <div class="card mb-4">
+                <div class="card-header" style="background-color: #2e4154; color: #ffffff;">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <h4 class="card-title mb-0" style="color: #ffffff;">
+                      <i class="fas fa-truck" style="color: #ffffff;"></i> Gestión de Plataformas
+                    </h4>
+                    <button type="button" class="btn btn-outline-light btn-sm exportar-btn-header" data-action="exportarPlataformasGestiónExcel" title="Exportar a Excel">
+                      <i class="fas fa-file-excel"></i> Exportar
+                    </button>
+                  </div>
+                </div>
+                <div class="card-body">
+                  <div class="filter-section mb-3">
+                    <div class="row g-2">
+                      <div class="col-md-2">
+                        <label class="form-label">Plataforma</label>
+                        <input type="text" id="fltPlataforma" class="form-control" placeholder="Buscar por plataforma..." data-action="aplicarFiltrosInventario">
+                      </div>
+                      <div class="col-md-2">
+                        <label class="form-label">Placas Plataforma</label>
+                        <input type="text" id="fltPlacas" class="form-control" placeholder="Buscar por placas..." data-action="aplicarFiltrosInventario">
+                      </div>
+                      <div class="col-md-2">
+                        <label class="form-label">Tipo Plataforma</label>
+                        <select id="fltTipo" class="form-select" data-action="aplicarFiltrosInventario">
+                          <option value="">Todas</option>
+                          <option value="48ft">48 ft</option>
+                          <option value="53ft">53 ft</option>
+                          <option value="extendible">Extendible</option>
+                          <option value="step-deck">Step-Deck</option>
+                          <option value="lowboy">Lowboy</option>
+                        </select>
+                      </div>
+                      <div class="col-md-2">
+                        <label class="form-label">Ubicación Actual</label>
+                        <select id="fltUbicacion" class="form-select" data-action="aplicarFiltrosInventario">
+                          <option value="">Todas</option>
+                        </select>
+                      </div>
+                      <div class="col-md-2 d-flex align-items-end">
+                        <button class="btn btn-outline-primary w-100" data-action="aplicarFiltrosInventario"><i class="fas fa-search"></i></button>
+                      </div>
+                    </div>
+                  </div>
+
+
+                  <div class="table-responsive">
+                    <table class="table table-hover">
+                      <thead>
+                        <tr>
+                          <th>Plataforma</th>
+                          <th>Placas</th>
+                          <th>Tipo</th>
+                          <th>Último Origen</th>
+                          <th>Último Destino</th>
+                          <th>Ubicación Actual</th>
+                          <th>Último Movimiento</th>
+                          <th>Acciones</th>
+                        </tr>
+                      </thead>
+                      <tbody id="tbodyPlataformas"></tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Modal para Historial de Estancias -->
+              <div class="modal fade" id="modalHistorialEstancias" tabindex="-1" aria-labelledby="modalHistorialEstanciasLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                  <div class="modal-content">
+                    <div class="modal-header" style="background-color: #2e4154; color: #ffffff;">
+                      <h5 class="modal-title" id="modalHistorialEstanciasLabel" style="color: #ffffff;">
+                        <i class="fas fa-history"></i> Historial de Estancias
+                      </h5>
+                      <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                      <div class="mb-3">
+                        <p class="mb-1"><strong>Plataforma:</strong> <span id="historialPlataformaNombre">-</span></p>
+                        <p class="mb-0"><strong>Placas:</strong> <span id="historialPlataformaPlacas">-</span></p>
+                      </div>
+                      <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
+                        <table class="table table-hover table-sm">
+                          <thead class="table-dark">
+                            <tr>
+                              <th>Fecha</th>
+                              <th>Origen</th>
+                              <th>Destino</th>
+                              <th>Estado</th>
+                              <th>Registro</th>
+                            </tr>
+                          </thead>
+                          <tbody id="tbodyHistorialEstancias">
+                            <tr>
+                              <td colspan="5" class="text-center text-muted">
+                                <i class="fas fa-spinner fa-spin"></i> Cargando historial...
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="tab-pane fade" id="refacciones" role="tabpanel">
+              <div class="card mb-4">
+                <div class="card-header" style="background-color: #2e4154; color: #ffffff;">
+                  <h4 class="card-title mb-0" style="color: #ffffff;">
+                    <i class="fas fa-cog" style="color: #ffffff;"></i> Gestión de Refacciones
+                  </h4>
+                </div>
+                <div class="card-body">
+
+                  <!-- Registrar Movimiento - Parte Superior (Ancho Completo) -->
+                  <div class="row g-3 mb-4">
+                    <div class="col-12">
+                      <div class="card shadow-sm">
+                        <div class="card-header bg-primary text-white d-flex align-items-center">
+                          <i class="fas fa-box-open me-2"></i>
+                          <h5 class="mb-0">Registrar Movimiento de Refacciones</h5>
+                        </div>
+                        <div class="card-body">
+                          <!-- Información Básica del Producto -->
+                          <div class="mb-4">
+                            <h6 class="text-primary border-bottom pb-2 mb-3">
+                              Información del Producto
+                            </h6>
+                            <div class="row g-3">
+                              <div class="col-md-3">
+                                <label class="form-label fw-bold">
+                                  Código <span class="text-danger"></span>
+                                </label>
+                                <input type="text" id="ref_cod" class="form-control" placeholder="Ej. FIL-001" required>
+                                <small class="form-text text-muted">Código único del producto</small>
+                              </div>
+                              <div class="col-md-5">
+                                <label class="form-label fw-bold">
+                                  Descripción <span class="text-danger"></span>
+                                </label>
+                                <input type="text" id="ref_desc" class="form-control" placeholder="Ej. Filtro de aceite" required>
+                                <small class="form-text text-muted">Descripción detallada del producto</small>
+                              </div>
+                              <div class="col-md-2">
+                                <label class="form-label fw-bold">
+                                  Stock Mínimo <span class="text-danger"></span>
+                                </label>
+                                <input type="number" id="ref_stock_minimo" class="form-control" min="0" step="1" placeholder="0" required>
+                                <small class="form-text text-muted">Cantidad mínima de stock</small>
+                              </div>
+                              <div class="col-md-2">
+                                <label class="form-label fw-bold">
+                                  Unidad <span class="text-danger"></span>
+                                </label>
+                                <select id="ref_unidad" class="form-select" required>
+                                  <option value="piezas">Piezas</option>
+                                  <option value="pares">Pares</option>
+                                  <option value="litros">Litros</option>
+                                  <option value="paquete">Paquete</option>
+                                  <option value="caja">Caja</option>
+                                  <option value="otro">Otro</option>
+                                </select>
+                              </div>
+                            </div>
+                          </div>
+
+                          <!-- Información del Movimiento -->
+                          <div class="mb-4">
+                            <h6 class="text-primary border-bottom pb-2 mb-3">
+                              Detalles del Movimiento
+                            </h6>
+                            <div class="row g-3">
+                              <div class="col-md-2">
+                                <label class="form-label fw-bold">
+                                  Movimiento <span class="text-danger"></span>
+                                </label>
+                                <select id="ref_tipo" class="form-select" required>
+                                  <option value="entrada">Entrada</option>
+                                  <option value="salida">Salida</option>
+                                </select>
+                              </div>
+                              <div class="col-md-2">
+                                <label class="form-label fw-bold">
+                                  Cantidad <span class="text-danger"></span>
+                                </label>
+                                <input type="number" id="ref_cant" class="form-control" min="0" step="1" placeholder="0" required>
+                                <small class="form-text text-muted">Cantidad a registrar</small>
+                              </div>
+                              <div class="col-md-2">
+                                <label class="form-label fw-bold">
+                                  Fecha
+                                </label>
+                                <input type="date" id="ref_fecha" class="form-control">
+                                <small class="form-text text-muted">Fecha del movimiento</small>
+                              </div>
+                              <div class="col-md-3">
+                                <label class="form-label fw-bold">
+                                  Almacén
+                                </label>
+                                <div class="input-group">
+                                  <select id="ref_almacen" class="form-select">
+                                    <option value="">Seleccione almacén...</option>
+                                  </select>
+                                  <button class="btn btn-outline-secondary" type="button" data-action="refreshAlmacenes" title="Actualizar lista">
+                                    <i class="fas fa-sync-alt"></i>
+                                  </button>
+                                </div>
+                              </div>
+                              <div class="col-md-3">
+                                <label class="form-label fw-bold">
+                                  Proveedor
+                                </label>
+                                <div class="input-group">
+                                  <select id="ref_proveedor" class="form-select">
+                                    <option value="">Seleccione proveedor...</option>
+                                  </select>
+                                  <button class="btn btn-outline-secondary" type="button" data-action="refreshProveedores" title="Actualizar lista">
+                                    <i class="fas fa-sync-alt"></i>
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          <!-- Información Adicional -->
+                          <div class="mb-4">
+                            <h6 class="text-primary border-bottom pb-2 mb-3">
+                              Información Adicional
+                            </h6>
+                            <div class="row g-3">
+                              <div class="col-md-4">
+                                <label class="form-label fw-bold">
+                                  Número de Factura
+                                </label>
+                                <input type="text" id="ref_factura" class="form-control" placeholder="Número de factura">
+                              </div>
+                              <div class="col-md-8">
+                                <label class="form-label fw-bold">
+                                  Observaciones
+                                </label>
+                                <textarea id="ref_obs" class="form-control" rows="3" placeholder="Notas adicionales sobre el movimiento..."></textarea>
+                              </div>
+                            </div>
+                          </div>
+
+                          <!-- Botón de Guardar -->
+                          <div class="row">
+                            <div class="col-12">
+                              <div class="d-flex justify-content-end gap-2">
+                                <button class="btn" style="background-color: #2c3f52; border-color: #2c3f52; color: #ffffff;" id="btnGuardarMovimiento" data-action="registrarMovimiento">
+                                  <i class="fas fa-save"></i> Guardar Movimiento
+                                </button>
+                              </div>
+
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Filtros Unificados para Existencias y Movimientos -->
+                  <div class="row g-3 mb-3">
+                    <div class="col-12">
+                      <div class="card">
+                        <div class="card-header" style="background-color: #2e4154; color: #ffffff;">
+                          <i class="fas fa-filter"></i> Filtros (Aplican a Existencias y Movimientos)
+                        </div>
+                        <div class="card-body">
+                          <div class="row g-2">
+                            <div class="col-md-3">
+                              <label class="form-label small">Filtrar por Código</label>
+                              <input type="text" id="ref_filtroCodigo" class="form-control form-control-sm" placeholder="Código..." data-action="aplicarFiltrosRefacciones">
+                            </div>
+                            <div class="col-md-3">
+                              <label class="form-label small">Filtrar por Descripción</label>
+                              <input type="text" id="ref_filtroDesc" class="form-control form-control-sm" placeholder="Descripción..." data-action="aplicarFiltrosRefacciones">
+                            </div>
+                            <div class="col-md-2">
+                              <label class="form-label small">Filtrar por Tipo</label>
+                              <select id="ref_filtroTipo" class="form-select form-select-sm" data-action="aplicarFiltrosRefacciones">
+                                <option value="">Todos</option>
+                                <option value="entrada">Entrada</option>
+                                <option value="salida">Salida</option>
+                              </select>
+                            </div>
+                            <div class="col-md-2">
+                              <label class="form-label small">Filtrar por Fecha</label>
+                              <input type="date" id="ref_filtroFecha" class="form-control form-control-sm" data-action="aplicarFiltrosRefacciones">
+                            </div>
+                            <div class="col-md-2 d-flex align-items-end">
+                              <button class="btn btn-sm btn-outline-secondary w-100" data-action="limpiarFiltrosUnificados">
+                                <i class="fas fa-times"></i> Limpiar
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Existencias y Movimientos - Parte Inferior (Mitad cada uno) -->
+                  <div class="row g-3">
+                    <!-- Existencias - Parte Izquierda -->
+                    <div class="col-md-6">
+                      <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                          <span><i class="fas fa-warehouse"></i> Existencias</span>
+                          <button class="btn btn-outline-light btn-sm exportar-btn-header" data-action="exportarRefaccionesMovimientosExcel" title="Exportar a Excel">
+                            <i class="fas fa-file-excel"></i> Exportar
+                          </button>
+                        </div>
+                        <div class="card-body">
+                          <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
+                            <table class="table table-hover">
+                              <thead>
+                                <tr>
+                                  <th>Código</th>
+                                  <th>Descripción</th>
+                                  <th>Stock</th>
+                                  <th>Stock Mínimo</th>
+                                  <th>Últ. Mov.</th>
+                                  <th>Acciones</th>
+                                </tr>
+                              </thead>
+                              <tbody id="tbodyRefaccionesStock"></tbody>
+                            </table>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Movimientos - Parte Derecha -->
+                    <div class="col-md-6">
+                      <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                          <span><i class="fas fa-list"></i> Movimientos</span>
+                          <button class="btn btn-outline-light btn-sm exportar-btn-header" data-action="exportarMovimientosRefaccionesExcel" title="Exportar a Excel">
+                            <i class="fas fa-file-excel"></i> Exportar
+                          </button>
+                        </div>
+                        <div class="card-body">
+                          <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
+                            <table class="table table-sm table-striped">
+                              <thead>
+                                <tr>
+                                  <th>Fecha</th>
+                                  <th>Tipo</th>
+                                  <th>Código</th>
+                                  <th>Descripción</th>
+                                  <th>Cantidad</th>
+                                  <th>Unidad</th>
+                                  <th>Observaciones</th>
+                                  <th>Acciones</th>
+                                </tr>
+                              </thead>
+                              <tbody id="tbodyRefaccionesMovs"></tbody>
+                            </table>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+
+  <!-- ===== SCRIPTS COMUNES Y MÓDULOS (Carga automática) ===== -->
+  <script src="../assets/scripts/performance/common-head-loader.js"></script>
+  <script src="../assets/scripts/performance/common-scripts-loader.js"></script>
+  <script src="../assets/scripts/performance/page-modules-config.js"></script>
+  <script src="../assets/scripts/performance/page-modules-loader.js"></script>
+  <script src="../assets/scripts/paginacion.js" defer></script>
+  <script src="../assets/scripts/inventario.js" defer></script>
+  <!-- Script para indicador de carga del backend (compartido) -->
+  <script src="../assets/scripts/backend-ready-indicator.js"></script>
+</body>
+</html>
+
+

@@ -1,0 +1,1172 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/png" sizes="16x16" href="../assets/img/Logo TF.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="../assets/img/Logo TF.png" />
+    <link rel="icon" type="image/png" sizes="64x64" href="../assets/img/Logo TF.png" />
+    <title>Operadores</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../styles/styles.css" />
+    <link rel="stylesheet" href="../assets/styles/operadores.css" />
+    <link rel="stylesheet" href="../styles/backend-indicator.css" />
+    <!-- Estilos para el componente searchable-select -->
+    <link rel="stylesheet" href="../assets/styles/searchable-select.css" />
+
+    <!-- Bootstrap JavaScript (requerido para modales) - SIN defer para que cargue inmediatamente -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      // Verificar que Bootstrap se cargó correctamente
+      if (typeof bootstrap === 'undefined') {
+        console.error('❌ Bootstrap no se cargó correctamente');
+      } else {
+        console.log('✅ Bootstrap cargado correctamente');
+      }
+    </script>
+
+    <!-- CRÍTICO: Ocultar elementos del sidebar INMEDIATAMENTE para evitar parpadeo -->
+    <style>
+      /* Ocultar todos los módulos del sidebar inicialmente (solo dentro del sidebar) */
+      .sidebar .nav-item:not(#nav-menu),
+      .sidebar-nav .nav-item:not(#nav-menu) {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        height: 0 !important;
+        overflow: hidden !important;
+      }
+      /* Permitir que auth.js muestre los elementos con permisos */
+      .sidebar .nav-item.permission-granted,
+      .sidebar-nav .nav-item.permission-granted {
+        display: list-item !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        height: auto !important;
+        overflow: visible !important;
+      }
+    </style>
+
+    <!-- Performance Optimizations y Loaders Comunes -->
+    <script src="../assets/scripts/performance/performance-init.js" defer></script>
+
+    <!-- CRÍTICO: auth.js DEBE cargarse ANTES de common-head-loader.js -->
+    <!-- para que los permisos se apliquen antes de que se oculten elementos -->
+    <script src="../assets/scripts/auth.js"></script>
+
+    <!-- Ahora cargar common-head-loader.js que esperará a que auth.js esté listo -->
+    <script src="../assets/scripts/performance/common-head-loader.js"></script>
+    <script src="../assets/scripts/script-loader.js" defer></script>
+
+    <!-- Scripts críticos específicos de la página -->
+    <!-- Script crítico: Restaurar estado del sidebar ANTES de renderizar para evitar parpadeo -->
+    <script src="../assets/scripts/menu/sidebar-state.js"></script>
+    <!-- Script para actualizar período automáticamente -->
+    <script src="../assets/scripts/periodo.js"></script>
+
+    <!-- ===== FASE 3: Scripts Base del Sistema (SIN defer) ===== -->
+    <!-- CRÍTICO: main.js debe cargarse SIN defer para que funciones base estén disponibles -->
+    <script src="../assets/scripts/main.js"></script>
+    <!-- CRÍTICO: cache-manager.js debe cargarse ANTES de otros scripts que usan caché -->
+    <script src="../assets/scripts/cache-manager.js"></script>
+    <!-- CRÍTICO: firebase-init.js debe cargarse PRIMERO para inicializar Firebase -->
+    <script type="module" src="../assets/scripts/firebase-init.js"></script>
+    <!-- CRÍTICO: firebase-ready.js debe cargarse DESPUÉS de firebase-init.js para verificar disponibilidad -->
+    <script src="../assets/scripts/firebase-ready.js"></script>
+    <!-- CRÍTICO: firebase-repo-base.js debe cargarse para que FirebaseRepoBase esté disponible -->
+    <script src="../assets/scripts/firebase-repo-base.js" defer></script>
+    <!-- CRÍTICO: firebase-repos.js debe cargarse DESPUÉS de firebase-repo-base.js para crear los repositorios -->
+    <script src="../assets/scripts/firebase-repos.js" defer></script>
+
+    <!-- Sistema de limpieza automática de localStorage -->
+    <script src="../assets/scripts/localstorage-cleanup.js" defer></script>
+  </head>
+  <body>
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="logo">
+          <img src="../assets/img/Logo TF.png" alt="TitanFleet" style="height: 50px; width: auto" />
+          <span class="logo-text">TitanFleet</span>
+        </div>
+        <button class="btn-close-sidebar" id="closeSidebar"><i class="fas fa-times"></i></button>
+      </div>
+      <nav class="sidebar-nav">
+        <ul class="nav-menu">
+          <li class="nav-item" id="nav-menu">
+            <a href="menu.html" class="nav-link"
+              ><i class="fa-solid fa-house-chimney"></i><span>Menú</span></a
+            >
+          </li>
+          <li class="nav-item" id="nav-logistica">
+            <a href="logistica.html" class="nav-link"
+              ><i class="fas fa-truck"></i><span>Logística</span></a
+            >
+          </li>
+          <li class="nav-item" id="nav-facturacion">
+            <a href="facturacion.html" class="nav-link"
+              ><i class="fas fa-file-invoice"></i><span>Facturación</span></a
+            >
+          </li>
+          <li class="nav-item" id="nav-trafico">
+            <a href="trafico.html" class="nav-link"
+              ><i class="fas fa-route"></i><span>Tráfico</span></a
+            >
+          </li>
+          <li class="nav-item active" id="nav-operadores">
+            <a href="operadores.html" class="nav-link"
+              ><i class="fas fa-user"></i><span>Operadores</span></a
+            >
+          </li>
+          <li class="nav-item" id="nav-diesel">
+            <a href="diesel.html" class="nav-link"
+              ><i class="fa-solid fa-gas-pump"></i><span>Diesel</span></a
+            >
+          </li>
+          <li class="nav-item" id="nav-mantenimiento">
+            <a href="mantenimiento.html" class="nav-link"
+              ><i class="fa-solid fa-screwdriver-wrench"></i><span>Mantenimiento</span></a
+            >
+          </li>
+          <li class="nav-item" id="nav-tesoreria">
+            <a href="tesoreria.html" class="nav-link"
+              ><i class="fa-solid fa-money-bill"></i><span>Tesoreria</span></a
+            >
+          </li>
+          <li class="nav-item" id="nav-cxc">
+            <a href="CXC.html" class="nav-link"
+              ><i class="fas fa-hand-holding-usd"></i><span>Cuentas x Cobrar</span></a
+            >
+          </li>
+          <li class="nav-item" id="nav-cxp">
+            <a href="CXP.html" class="nav-link"
+              ><i class="fas fa-credit-card"></i><span>Cuentas x Pagar</span></a
+            >
+          </li>
+          <li class="nav-item" id="nav-inventario">
+            <a href="inventario.html" class="nav-link"
+              ><i class="fa-solid fa-cart-flatbed"></i><span>Inventario</span></a
+            >
+          </li>
+          <li class="nav-item" id="nav-configuracion">
+            <a href="configuracion.html" class="nav-link"
+              ><i class="fa-solid fa-gears"></i><span>Configuración</span></a
+            >
+          </li>
+          <li class="nav-item" id="nav-reportes">
+            <a href="reportes.html" class="nav-link"
+              ><i class="fas fa-chart-line"></i><span>Reportes</span></a
+            >
+          </li>
+        </ul>
+      </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+      <!-- Top Bar -->
+      <div class="top-bar">
+        <button class="btn-toggle-sidebar" id="toggleSidebar">
+          <i class="fas fa-bars"></i>
+        </button>
+        <div class="top-bar-content">
+          <div class="page-title-section">
+            <h1 class="page-title">
+              <i class="fas fa-users"></i>
+              Control de Operadores
+              <span
+                id="backendReadyIndicator"
+                class="backend-loading-indicator"
+                style="display: none"
+              >
+                <span
+                  class="spinner-border spinner-border-sm"
+                  role="status"
+                  aria-hidden="true"
+                ></span>
+                <span class="ms-2">Cargando datos...</span>
+              </span>
+              <span id="backendReadyBadge" class="backend-ready-badge" style="display: none">
+                <i class="fas fa-check-circle"></i>
+                <span class="ms-2">Listo para trabajar</span>
+              </span>
+            </h1>
+            <div class="current-period">
+              <small class="text-muted">Período: </small>
+              <span class="period-info" id="currentPeriod"></span>
+            </div>
+          </div>
+          <div class="user-info">
+            <div class="user-details">
+              <i class="fas fa-user-circle"></i>
+              <span id="currentUserName">Usuario ERP</span>
+            </div>
+            <div class="user-actions">
+              <button class="btn btn-outline-light btn-sm logout-btn" data-action="logout">
+                <i class="fas fa-sign-out-alt"></i> <span class="logout-text">Cerrar Sesión</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Page Header -->
+      <div class="page-header">
+        <div class="row align-items-center">
+          <div class="col-md-8">
+            <h2 class="mb-2">Control de Operadores</h2>
+            <p class="text-muted mb-0">Gestión de gastos e incidencias</p>
+          </div>
+          <div class="col-md-4 text-end">
+            <!-- Botones removidos según solicitud -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Navigation Tabs -->
+      <ul class="nav nav-tabs" id="operadoresTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+          <button
+            class="nav-link active"
+            id="gastos-tab"
+            data-bs-toggle="tab"
+            data-bs-target="#gastos"
+            type="button"
+            role="tab"
+          >
+            <i class="fas fa-receipt"></i> Gastos de Operadores
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button
+            class="nav-link"
+            id="incidencias-tab"
+            data-bs-toggle="tab"
+            data-bs-target="#incidencias"
+            type="button"
+            role="tab"
+          >
+            <i class="fas fa-exclamation-triangle"></i> Incidencias
+          </button>
+        </li>
+      </ul>
+
+      <!-- Tab Content -->
+      <div class="tab-content" id="operadoresTabContent">
+        <!-- Gastos de Operadores Tab -->
+        <div class="tab-pane fade show active" id="gastos" role="tabpanel">
+          <!-- Formulario de Gastos -->
+          <div class="card mb-4">
+            <div class="card-header" style="background-color: #2e4154; color: #ffffff">
+              <h4 class="card-title mb-0" style="color: #ffffff">
+                <i class="fas fa-receipt" style="color: #ffffff"></i> Registrar Gasto de Operador
+              </h4>
+            </div>
+            <div class="card-body">
+              <form id="gastosForm" class="needs-validation" novalidate>
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <label for="numeroRegistroGasto" class="form-label">Número de Registro *</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="numeroRegistroGasto"
+                      required
+                      placeholder="Ej: 2500001"
+                      pattern="^250000[0-9]$"
+                      minlength="7"
+                      maxlength="7"
+                      onkeypress="return soloNumeros(event)"
+                      oninput="validarNumeroRegistro(this, 'numeroRegistroGasto')"
+                      onpaste="validarPasteNumeroRegistro(event, this)"
+                    />
+                    <div class="invalid-feedback">
+                      El número de registro debe tener exactamente 7 dígitos y comenzar con 250000
+                      seguido de un dígito (ej: 2500001)
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <label for="fechaGasto" class="form-label">Fecha *</label>
+                    <input type="date" class="form-control" id="fechaGasto" required />
+                  </div>
+                  <div class="col-md-6">
+                    <label for="operador" class="form-label">Operador *</label>
+                    <div class="searchable-select-container">
+                      <div class="search-input-wrapper">
+                        <input
+                          type="text"
+                          id="operador"
+                          class="form-control"
+                          placeholder="Escriba para buscar operador..."
+                          autocomplete="off"
+                          required
+                        />
+                        <i class="fas fa-search search-icon"></i>
+                        <button
+                          id="btn-clear-operador"
+                          class="btn btn-outline-secondary btn-sm btn-clear"
+                          type="button"
+                          title="Limpiar"
+                        >
+                          <i class="fas fa-times"></i>
+                        </button>
+                      </div>
+                      <div id="select-operador" class="filtered-select"></div>
+                    </div>
+                    <input type="hidden" id="operador_value" />
+                    <div class="invalid-feedback">Por favor seleccione un operador</div>
+                  </div>
+                  <div class="col-md-6">
+                    <label for="tractocamion" class="form-label">Tractocamión *</label>
+                    <div class="searchable-select-container">
+                      <div class="search-input-wrapper">
+                        <input
+                          type="text"
+                          id="tractocamion"
+                          class="form-control"
+                          placeholder="Escriba para buscar tractocamión..."
+                          autocomplete="off"
+                          required
+                        />
+                        <i class="fas fa-search search-icon"></i>
+                        <button
+                          id="btn-clear-tractocamion"
+                          class="btn btn-outline-secondary btn-sm btn-clear"
+                          type="button"
+                          title="Limpiar"
+                        >
+                          <i class="fas fa-times"></i>
+                        </button>
+                      </div>
+                      <div id="select-tractocamion" class="filtered-select"></div>
+                    </div>
+                    <input type="hidden" id="tractocamion_value" />
+                    <div class="invalid-feedback">Por favor seleccione un tractocamión</div>
+                  </div>
+                  <div class="col-md-6">
+                    <label for="tipoGasto" class="form-label">Tipo de Gasto *</label>
+                    <select class="form-select" id="tipoGasto" required>
+                      <option value="">Seleccionar tipo...</option>
+                      <option value="combustible">Combustible</option>
+                      <option value="alimentacion">Alimentación</option>
+                      <option value="hospedaje">Hospedaje</option>
+                      <option value="peaje">Peaje</option>
+                      <option value="mantenimiento">Mantenimiento</option>
+                      <option value="otros">Otros</option>
+                    </select>
+                  </div>
+                  <div class="col-md-6">
+                    <label for="montoGasto" class="form-label">Monto *</label>
+                    <div class="input-group">
+                      <span class="input-group-text">$</span>
+                      <input
+                        type="number"
+                        class="form-control"
+                        id="montoGasto"
+                        step="0.01"
+                        min="0"
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <label for="conceptoGasto" class="form-label">Concepto</label>
+                    <input type="text" class="form-control" id="conceptoGasto" />
+                  </div>
+                  <div class="col-12">
+                    <label for="evidenciaGasto" class="form-label">Evidencia (Archivos)</label>
+                    <input
+                      type="file"
+                      class="form-control"
+                      id="evidenciaGasto"
+                      multiple
+                      accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                    />
+                    <div class="form-text">
+                      Formatos permitidos: PDF, JPG, PNG, DOC, DOCX. Máximo 5 archivos.
+                    </div>
+                  </div>
+                  <div class="col-12">
+                    <label for="observacionesGasto" class="form-label">Observaciones</label>
+                    <textarea class="form-control" id="observacionesGasto" rows="3"></textarea>
+                  </div>
+                  <div class="col-12">
+                    <div class="form-actions">
+                      <button
+                        type="button"
+                        class="btn btn-outline-warning me-2"
+                        data-action="limpiarFormulario"
+                      >
+                        <i class="fas fa-times"></i> Limpiar
+                      </button>
+                      <button
+                        type="button"
+                        class="btn"
+                        style="background-color: #2c3f52; border-color: #2c3f52; color: #ffffff"
+                        data-action="guardarGasto"
+                      >
+                        <i class="fas fa-save"></i> Registrar Gasto
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <!-- Lista de Gastos -->
+          <div class="card">
+            <div
+              class="card-header d-flex justify-content-between align-items-center"
+              style="background-color: #2e4154; color: #ffffff"
+            >
+              <h5 class="mb-0" style="color: #ffffff">
+                <i class="fas fa-list" style="color: #ffffff"></i> Gastos Registrados
+              </h5>
+              <button
+                type="button"
+                class="btn btn-outline-light btn-sm exportar-btn-header"
+                data-action="exportarGastosExcel"
+              >
+                <i class="fas fa-file-excel"></i> Exportar
+              </button>
+            </div>
+
+            <!-- Filtros de Gastos -->
+            <div class="card-body border-bottom">
+              <div class="row g-3">
+                <div class="col-md-3">
+                  <label for="filtroOperadorGastos" class="form-label">Operador</label>
+                  <select class="form-select form-select-sm" id="filtroOperadorGastos">
+                    <option value="">Todos los operadores</option>
+                  </select>
+                </div>
+                <div class="col-md-3">
+                  <label for="filtroTractocamionGastos" class="form-label">Tractocamión</label>
+                  <select class="form-select form-select-sm" id="filtroTractocamionGastos">
+                    <option value="">Todos los tractocamiones</option>
+                  </select>
+                </div>
+                <div class="col-md-3">
+                  <label for="filtroTipoGastos" class="form-label">Tipo de Gasto</label>
+                  <select class="form-select form-select-sm" id="filtroTipoGastos">
+                    <option value="">Todos los tipos</option>
+                  </select>
+                </div>
+                <div class="col-md-3">
+                  <label for="filtroFechaGastos" class="form-label">Fecha</label>
+                  <div class="input-group">
+                    <input
+                      type="date"
+                      class="form-control form-control-sm"
+                      id="filtroFechaGastos"
+                    />
+                    <button
+                      class="btn btn-sm"
+                      data-action="aplicarFiltrosGastos"
+                      type="button"
+                      title="Aplicar Filtros"
+                      style="background-color: #2c3f52; border-color: #2c3f52; color: #ffffff"
+                    >
+                      <i class="fas fa-filter"></i>
+                    </button>
+                    <button
+                      class="btn btn-outline-secondary btn-sm"
+                      data-action="limpiarFiltrosGastos"
+                      type="button"
+                      title="Limpiar Filtros"
+                    >
+                      <i class="fas fa-times"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card-body">
+              <div class="table-responsive">
+                <table class="table table-hover" id="gastosTable">
+                  <thead>
+                    <tr>
+                      <th>Fecha</th>
+                      <th>N° Registro</th>
+                      <th>Operador</th>
+                      <th>Tractocamión</th>
+                      <th>Tipo</th>
+                      <th>Monto</th>
+                      <th>Evidencia</th>
+                      <th>Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody id="gastosTableBody">
+                    <tr>
+                      <td colspan="8" class="text-center text-muted">Sin registros</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div id="paginacionGastos"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Incidencias Tab -->
+        <div class="tab-pane fade" id="incidencias" role="tabpanel">
+          <!-- Formulario de Incidencias -->
+          <div class="card mb-4">
+            <div class="card-header" style="background-color: #2e4154; color: #ffffff">
+              <h4 class="card-title mb-0" style="color: #ffffff">
+                <i class="fas fa-exclamation-triangle" style="color: #ffffff"></i> Registrar
+                Incidencia
+              </h4>
+            </div>
+            <div class="card-body">
+              <form id="incidenciasForm" class="needs-validation" novalidate>
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <label for="numeroRegistroIncidencia" class="form-label"
+                      >Número de Registro *</label
+                    >
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="numeroRegistroIncidencia"
+                      required
+                      placeholder="Ej: 2500001"
+                      pattern="^[0-9]{7}$"
+                      minlength="7"
+                      maxlength="7"
+                      onkeypress="return soloNumeros(event)"
+                      oninput="validarNumeroRegistro(this, 'numeroRegistroIncidencia')"
+                      onpaste="validarPasteNumeroRegistro(event, this)"
+                    />
+                    <div class="invalid-feedback">
+                      El número de registro debe tener exactamente 7 dígitos numéricos
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <label for="fechaIncidencia" class="form-label">Fecha *</label>
+                    <input type="date" class="form-control" id="fechaIncidencia" required />
+                  </div>
+                  <div class="col-md-6">
+                    <label for="operadorIncidencia" class="form-label">Operador *</label>
+                    <div class="searchable-select-container">
+                      <div class="search-input-wrapper">
+                        <input
+                          type="text"
+                          id="operadorIncidencia"
+                          class="form-control"
+                          placeholder="Escriba para buscar operador..."
+                          autocomplete="off"
+                          required
+                        />
+                        <i class="fas fa-search search-icon"></i>
+                        <button
+                          id="btn-clear-operadorIncidencia"
+                          class="btn btn-outline-secondary btn-sm btn-clear"
+                          type="button"
+                          title="Limpiar"
+                        >
+                          <i class="fas fa-times"></i>
+                        </button>
+                      </div>
+                      <div id="select-operadorIncidencia" class="filtered-select"></div>
+                    </div>
+                    <input type="hidden" id="operadorIncidencia_value" />
+                    <div class="invalid-feedback">Por favor seleccione un operador</div>
+                  </div>
+                  <div class="col-md-6">
+                    <label for="tractocamionIncidencia" class="form-label">Tractocamión *</label>
+                    <div class="searchable-select-container">
+                      <div class="search-input-wrapper">
+                        <input
+                          type="text"
+                          id="tractocamionIncidencia"
+                          class="form-control"
+                          placeholder="Escriba para buscar tractocamión..."
+                          autocomplete="off"
+                          required
+                        />
+                        <i class="fas fa-search search-icon"></i>
+                        <button
+                          id="btn-clear-tractocamionIncidencia"
+                          class="btn btn-outline-secondary btn-sm btn-clear"
+                          type="button"
+                          title="Limpiar"
+                        >
+                          <i class="fas fa-times"></i>
+                        </button>
+                      </div>
+                      <div id="select-tractocamionIncidencia" class="filtered-select"></div>
+                    </div>
+                    <input type="hidden" id="tractocamionIncidencia_value" />
+                    <div class="invalid-feedback">Por favor seleccione un tractocamión</div>
+                  </div>
+                  <div class="col-md-6">
+                    <label for="tipoIncidencia" class="form-label">Tipo de Incidencia *</label>
+                    <select class="form-select" id="tipoIncidencia" required>
+                      <option value="">Seleccionar tipo...</option>
+                      <option value="accidente">Accidente</option>
+                      <option value="averia">Avería</option>
+                      <option value="multa">Multa</option>
+                      <option value="retraso">Retraso</option>
+                      <option value="robo">Robo</option>
+                      <option value="otro">Otro</option>
+                    </select>
+                  </div>
+                  <div class="col-md-6">
+                    <label for="descripcionIncidencia" class="form-label">Descripción *</label>
+                    <textarea
+                      class="form-control"
+                      id="descripcionIncidencia"
+                      rows="3"
+                      required
+                    ></textarea>
+                  </div>
+                  <div class="col-12">
+                    <label for="evidenciaIncidencia" class="form-label">Evidencia (Archivos)</label>
+                    <input
+                      type="file"
+                      class="form-control"
+                      id="evidenciaIncidencia"
+                      multiple
+                      accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                    />
+                    <div class="form-text">
+                      Formatos permitidos: PDF, JPG, PNG, DOC, DOCX. Máximo 5 archivos.
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <label for="ubicacionIncidencia" class="form-label">Ubicación</label>
+                    <input type="text" class="form-control" id="ubicacionIncidencia" />
+                  </div>
+                  <div class="col-md-6">
+                    <label for="severidadIncidencia" class="form-label">Severidad</label>
+                    <select class="form-select" id="severidadIncidencia">
+                      <option value="baja">Baja</option>
+                      <option value="media">Media</option>
+                      <option value="alta">Alta</option>
+                      <option value="critica">Crítica</option>
+                    </select>
+                  </div>
+                  <div class="col-12">
+                    <label for="accionesTomadas" class="form-label">Acciones Tomadas</label>
+                    <textarea class="form-control" id="accionesTomadas" rows="2"></textarea>
+                  </div>
+                  <div class="col-12">
+                    <div class="form-actions">
+                      <button
+                        type="button"
+                        class="btn btn-outline-warning me-2"
+                        data-action="limpiarFormulario"
+                      >
+                        <i class="fas fa-times"></i> Limpiar
+                      </button>
+                      <button
+                        type="button"
+                        class="btn"
+                        style="background-color: #2c3f52; border-color: #2c3f52; color: #ffffff"
+                        data-action="guardarIncidencia"
+                      >
+                        <i class="fas fa-save"></i> Registrar Incidencia
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <!-- Lista de Incidencias -->
+          <div class="card">
+            <div
+              class="card-header d-flex justify-content-between align-items-center"
+              style="background-color: #2e4154; color: #ffffff"
+            >
+              <h5 class="mb-0" style="color: #ffffff">
+                <i class="fas fa-list" style="color: #ffffff"></i> Incidencias Registradas
+              </h5>
+              <button
+                type="button"
+                class="btn btn-outline-light btn-sm exportar-btn-header"
+                data-action="exportarIncidenciasExcel"
+              >
+                <i class="fas fa-file-excel"></i> Exportar
+              </button>
+            </div>
+            <!-- Filtros de Incidencias -->
+            <div class="card-body border-bottom">
+              <div class="row g-3">
+                <div class="col-md-3">
+                  <label for="filtroOperadorIncidencias" class="form-label">Operador</label>
+                  <select class="form-select form-select-sm" id="filtroOperadorIncidencias">
+                    <option value="">Todos los operadores</option>
+                  </select>
+                </div>
+                <div class="col-md-3">
+                  <label for="filtroTractocamionIncidencias" class="form-label">Tractocamión</label>
+                  <select class="form-select form-select-sm" id="filtroTractocamionIncidencias">
+                    <option value="">Todos los tractocamiones</option>
+                  </select>
+                </div>
+                <div class="col-md-2">
+                  <label for="filtroTipoIncidencias" class="form-label">Tipo de Incidencia</label>
+                  <select class="form-select form-select-sm" id="filtroTipoIncidencias">
+                    <option value="">Todos los tipos</option>
+                  </select>
+                </div>
+                <div class="col-md-2">
+                  <label for="filtroSeveridadIncidencias" class="form-label">Severidad</label>
+                  <select class="form-select form-select-sm" id="filtroSeveridadIncidencias">
+                    <option value="">Todas las severidades</option>
+                  </select>
+                </div>
+                <div class="col-md-2">
+                  <label for="filtroFechaIncidencias" class="form-label">Fecha</label>
+                  <div class="input-group">
+                    <input
+                      type="date"
+                      class="form-control form-control-sm"
+                      id="filtroFechaIncidencias"
+                    />
+                    <button
+                      class="btn btn-sm"
+                      data-action="aplicarFiltrosIncidencias"
+                      type="button"
+                      title="Aplicar Filtros"
+                      style="background-color: #2c3f52; border-color: #2c3f52; color: #ffffff"
+                    >
+                      <i class="fas fa-filter"></i>
+                    </button>
+                    <button
+                      class="btn btn-outline-secondary btn-sm"
+                      data-action="limpiarFiltrosIncidencias"
+                      type="button"
+                      title="Limpiar Filtros"
+                    >
+                      <i class="fas fa-times"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="table-responsive">
+                <table class="table table-hover" id="incidenciasTable">
+                  <thead>
+                    <tr>
+                      <th>Fecha</th>
+                      <th>N° Registro</th>
+                      <th>Operador</th>
+                      <th>Tipo</th>
+                      <th>Severidad</th>
+                      <th>Evidencia</th>
+                      <th>Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody id="incidenciasTableBody">
+                    <tr>
+                      <td colspan="7" class="text-center text-muted">Sin registros</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div id="paginacionIncidencias"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== SCRIPTS COMUNES Y MÓDULOS (Carga automática) ===== -->
+    <script src="../assets/scripts/performance/common-head-loader.js"></script>
+    <script src="../assets/scripts/performance/common-scripts-loader.js"></script>
+    <script src="../assets/scripts/performance/page-modules-config.js"></script>
+    <script src="../assets/scripts/performance/page-modules-loader.js"></script>
+    <script src="../assets/scripts/paginacion.js" defer></script>
+    <!-- Scripts del componente searchable-select -->
+    <script src="../assets/scripts/searchable-select.js"></script>
+    <!-- Scripts de inicialización para searchable-select en operadores -->
+    <script src="../assets/scripts/operadores/searchable-select-operadores.js" defer></script>
+    <script src="../assets/scripts/operadores/searchable-select-tractocamiones.js" defer></script>
+
+    <!-- operadores.js y otros scripts se cargan automáticamente por page-modules-loader.js -->
+
+    <!-- JavaScript movido a operadores-main.js -->
+
+    <!-- Firestore Integration -->
+    <!-- v2: Cargado como módulo para evitar error de import -->
+    <script type="module" src="../assets/scripts/firebase-init.js?v=2"></script>
+    <!-- JavaScript movido a operadores-main.js -->
+    <!-- Scripts movidos a carga bajo demanda arriba -->
+
+    <!-- JavaScript movido a operadores-main.js -->
+
+    <!-- Modal para Editar Gasto -->
+    <div
+      class="modal fade"
+      id="modalEditarGasto"
+      tabindex="-1"
+      aria-labelledby="modalEditarGastoLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="modalEditarGastoLabel">
+              <i class="fas fa-edit"></i> Editar Gasto de Operador
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <form id="formEditarGasto" class="needs-validation" novalidate>
+              <input type="hidden" id="editarGasto_id" />
+
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label for="editarGasto_numeroRegistro" class="form-label">N° Registro *</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="editarGasto_numeroRegistro"
+                    required
+                  />
+                  <div class="invalid-feedback">Por favor ingrese el número de registro</div>
+                </div>
+
+                <div class="col-md-6">
+                  <label for="editarGasto_fecha" class="form-label">Fecha *</label>
+                  <input type="date" class="form-control" id="editarGasto_fecha" required />
+                  <div class="invalid-feedback">Por favor seleccione la fecha</div>
+                </div>
+
+                <div class="col-md-6">
+                  <label for="editarGasto_operador" class="form-label">Operador *</label>
+                  <div class="searchable-select-container">
+                    <div class="search-input-wrapper">
+                      <input
+                        type="text"
+                        id="editarGasto_operador"
+                        class="form-control"
+                        placeholder="Escriba para buscar operador..."
+                        autocomplete="off"
+                        required
+                      />
+                      <i class="fas fa-search search-icon"></i>
+                      <button
+                        id="btn-clear-editarGasto_operador"
+                        class="btn btn-outline-secondary btn-sm btn-clear"
+                        type="button"
+                        title="Limpiar"
+                      >
+                        <i class="fas fa-times"></i>
+                      </button>
+                    </div>
+                    <div id="select-editarGasto_operador" class="filtered-select"></div>
+                  </div>
+                  <input type="hidden" id="editarGasto_operador_value" />
+                  <div class="invalid-feedback">Por favor seleccione un operador</div>
+                </div>
+
+                <div class="col-md-6">
+                  <label for="editarGasto_tractocamion" class="form-label">Tractocamión</label>
+                  <div class="searchable-select-container">
+                    <div class="search-input-wrapper">
+                      <input
+                        type="text"
+                        id="editarGasto_tractocamion"
+                        class="form-control"
+                        placeholder="Escriba para buscar tractocamión..."
+                        autocomplete="off"
+                      />
+                      <i class="fas fa-search search-icon"></i>
+                      <button
+                        id="btn-clear-editarGasto_tractocamion"
+                        class="btn btn-outline-secondary btn-sm btn-clear"
+                        type="button"
+                        title="Limpiar"
+                      >
+                        <i class="fas fa-times"></i>
+                      </button>
+                    </div>
+                    <div id="select-editarGasto_tractocamion" class="filtered-select"></div>
+                  </div>
+                  <input type="hidden" id="editarGasto_tractocamion_value" />
+                </div>
+
+                <div class="col-md-6">
+                  <label for="editarGasto_tipoGasto" class="form-label">Tipo de Gasto *</label>
+                  <select class="form-select" id="editarGasto_tipoGasto" required>
+                    <option value="">Seleccione...</option>
+                    <option value="Combustible">Combustible</option>
+                    <option value="Alimentos">Alimentos</option>
+                    <option value="Hospedaje">Hospedaje</option>
+                    <option value="Peaje">Peaje</option>
+                    <option value="Estacionamiento">Estacionamiento</option>
+                    <option value="Reparación">Reparación</option>
+                    <option value="Otro">Otro</option>
+                  </select>
+                  <div class="invalid-feedback">Por favor seleccione el tipo de gasto</div>
+                </div>
+
+                <div class="col-md-6">
+                  <label for="editarGasto_monto" class="form-label">Monto *</label>
+                  <input
+                    type="number"
+                    class="form-control"
+                    id="editarGasto_monto"
+                    step="0.01"
+                    min="0"
+                    required
+                  />
+                  <div class="invalid-feedback">Por favor ingrese el monto</div>
+                </div>
+
+                <div class="col-md-12">
+                  <label for="editarGasto_concepto" class="form-label">Concepto</label>
+                  <textarea class="form-control" id="editarGasto_concepto" rows="2"></textarea>
+                </div>
+
+                <div class="col-md-12">
+                  <label for="editarGasto_evidencia" class="form-label">Evidencia</label>
+                  <input
+                    type="file"
+                    class="form-control"
+                    id="editarGasto_evidencia"
+                    multiple
+                    accept="image/*,.pdf"
+                  />
+                  <small class="text-muted"
+                    >Puede seleccionar múltiples archivos. Los archivos existentes se mantendrán si
+                    no selecciona nuevos.</small
+                  >
+                  <div id="editarGasto_evidencia_existente" class="mt-2"></div>
+                </div>
+
+                <div class="col-md-12">
+                  <label for="editarGasto_observaciones" class="form-label">Observaciones</label>
+                  <textarea class="form-control" id="editarGasto_observaciones" rows="3"></textarea>
+                </div>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+              Cancelar
+            </button>
+            <button type="button" class="btn btn-primary" data-action="guardarGastoEditado">
+              <i class="fas fa-save"></i> Guardar Cambios
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal para Editar Incidencia -->
+    <div
+      class="modal fade"
+      id="modalEditarIncidencia"
+      tabindex="-1"
+      aria-labelledby="modalEditarIncidenciaLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="modalEditarIncidenciaLabel">
+              <i class="fas fa-edit"></i> Editar Incidencia
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <form id="formEditarIncidencia" class="needs-validation" novalidate>
+              <input type="hidden" id="editarIncidencia_id" />
+
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label for="editarIncidencia_numeroRegistro" class="form-label"
+                    >N° Registro *</label
+                  >
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="editarIncidencia_numeroRegistro"
+                    required
+                  />
+                  <div class="invalid-feedback">Por favor ingrese el número de registro</div>
+                </div>
+
+                <div class="col-md-6">
+                  <label for="editarIncidencia_fecha" class="form-label">Fecha *</label>
+                  <input type="date" class="form-control" id="editarIncidencia_fecha" required />
+                  <div class="invalid-feedback">Por favor seleccione la fecha</div>
+                </div>
+
+                <div class="col-md-6">
+                  <label for="editarIncidencia_operador" class="form-label">Operador *</label>
+                  <div class="input-group">
+                    <div class="searchable-select-wrapper" style="flex: 1">
+                      <input
+                        type="text"
+                        class="form-control searchable-select-input"
+                        id="editarIncidencia_operador"
+                        required
+                        placeholder="Escriba para buscar..."
+                        autocomplete="off"
+                        oninput="filtrarOperadoresIncidenciasEditar(this.value)"
+                        onfocus="mostrarDropdownOperadoresIncidenciasEditar()"
+                        onblur="if(typeof ocultarDropdownOperadoresIncidenciasEditar==='function')ocultarDropdownOperadoresIncidenciasEditar()"
+                        onkeydown="manejarTecladoOperadoresIncidenciasEditar(event)"
+                      />
+                      <div
+                        class="searchable-select-dropdown"
+                        id="editarIncidencia_operador_dropdown"
+                      ></div>
+                      <input type="hidden" id="editarIncidencia_operador_value" />
+                    </div>
+                    <button
+                      class="btn btn-outline-secondary"
+                      type="button"
+                      data-action="desplegarListaOperadoresIncidenciasEditar"
+                      title="Desplegar lista completa"
+                    >
+                      <i class="fas fa-list"></i>
+                    </button>
+                  </div>
+                  <div class="invalid-feedback">Por favor seleccione un operador</div>
+                </div>
+
+                <div class="col-md-6">
+                  <label for="editarIncidencia_tractocamion" class="form-label"
+                    >Tractocamión *</label
+                  >
+                  <div class="searchable-select-container">
+                    <div class="search-input-wrapper">
+                      <input
+                        type="text"
+                        id="editarIncidencia_tractocamion"
+                        class="form-control"
+                        placeholder="Escriba para buscar tractocamión..."
+                        autocomplete="off"
+                        required
+                      />
+                      <i class="fas fa-search search-icon"></i>
+                      <button
+                        id="btn-clear-editarIncidencia_tractocamion"
+                        class="btn btn-outline-secondary btn-sm btn-clear"
+                        type="button"
+                        title="Limpiar"
+                      >
+                        <i class="fas fa-times"></i>
+                      </button>
+                    </div>
+                    <div id="select-editarIncidencia_tractocamion" class="filtered-select"></div>
+                  </div>
+                  <input type="hidden" id="editarIncidencia_tractocamion_value" />
+                  <div class="invalid-feedback">Por favor seleccione un tractocamión</div>
+                </div>
+
+                <div class="col-md-6">
+                  <label for="editarIncidencia_tipoIncidencia" class="form-label"
+                    >Tipo de Incidencia *</label
+                  >
+                  <select class="form-select" id="editarIncidencia_tipoIncidencia" required>
+                    <option value="">Seleccione...</option>
+                    <option value="accidente">Accidente</option>
+                    <option value="averia">Avería</option>
+                    <option value="multa">Multa</option>
+                    <option value="retraso">Retraso</option>
+                    <option value="robo">Robo</option>
+                    <option value="otro">Otro</option>
+                  </select>
+                  <div class="invalid-feedback">Por favor seleccione el tipo de incidencia</div>
+                </div>
+
+                <div class="col-md-6">
+                  <label for="editarIncidencia_severidad" class="form-label">Severidad</label>
+                  <select class="form-select" id="editarIncidencia_severidad">
+                    <option value="baja">Baja</option>
+                    <option value="media">Media</option>
+                    <option value="alta">Alta</option>
+                    <option value="critica">Crítica</option>
+                  </select>
+                </div>
+
+                <div class="col-md-12">
+                  <label for="editarIncidencia_descripcion" class="form-label">Descripción *</label>
+                  <textarea
+                    class="form-control"
+                    id="editarIncidencia_descripcion"
+                    rows="3"
+                    required
+                  ></textarea>
+                  <div class="invalid-feedback">Por favor ingrese la descripción</div>
+                </div>
+
+                <div class="col-md-6">
+                  <label for="editarIncidencia_ubicacion" class="form-label">Ubicación</label>
+                  <input type="text" class="form-control" id="editarIncidencia_ubicacion" />
+                </div>
+
+                <div class="col-md-12">
+                  <label for="editarIncidencia_evidencia" class="form-label">Evidencia</label>
+                  <input
+                    type="file"
+                    class="form-control"
+                    id="editarIncidencia_evidencia"
+                    multiple
+                    accept="image/*,.pdf"
+                  />
+                  <small class="text-muted"
+                    >Puede seleccionar múltiples archivos. Los archivos existentes se mantendrán si
+                    no selecciona nuevos.</small
+                  >
+                  <div id="editarIncidencia_evidencia_existente" class="mt-2"></div>
+                </div>
+
+                <div class="col-md-12">
+                  <label for="editarIncidencia_accionesTomadas" class="form-label"
+                    >Acciones Tomadas</label
+                  >
+                  <textarea
+                    class="form-control"
+                    id="editarIncidencia_accionesTomadas"
+                    rows="2"
+                  ></textarea>
+                </div>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+              Cancelar
+            </button>
+            <button type="button" class="btn btn-primary" data-action="guardarIncidenciaEditada">
+              <i class="fas fa-save"></i> Guardar Cambios
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="../assets/scripts/menu/sidebar-handler.js"></script>
+    <!-- Script para indicador de carga del backend (compartido) -->
+    <script src="../assets/scripts/backend-ready-indicator.js"></script>
+  </body>
+</html>

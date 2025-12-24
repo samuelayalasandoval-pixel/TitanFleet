@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="../assets/img/Logo TF.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/img/Logo TF.png">
+  <link rel="icon" type="image/png" sizes="64x64" href="../assets/img/Logo TF.png">
+  <title>Mantenimiento</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="../styles/styles.css">
+  <link rel="stylesheet" href="../styles/mantenimiento.css">
+  <link rel="stylesheet" href="../styles/backend-indicator.css">
+  <!-- CSS del componente Searchable Select -->
+  <link rel="stylesheet" href="../assets/styles/searchable-select.css">
+  
+  <!-- Bootstrap JavaScript (requerido para modales) - SIN defer para que cargue inmediatamente -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Verificar que Bootstrap se cargó correctamente
+    if (typeof bootstrap === 'undefined') {
+      console.error('❌ Bootstrap no se cargó correctamente');
+    } else {
+      console.log('✅ Bootstrap cargado correctamente');
+    }
+  </script>
+  
+  <!-- CRÍTICO: Ocultar elementos del sidebar INMEDIATAMENTE para evitar parpadeo -->
+  <style>
+    /* Ocultar todos los módulos del sidebar inicialmente */
+    .nav-item:not(#nav-menu) {
+      display: none !important;
+      visibility: hidden !important;
+      opacity: 0 !important;
+      height: 0 !important;
+      overflow: hidden !important;
+    }
+    /* Permitir que auth.js muestre los elementos con permisos */
+    .nav-item.permission-granted {
+      display: list-item !important;
+      visibility: visible !important;
+      opacity: 1 !important;
+      height: auto !important;
+      overflow: visible !important;
+    }
+  </style>
+  
+  <!-- Performance Optimizations y Loaders Comunes -->
+  <script src="../assets/scripts/performance/performance-init.js" defer></script>
+  
+  <!-- CRÍTICO: auth.js DEBE cargarse ANTES de common-head-loader.js -->
+  <!-- para que los permisos se apliquen antes de que se oculten elementos -->
+  <script src="../assets/scripts/auth.js"></script>
+  
+  <!-- Ahora cargar common-head-loader.js que esperará a que auth.js esté listo -->
+  <script src="../assets/scripts/performance/common-head-loader.js"></script>
+  <script src="../assets/scripts/script-loader.js" defer></script>
+  
+  <!-- Scripts críticos específicos de la página -->
+  <!-- Script crítico: Restaurar estado del sidebar ANTES de renderizar para evitar parpadeo -->
+  <script src="../assets/scripts/menu/sidebar-state.js"></script>
+  <!-- Script para actualizar período automáticamente -->
+  <script src="../assets/scripts/periodo.js"></script>
+  
+  <!-- ===== FASE 3: Scripts Base del Sistema (SIN defer) ===== -->
+  <!-- CRÍTICO: main.js debe cargarse SIN defer para que funciones base estén disponibles -->
+  <script src="../assets/scripts/main.js"></script>
+  <!-- CRÍTICO: cache-manager.js debe cargarse ANTES de otros scripts que usan caché -->
+  <script src="../assets/scripts/cache-manager.js"></script>
+  <!-- CRÍTICO: firebase-init.js debe cargarse PRIMERO para inicializar Firebase -->
+  <script type="module" src="../assets/scripts/firebase-init.js"></script>
+  <!-- CRÍTICO: firebase-ready.js debe cargarse DESPUÉS de firebase-init.js para verificar disponibilidad -->
+  <script src="../assets/scripts/firebase-ready.js"></script>
+  <!-- CRÍTICO: firebase-repo-base.js debe cargarse para que FirebaseRepoBase esté disponible -->
+  <script src="../assets/scripts/firebase-repo-base.js" defer></script>
+  <!-- CRÍTICO: firebase-repos.js debe cargarse DESPUÉS de firebase-repo-base.js para crear los repositorios -->
+  <script src="../assets/scripts/firebase-repos.js" defer></script>
+  
+  <!-- Sistema de limpieza automática de localStorage -->
+  <script src="../assets/scripts/localstorage-cleanup.js" defer></script>
+</head>
+
+<body>
+<!-- Sidebar -->
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="logo">
+        <img src="../assets/img/Logo TF.png" alt="TitanFleet" style="height: 50px; width: auto;">
+        <span class="logo-text">TitanFleet</span>
+      </div>
+      <button class="btn-close-sidebar" id="closeSidebar"><i class="fas fa-times"></i></button>
+    </div>
+    <nav class="sidebar-nav">
+      <ul class="nav-menu">
+        <li class="nav-item" id="nav-menu"><a href="menu.html" class="nav-link"><i class="fa-solid fa-house-chimney"></i><span>Menú</span></a></li>
+        <li class="nav-item" id="nav-logistica"><a href="logistica.html" class="nav-link"><i class="fas fa-truck"></i><span>Logística</span></a></li>
+        <li class="nav-item" id="nav-facturacion"><a href="facturacion.html" class="nav-link"><i class="fas fa-file-invoice"></i><span>Facturación</span></a></li>
+        <li class="nav-item" id="nav-trafico"><a href="trafico.html" class="nav-link"><i class="fas fa-route"></i><span>Tráfico</span></a></li>
+        <li class="nav-item" id="nav-operadores"><a href="operadores.html" class="nav-link"><i class="fas fa-user"></i><span>Operadores</span></a></li>
+        <li class="nav-item" id="nav-diesel"><a href="diesel.html" class="nav-link"><i class="fa-solid fa-gas-pump"></i><span>Diesel</span></a></li>
+        <li class="nav-item active" id="nav-mantenimiento"><a href="mantenimiento.html" class="nav-link"><i class="fa-solid fa-screwdriver-wrench"></i><span>Mantenimiento</span></a></li>
+        <li class="nav-item" id="nav-tesoreria"><a href="tesoreria.html" class="nav-link"><i class="fa-solid fa-money-bill"></i><span>Tesoreria</span></a></li>
+        <li class="nav-item" id="nav-cxc"><a href="CXC.html" class="nav-link"><i class="fas fa-hand-holding-usd"></i><span>Cuentas x Cobrar</span></a></li>
+        <li class="nav-item" id="nav-cxp"><a href="CXP.html" class="nav-link"><i class="fas fa-credit-card"></i><span>Cuentas x Pagar</span></a></li>
+        <li class="nav-item" id="nav-inventario"><a href="inventario.html" class="nav-link"><i class="fa-solid fa-cart-flatbed"></i><span>Inventario</span></a></li>
+        <li class="nav-item" id="nav-configuracion"><a href="configuracion.html" class="nav-link"><i class="fa-solid fa-gears"></i><span>Configuración</span></a></li>
+        <li class="nav-item" id="nav-reportes"><a href="reportes.html" class="nav-link"><i class="fas fa-chart-line"></i><span>Reportes</span></a></li>
+      </ul>
+    </nav>
+  </div>  
+
+<!-- Main Content -->
+  <div class="main-content" id="mainContent">
+<!-- Top Bar -->
+    <div class="top-bar">
+      <button class="btn-toggle-sidebar" id="toggleSidebar">
+        <i class="fas fa-bars"></i>
+      </button>
+               <div class="top-bar-content">
+           <div class="page-title-section">
+             <h1 class="page-title">
+               <i class="fa-solid fa-screwdriver-wrench"></i>
+               Gestión Mantenimiento
+               <span id="backendReadyIndicator" class="backend-loading-indicator" style="display: none;">
+                 <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                 <span class="ms-2">Cargando datos...</span>
+               </span>
+               <span id="backendReadyBadge" class="backend-ready-badge" style="display: none;">
+                 <i class="fas fa-check-circle"></i>
+                 <span class="ms-2">Listo para trabajar</span>
+               </span>
+             </h1>
+                    <div class="current-period">
+                        <small class="text-muted">Período: </small>
+                        <span class="period-info" id="currentPeriod">Septiembre 2025</span>
+                    </div>
+           </div>
+                    <div class="user-info">
+           <div class="user-details">
+             <i class="fas fa-user-circle"></i>
+             <span id="currentUserName">Usuario ERP</span>
+           </div>
+           <div class="user-actions">
+             <button class="btn btn-outline-light btn-sm logout-btn" data-action="logout">
+               <i class="fas fa-sign-out-alt"></i> <span class="logout-text">Cerrar Sesión</span>
+             </button>
+           </div>
+         </div>
+         </div>
+    </div>
+
+<!-- Content Area -->
+    <div class="content-wrapper" style="padding: 8px;">
+      <div class="container-fluid">
+<!-- Page Header -->
+        <div class="page-header">
+          <div class="row align-items-center">
+            <div class="col-md-8">
+              <h2 class="mb-2">Registro de mantenimiento</h2>
+              <p class="text-muted mb-0">Complete el formulario para registrar el Mantenimiento.</p>
+            </div>
+            <div class="col-md-4 text-end">
+              <!-- Botones removidos según solicitud -->
+            </div>
+          </div>
+        </div>
+
+
+<!-- Form -->
+         <div class="card">
+           <div class="card-body">
+             <form class="needs-validation" novalidate>
+
+<!-- Registro de Mantenimiento -->
+               <div class="form-section">
+                 <h4 class="section-title">
+                   <i class="fa-solid fa-wrench"></i>
+                   Registro de Mantenimiento
+                 </h4>
+
+                <div class="row g-1">
+                  <div class="col-md-4">
+                    <label for="Fecha" class="form-label">Fecha de Servicio</label>
+                    <input type="date" class="form-control" id="Fecha" placeholder="Ingresa la fecha de servicio" required>
+                  </div>
+                  <div class="col-md-4">
+                    <label for="economico" class="form-label">Económico Tractocamión *</label>
+                    <div class="searchable-select-container">
+                      <div class="search-input-wrapper">
+                        <input 
+                          type="text" 
+                          id="economico" 
+                          class="form-control" 
+                          placeholder="Escriba para buscar económico..."
+                          autocomplete="off"
+                          required
+                        >
+                        <i class="fas fa-search search-icon"></i>
+                        <button id="btn-clear-economico" class="btn btn-outline-secondary btn-sm btn-clear" type="button" title="Limpiar">
+                          <i class="fas fa-times"></i>
+                        </button>
+                      </div>
+                      <div id="select-economico" class="filtered-select"></div>
+                    </div>
+                    <input type="hidden" id="economico_value">
+                    <div class="invalid-feedback">Por favor seleccione un económico</div>
+                  </div>
+                  <div class="col-md-4">
+                    <label for="Kilometraje" class="form-label">Kilometraje Actual</label>
+                    <input type="number" class="form-control" id="kilometraje" placeholder="Ingresa el Kilometraje" required>
+                  </div>
+                </div>
+
+                <div class="row g-1">
+                  <div class="col-md-4">
+                    <label for="Placas" class="form-label">Placa</label>
+                    <input type="text" class="form-control" id="Placa" placeholder="Se llena en Automatico" readonly>
+                  </div>
+
+                  <div class="col-md-4">
+                    <label for="marca" class="form-label">Marca</label>
+                    <input type="text" class="form-control" id="marca" placeholder="Se llena en Automatico" readonly>
+                  </div>
+
+                  <div class="col-md-4">
+                    <label for="modelo" class="form-label">Modelo</label>
+                    <input type="text" class="form-control" id="modelo" placeholder="Se llena en Automatico" readonly>
+                  </div>
+                </div>
+              </div>
+
+<!-- tipo de mantenimiento -->                
+              <div class="form-section">
+                 <h4 class="section-title">
+                   <i class="fa-solid fa-square-check"></i>
+                   Tipo de Mantenimiento <span class="text-danger">*</span>
+                 </h4>
+
+                 <div class="row g-3">
+                    <div class="col-md-6">
+                    <div>
+                      <input type="radio" id="preventivo" name="fav_language" value="preventivo" required>
+                      <label for="preventivo">Preventivo</label><br>
+                      <input type="radio" id="correctivo" name="fav_language" value="correctivo" required>
+                      <label for="correctivo">Correctivo</label><br>
+                      <input type="radio" id="predictivo" name="fav_language" value="predictivo" required>
+                      <label for="predictivo">Predictivo</label>
+                    </div>
+                    </div>
+
+                  <div class="col-md-6">
+                    <div class="accordion accordion-flush" id="accordionFlushExample">
+                      <div class="accordion-item">
+                        <h2 class="accordion-header">
+                          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseOne" aria-expanded="false" aria-controls="flush-collapseOne">
+                            Preventivo
+                          </button>
+                        </h2>
+                        <div id="flush-collapseOne" class="accordion-collapse collapse" data-bs-parent="#accordionFlushExample">
+                          <div class="accordion-body">Se realiza de forma programada para evitar fallas. Ejemplo: cambio de aceite cada cierto kilometraje.</div>
+                        </div>
+                      </div>
+                      <div class="accordion-item">
+                        <h2 class="accordion-header">
+                          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseTwo" aria-expanded="false" aria-controls="flush-collapseTwo">
+                            Correctivo
+                          </button>
+                        </h2>
+                        <div id="flush-collapseTwo" class="accordion-collapse collapse" data-bs-parent="#accordionFlushExample">
+                          <div class="accordion-body">Se aplica después de una avería para restaurar el funcionamiento. Ejemplo: reparar un motor que dejó de funcionar.</div>
+                        </div>
+                      </div>
+                      <div class="accordion-item">
+                        <h2 class="accordion-header">
+                          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseThree" aria-expanded="false" aria-controls="flush-collapseThree">
+                            Predictivo
+                          </button>
+                        </h2>
+                        <div id="flush-collapseThree" class="accordion-collapse collapse" data-bs-parent="#accordionFlushExample">
+                          <div class="accordion-body">Se basa en datos y sensores para anticipar fallas antes de que ocurran. Ejemplo: alertas por desgaste de frenos detectadas por telemetría.</div>
+                        </div>
+                      </div>
+                    </div>                  
+                  </div>
+                </div>
+              </div>
+
+<!-- Invervención -->
+               <div class="form-section">
+                 <h4 class="section-title">
+                   <i class="fa-solid fa-helmet-safety"></i>
+                   Detalle de Intervención
+                 </h4>  
+
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <label for="nivelCombustible" class="form-label">Nivel de Combustible</label>
+                    <input type="range" class="form-range" min="0" max="100" value="50" id="nivelCombustible">
+                    <output for="nivelCombustible" id="nivelCombustibleValue" aria-hidden="true"></output>
+                  </div>
+
+                  <div class="col-md-6">
+                    <label for="nivelUrea" class="form-label">Nivel de Urea</label>
+                    <input type="range" class="form-range" min="0" max="100" value="50" id="nivelUrea">
+                    <output for="nivelUrea" id="nivelUreaValue" aria-hidden="true"></output>     
+                  </div>
+                </div>
+
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <label for="responsabletecnico" class="form-label">Responsable Técnico *</label>
+                    <input type="text" class="form-control" id="responsabletecnico" placeholder="Nombre del responsable" required>
+                    <div class="invalid-feedback">Por favor ingrese el responsable técnico</div>
+                  </div>
+                  <div class="col-md-6">
+                    <label for="tiempoejecucion" class="form-label">Tiempo de Ejecucion </label>
+                    <input type="text" class="form-control" id="tiempoejecucion" placeholder="Tiempo de Ejecucion" required>
+                    <div class="invalid-feedback">Por favor ingrese en cuanto tiempo se realizo el mantenimiento</div>
+                  </div>
+                </div>
+
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <label for="subcontratacion" class="form-label">Subcontratación </label>
+                    <input type="text" class="form-control" id="subcontratacion" placeholder="Que empresa se subcontrato">
+                    <div class="invalid-feedback">Por favor ingrese el nombre de la subcontratacion</div>
+                  </div>
+                  <div class="col-md-6">
+                    <label for="servicio" class="form-label">Servicio Realizado </label>
+                    <input type="text" class="form-control" id="servicio" placeholder="Servicio Realizado">
+                    <div class="invalid-feedback">Por favor ingrese que servicio se realizo</div>
+                  </div>
+                </div>
+
+                <div class="row g-1">
+                  <div class="col-md-12">
+                    <label for="descripcion" class="form-label">Descripción del Servicio Realizado</label>
+                    <textarea class="form-control" id="descripcion" rows="3" placeholder="Describa el servicio realizado..." required></textarea>
+                    <div class="invalid-feedback">Por favor ingrese una descripción del servicio realizado</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Sección de Refacciones Utilizadas -->
+              <div class="form-section">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <h5 class="section-title mb-0"><i class="fas fa-cogs"></i> Refacciones Utilizadas</h5>
+                  <button class="btn btn-sm btn-outline-danger" data-action="limpiarDatosRefacciones" title="Limpiar todos los datos de refacciones">
+                    <i class="fas fa-trash-alt"></i> Limpiar Datos
+                  </button>
+                </div>
+                
+                <!-- Fila de refacciones -->
+                <div class="row g-3 mb-3">
+                    <div class="col-md-3">
+                      <label class="form-label">Código/SKU *</label>
+                      <div class="searchable-select-container">
+                        <div class="search-input-wrapper">
+                          <input 
+                            type="text" 
+                            id="refaccion_buscar_1" 
+                            class="form-control" 
+                            placeholder="Buscar por código o descripción..."
+                            autocomplete="off"
+                            data-numero-fila="1"
+                          >
+                          <i class="fas fa-search search-icon"></i>
+                          <button id="btn-clear-refaccion-1" class="btn btn-outline-secondary btn-sm btn-clear" type="button" title="Limpiar">
+                            <i class="fas fa-times"></i>
+                          </button>
+                        </div>
+                        <div id="select-refaccion-1" class="filtered-select"></div>
+                      </div>
+                      <div class="form-text">Escriba para buscar refacciones</div>
+                    </div>
+                    <div class="col-md-2">
+                      <label class="form-label">Descripción</label>
+                      <input type="text" class="form-control" id="refaccion_desc_1" readonly placeholder="Descripción automática">
+                </div>
+                    <div class="col-md-2">
+                      <label class="form-label">Almacén</label>
+                      <input type="text" class="form-control" id="refaccion_almacen_1" readonly placeholder="Almacén seleccionado">
+                </div>
+                    <div class="col-md-1">
+                      <label class="form-label">Stock</label>
+                      <input type="text" class="form-control" id="refaccion_stock_1" readonly placeholder="0">
+                  </div>
+                    <div class="col-md-1">
+                      <label class="form-label">Unidad</label>
+                      <input type="text" class="form-control" id="refaccion_unidad_1" readonly placeholder="Unidad automática">
+                  </div>
+                    <div class="col-md-2">
+                      <label class="form-label">Cantidad *</label>
+                      <input type="number" class="form-control" id="refaccion_cantidad_1" min="1" placeholder="0" data-action="validarCantidadRefaccion">
+                </div>
+                    <div class="col-md-1 d-flex align-items-center">
+                      <button type="button" class="btn btn-outline-danger" data-action="eliminarFilaRefaccion" data-indice="1" title="Eliminar refacción">
+                        <i class="fas fa-trash"></i>
+                      </button>
+                </div>
+                  </div>
+
+                  <!-- Botón para agregar más refacciones -->
+                  <div class="row">
+                    <div class="col-12">
+                      <button type="button" class="btn btn-outline-primary" data-action="agregarFilaRefaccion">
+                        <i class="fas fa-plus"></i> Agregar Refacción
+                      </button>
+                </div>
+                </div>
+
+                <!-- Contenedor para filas adicionales -->
+                <div id="refaccionesAdicionales"></div>
+              </div>
+
+<!-- Evidencia y Seguimiento -->
+               <div class="form-section">
+                 <h4 class="section-title">
+                   <i class="fa-solid fa-code-compare"></i>
+                   Evidencia y Seguimiento
+                 </h4>
+
+                 <div class="row g-1">
+                  <div class="col-md-4">
+                    <label for="fechaSiguienteServicio" class="form-label">Fecha del siguiente Servicio</label>
+                    <input type="date" class="form-control" id="fechaSiguienteServicio" placeholder="Ingresa la fecha del siguiente servicio" required>
+                  </div>
+
+                  <div class="col-md-4">
+                    <label for="estadoeconomico" class="form-label">Estado del Economico</label>
+                    <select id="estadoeconomico" class="form-select" required>
+                      <option value="">Seleccione...</option>
+                      <option value="operativo">Operativo</option>
+                      <option value="enespera">En Espera</option>
+                      <option value="fueradeservicio">Fuera de Servicio</option>
+                    </select>
+                    <div class="invalid-feedback">Por favor seleccione el estado del Economico</div>
+                  </div>
+
+                  <div class="col-md-4">
+                    <label for="kilometrajesiguienteservicio" class="form-label">Kilometraje del siguiente Servicio</label>
+                    <input type="number" class="form-control" id="kilometrajesiguienteservicio" placeholder="Ingresa el Kilometraje del siguiente servicio" required>
+                  </div>
+                </div>
+
+                <div class="row g-3">
+                  <div class="col-md-6">
+                      <label for="Evidenciaantes" class="form-label">Evidencia Antes</label>
+                      <input type="file" class="form-control" id="Evidenciaantes" name="Evidenciaantes">
+                  </div>
+                  <div class="col-md-6">
+                      <label for="Evidenciadespues" class="form-label">Evidencia Despues</label>
+                      <input type="file" class="form-control" id="Evidenciadespues" name="Evidenciadespues">
+                  </div>
+                      <div class="col-md-6">
+                        <label for="evidenciaproceso" class="form-label">Evidencia Proceso</label>
+                        <input type="file" class="form-control" id="evidenciaproceso" name="evidenciaproceso">
+                      </div>
+                      <div class="col-md-6">
+                        <label for="evidenciafacturas" class="form-label">Evidencia facturas y Tickets</label>
+                        <input type="file" class="form-control" id="evidenciafacturas" name="evidenciafacturas">
+                      </div>
+                </div>
+                </div>                     
+
+<!-- Botones de Acción -->
+                <div class="form-actions">
+                  <button type="button" class="btn btn-outline-warning me-2" data-action="clearCurrentForm">
+                    <i class="fas fa-times"></i> Limpiar
+                  </button>
+                  <button type="submit" class="btn me-2" data-action="saveMantenimientoData" style="background-color: #2f4255; border-color: #2f4255; color: #ffffff;">
+                    <i class="fas fa-check"></i> Registrar Mantenimiento
+                  </button>
+                </div>
+             </form>
+           </div>
+         </div>
+         
+<!-- Historial de Mantenimientos -->
+         <div class="card mt-4">
+           <div class="card-header d-flex justify-content-between align-items-center">
+             <h5 class="mb-0">
+               <i class="fas fa-history"></i>
+               Historial de Mantenimientos
+             </h5>
+             <button type="button" class="btn btn-outline-light btn-sm exportar-btn-header" data-action="exportarMantenimientoExcel">
+               <i class="fas fa-file-excel"></i> Exportar
+             </button>
+           </div>
+           <div class="card-body">
+             <!-- Filtros -->
+             <div class="row g-2 mb-3">
+               <div class="col-md-2">
+                 <label class="form-label">Económico</label>
+                 <input type="text" id="filtroEconomicoMantenimiento" class="form-control" placeholder="Buscar económico..." data-action="aplicarFiltrosMantenimiento">
+               </div>
+               <div class="col-md-2">
+                 <label class="form-label">Responsable</label>
+                 <input type="text" id="filtroResponsableMantenimiento" class="form-control" placeholder="Buscar responsable..." data-action="aplicarFiltrosMantenimiento">
+               </div>
+               <div class="col-md-2">
+                 <label class="form-label">Tipo de Servicio</label>
+                 <select id="filtroTipoServicioMantenimiento" class="form-select" data-action="aplicarFiltrosMantenimiento">
+                   <option value="">Todos</option>
+                   <option value="preventivo">Preventivo</option>
+                   <option value="correctivo">Correctivo</option>
+                   <option value="predictivo">Predictivo</option>
+                 </select>
+               </div>
+               <div class="col-md-2">
+                 <label class="form-label">SKU</label>
+                 <input type="text" id="filtroSKUMantenimiento" class="form-control" placeholder="Buscar SKU..." data-action="aplicarFiltrosMantenimiento">
+               </div>
+               <div class="col-md-2">
+                 <label class="form-label">Nombre Piezas</label>
+                 <input type="text" id="filtroNombrePiezasMantenimiento" class="form-control" placeholder="Buscar piezas..." data-action="aplicarFiltrosMantenimiento">
+               </div>
+               <div class="col-md-2 d-flex align-items-end">
+                 <button class="btn btn-outline-secondary w-100" data-action="limpiarFiltrosMantenimiento">
+                   <i class="fas fa-times"></i> Limpiar
+                 </button>
+               </div>
+             </div>
+             <div class="table-responsive">
+               <table class="table table-striped table-hover" id="tablaMantenimientos">
+                 <thead class="table-dark">
+                   <tr>
+                     <th>ID</th>
+                     <th>Fecha</th>
+                     <th>Económico</th>
+                     <th>Placas</th>
+                     <th>Tipo</th>
+                     <th>Responsable</th>
+                     <th>Estado</th>
+                     <th>Acciones</th>
+                   </tr>
+                 </thead>
+                 <tbody id="tablaMantenimientosBody">
+                   <tr>
+                     <td colspan="8" class="text-center text-muted">No hay registros de mantenimiento</td>
+                   </tr>
+                 </tbody>
+               </table>
+             </div>
+             <!-- Controles de paginación -->
+             <div id="paginacionMantenimiento" class="mt-3"></div>
+           </div>
+         </div>
+         
+           </div>
+    </div>
+  </div>
+
+  <!-- Modal de Edición de Mantenimiento -->
+  <div class="modal fade" id="modalEditarMantenimiento" tabindex="-1" aria-labelledby="modalEditarMantenimientoLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalEditarMantenimientoLabel">
+            <i class="fas fa-edit"></i> Editar Mantenimiento
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="formEditarMantenimiento" class="needs-validation" novalidate>
+            <input type="hidden" id="editarMantenimiento_id">
+            
+            <!-- Registro de Mantenimiento -->
+            <div class="form-section">
+              <h4 class="section-title">
+                <i class="fa-solid fa-wrench"></i>
+                Registro de Mantenimiento
+              </h4>
+
+              <div class="row g-1">
+                <div class="col-md-4">
+                  <label for="editarMantenimiento_Fecha" class="form-label">Fecha de Servicio</label>
+                  <input type="date" class="form-control" id="editarMantenimiento_Fecha" required>
+                </div>
+                <div class="col-md-4">
+                  <label for="editarMantenimiento_economico" class="form-label">Económico Tractocamión *</label>
+                  <div class="searchable-select-container">
+                    <div class="search-input-wrapper">
+                      <input 
+                        type="text" 
+                        id="editarMantenimiento_economico" 
+                        class="form-control" 
+                        placeholder="Escriba para buscar económico..."
+                        autocomplete="off"
+                        required
+                      >
+                      <i class="fas fa-search search-icon"></i>
+                      <button id="btn-clear-economico-editar" class="btn btn-outline-secondary btn-sm btn-clear" type="button" title="Limpiar">
+                        <i class="fas fa-times"></i>
+                      </button>
+                    </div>
+                    <div id="select-economico-editar" class="filtered-select"></div>
+                  </div>
+                  <input type="hidden" id="editarMantenimiento_economico_value">
+                </div>
+                <div class="col-md-4">
+                  <label for="editarMantenimiento_kilometraje" class="form-label">Kilometraje Actual</label>
+                  <input type="number" class="form-control" id="editarMantenimiento_kilometraje" required>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tipo de Mantenimiento -->
+            <div class="form-section">
+              <h4 class="section-title">
+                <i class="fa-solid fa-square-check"></i>
+                Tipo de Mantenimiento <span class="text-danger">*</span>
+              </h4>
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <input type="radio" id="editarMantenimiento_preventivo" name="editarMantenimiento_tipo" value="preventivo" required>
+                  <label for="editarMantenimiento_preventivo">Preventivo</label><br>
+                  <input type="radio" id="editarMantenimiento_correctivo" name="editarMantenimiento_tipo" value="correctivo" required>
+                  <label for="editarMantenimiento_correctivo">Correctivo</label><br>
+                  <input type="radio" id="editarMantenimiento_predictivo" name="editarMantenimiento_tipo" value="predictivo" required>
+                  <label for="editarMantenimiento_predictivo">Predictivo</label>
+                </div>
+              </div>
+            </div>
+
+            <!-- Detalle de Intervención -->
+            <div class="form-section">
+              <h4 class="section-title">
+                <i class="fa-solid fa-helmet-safety"></i>
+                Detalle de Intervención
+              </h4>
+              
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label for="editarMantenimiento_nivelCombustible" class="form-label">Nivel de Combustible</label>
+                  <input type="range" class="form-range" min="0" max="100" value="50" id="editarMantenimiento_nivelCombustible">
+                  <output for="editarMantenimiento_nivelCombustible" id="editarMantenimiento_nivelCombustibleValue"></output>
+                </div>
+                <div class="col-md-6">
+                  <label for="editarMantenimiento_nivelUrea" class="form-label">Nivel de Urea</label>
+                  <input type="range" class="form-range" min="0" max="100" value="50" id="editarMantenimiento_nivelUrea">
+                  <output for="editarMantenimiento_nivelUrea" id="editarMantenimiento_nivelUreaValue"></output>
+                </div>
+              </div>
+
+              <div class="row g-3 mt-2">
+                <div class="col-md-6">
+                  <label for="editarMantenimiento_responsabletecnico" class="form-label">Responsable Técnico *</label>
+                  <input type="text" class="form-control" id="editarMantenimiento_responsabletecnico" required>
+                </div>
+                <div class="col-md-6">
+                  <label for="editarMantenimiento_tiempoejecucion" class="form-label">Tiempo de Ejecución</label>
+                  <input type="text" class="form-control" id="editarMantenimiento_tiempoejecucion">
+                </div>
+              </div>
+
+              <div class="row g-3 mt-2">
+                <div class="col-md-6">
+                  <label for="editarMantenimiento_subcontratacion" class="form-label">Subcontratación</label>
+                  <input type="text" class="form-control" id="editarMantenimiento_subcontratacion">
+                </div>
+                <div class="col-md-6">
+                  <label for="editarMantenimiento_servicio" class="form-label">Servicio Realizado</label>
+                  <input type="text" class="form-control" id="editarMantenimiento_servicio">
+                </div>
+              </div>
+
+              <div class="row g-1 mt-2">
+                <div class="col-md-12">
+                  <label for="editarMantenimiento_descripcion" class="form-label">Descripción del Servicio Realizado</label>
+                  <textarea class="form-control" id="editarMantenimiento_descripcion" rows="3" required></textarea>
+                </div>
+              </div>
+            </div>
+
+            <!-- Refacciones Utilizadas -->
+            <div class="form-section" id="editarMantenimiento_refaccionesSection">
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="section-title mb-0"><i class="fas fa-cogs"></i> Refacciones Utilizadas</h5>
+                <button type="button" class="btn btn-sm btn-outline-primary" data-action="agregarFilaRefaccionEditar">
+                  <i class="fas fa-plus"></i> Agregar Refacción
+                </button>
+              </div>
+              
+              <!-- Primera fila de refacciones -->
+              <div class="row g-3 mb-3" id="editarMantenimiento_fila_refaccion_1">
+                <div class="col-md-3">
+                  <label class="form-label">Código/SKU *</label>
+                  <div class="searchable-select-container">
+                    <div class="search-input-wrapper">
+                      <input 
+                        type="text" 
+                        id="editarMantenimiento_refaccion_buscar_1" 
+                        class="form-control" 
+                        placeholder="Buscar por código o descripción..."
+                        autocomplete="off"
+                        data-numero-fila="1"
+                        data-edicion="true"
+                      >
+                      <i class="fas fa-search search-icon"></i>
+                      <button id="btn-clear-refaccion-editar-1" class="btn btn-outline-secondary btn-sm btn-clear" type="button" title="Limpiar">
+                        <i class="fas fa-times"></i>
+                      </button>
+                    </div>
+                    <div id="select-refaccion-editar-1" class="filtered-select"></div>
+                  </div>
+                </div>
+                <div class="col-md-2">
+                  <label class="form-label">Descripción</label>
+                  <input type="text" class="form-control" id="editarMantenimiento_refaccion_desc_1" readonly>
+                </div>
+                <div class="col-md-2">
+                  <label class="form-label">Almacén</label>
+                  <input type="text" class="form-control" id="editarMantenimiento_refaccion_almacen_1" readonly>
+                </div>
+                <div class="col-md-1">
+                  <label class="form-label">Stock</label>
+                  <input type="text" class="form-control" id="editarMantenimiento_refaccion_stock_1" readonly>
+                </div>
+                <div class="col-md-1">
+                  <label class="form-label">Unidad</label>
+                  <input type="text" class="form-control" id="editarMantenimiento_refaccion_unidad_1" readonly>
+                </div>
+                <div class="col-md-2">
+                  <label class="form-label">Cantidad *</label>
+                  <input type="number" class="form-control" id="editarMantenimiento_refaccion_cantidad_1" min="1">
+                </div>
+                <div class="col-md-1 d-flex align-items-center">
+                  <button type="button" class="btn btn-outline-danger" data-action="eliminarFilaRefaccionEditar" data-indice="1" title="Eliminar">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </div>
+              </div>
+              
+              <!-- Contenedor para filas adicionales de refacciones -->
+              <div id="editarMantenimiento_refaccionesAdicionales"></div>
+            </div>
+
+            <!-- Evidencia y Seguimiento -->
+            <div class="form-section">
+              <h4 class="section-title">
+                <i class="fa-solid fa-code-compare"></i>
+                Evidencia y Seguimiento
+              </h4>
+
+              <div class="row g-1">
+                <div class="col-md-4">
+                  <label for="editarMantenimiento_fechaSiguienteServicio" class="form-label">Fecha del siguiente Servicio</label>
+                  <input type="date" class="form-control" id="editarMantenimiento_fechaSiguienteServicio" required>
+                </div>
+                <div class="col-md-4">
+                  <label for="editarMantenimiento_estadoeconomico" class="form-label">Estado del Económico</label>
+                  <select id="editarMantenimiento_estadoeconomico" class="form-select" required>
+                    <option value="">Seleccione...</option>
+                    <option value="operativo">Operativo</option>
+                    <option value="enespera">En Espera</option>
+                    <option value="fueradeservicio">Fuera de Servicio</option>
+                  </select>
+                </div>
+                <div class="col-md-4">
+                  <label for="editarMantenimiento_kilometrajesiguienteservicio" class="form-label">Kilometraje del siguiente Servicio</label>
+                  <input type="number" class="form-control" id="editarMantenimiento_kilometrajesiguienteservicio" required>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="button" class="btn btn-primary" data-action="guardarMantenimientoEditado">
+            <i class="fas fa-save"></i> Guardar Cambios
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SCRIPTS COMUNES Y MÓDULOS (Carga automática) ===== -->
+  <script src="../assets/scripts/performance/common-head-loader.js"></script>
+  <script src="../assets/scripts/performance/common-scripts-loader.js"></script>
+  <script src="../assets/scripts/performance/page-modules-config.js"></script>
+  <script src="../assets/scripts/performance/page-modules-loader.js"></script>
+  <script src="../assets/scripts/paginacion.js" defer></script>
+  <!-- mantenimiento.js, mantenimiento-refacciones.js y mantenimiento-modal-editar.js se cargan automáticamente por page-modules-loader.js -->
+  <script src="../assets/scripts/menu/sidebar-handler.js"></script>
+  <!-- Script para indicador de carga del backend (compartido) -->
+  <script src="../assets/scripts/backend-ready-indicator.js"></script>
+  <!-- JS del componente Searchable Select -->
+  <script src="../assets/scripts/searchable-select.js"></script>
+  <!-- Script de inicialización del componente searchable-select para económicos -->
+  <script src="../assets/scripts/mantenimiento/searchable-select-economicos.js" defer></script>
+  <!-- Script de inicialización del componente searchable-select para refacciones (código/SKU) -->
+  <script src="../assets/scripts/mantenimiento/searchable-select-refacciones.js" defer></script>
+</body>
+</html>

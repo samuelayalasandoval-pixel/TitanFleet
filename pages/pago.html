@@ -1,0 +1,628 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/png" sizes="16x16" href="../assets/img/Logo TF.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="../assets/img/Logo TF.png" />
+    <link rel="icon" type="image/png" sizes="64x64" href="../assets/img/Logo TF.png" />
+    <title>Pago Seguro - TitanFleet</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link rel="stylesheet" href="../styles/styles.css" />
+    <style>
+      body {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 2rem 0;
+      }
+      .payment-container {
+        max-width: 600px;
+        margin: 0 auto;
+      }
+      .payment-card {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+      }
+      .payment-header {
+        background: linear-gradient(135deg, #03363d 0%, #05505a 100%);
+        color: white;
+        padding: 2rem;
+        text-align: center;
+      }
+      .payment-body {
+        padding: 2rem;
+      }
+      .plan-summary {
+        background: #f8f9fa;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+      }
+      .plan-summary h5 {
+        color: #03363d;
+        margin-bottom: 1rem;
+      }
+      .plan-summary-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #e9ecef;
+      }
+      .plan-summary-item:last-child {
+        border-bottom: none;
+        font-weight: bold;
+        font-size: 1.2rem;
+        color: #03363d;
+        margin-top: 0.5rem;
+        padding-top: 1rem;
+      }
+      .form-group {
+        margin-bottom: 1.5rem;
+      }
+      .form-label {
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 0.5rem;
+      }
+      .form-control {
+        border-radius: 8px;
+        padding: 0.75rem;
+        border: 1px solid #ced4da;
+        transition: all 0.3s ease;
+      }
+      .form-control:focus {
+        border-color: #03363d;
+        box-shadow: 0 0 0 0.2rem rgba(3, 54, 61, 0.25);
+      }
+      .card-input-group {
+        display: flex;
+        gap: 1rem;
+      }
+      .card-input-group .form-group {
+        flex: 1;
+      }
+      .btn-payment {
+        background: linear-gradient(135deg, #03363d 0%, #05505a 100%);
+        color: white;
+        border: none;
+        padding: 1rem 2rem;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 1.1rem;
+        width: 100%;
+        transition: all 0.3s ease;
+      }
+      .btn-payment:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 20px rgba(3, 54, 61, 0.3);
+      }
+      .btn-payment:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+      .security-badges {
+        display: flex;
+        justify-content: center;
+        gap: 2rem;
+        margin-top: 1.5rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid #e9ecef;
+      }
+      .security-badge {
+        text-align: center;
+        color: #6c757d;
+      }
+      .security-badge i {
+        font-size: 2rem;
+        color: #28a745;
+        margin-bottom: 0.5rem;
+      }
+      .loading-spinner {
+        display: none;
+      }
+      .loading-spinner.active {
+        display: inline-block;
+      }
+      .alert-payment {
+        border-radius: 8px;
+        border: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="payment-container">
+        <div class="payment-card">
+          <div class="payment-header">
+            <h2><i class="fas fa-lock me-2"></i>Pago Seguro</h2>
+            <p class="mb-0">Completa tu información para procesar el pago</p>
+          </div>
+
+          <div class="payment-body">
+            <!-- Resumen del Plan -->
+            <div class="plan-summary" id="planSummary">
+              <h5><i class="fas fa-receipt me-2"></i>Resumen de Compra</h5>
+              <div class="plan-summary-item">
+                <span>Plan:</span>
+                <span id="summaryPlan">-</span>
+              </div>
+              <div class="plan-summary-item">
+                <span>Periodo:</span>
+                <span id="summaryPeriod">-</span>
+              </div>
+              <div class="plan-summary-item">
+                <span>Total a pagar:</span>
+                <div id="summaryPrice" class="text-end">
+                  <!-- Se llenará dinámicamente con precio y descuento -->
+                </div>
+              </div>
+              <div
+                id="discountInfo"
+                class="mt-2 p-2 bg-success bg-opacity-10 rounded"
+                style="display: none"
+              >
+                <!-- Información del descuento se mostrará aquí -->
+              </div>
+            </div>
+
+            <!-- Información de Pago Seguro -->
+            <div class="alert alert-info alert-payment" style="margin-bottom: 2rem">
+              <i class="fas fa-shield-alt me-2"></i>
+              <strong>Pago 100% Seguro:</strong> Serás redirigido a Stripe Checkout, una plataforma
+              segura y certificada PCI-DSS. Tus datos de tarjeta nunca pasan por nuestros
+              servidores.
+            </div>
+
+            <!-- Botón para proceder a Stripe Checkout -->
+            <button type="button" class="btn btn-payment" id="btnProceedToStripe">
+              <span class="loading-spinner" id="loadingSpinner" style="display: none">
+                <i class="fas fa-spinner fa-spin me-2"></i>
+              </span>
+              <span id="btnText">
+                <i class="fas fa-credit-card me-2"></i>Continuar con Stripe Checkout
+              </span>
+            </button>
+
+            <div class="security-badges" style="margin-top: 2rem">
+              <div class="security-badge">
+                <i class="fas fa-shield-alt"></i>
+                <div>SSL Seguro</div>
+              </div>
+              <div class="security-badge">
+                <i class="fas fa-lock"></i>
+                <div>Encriptado</div>
+              </div>
+              <div class="security-badge">
+                <i class="fas fa-check-circle"></i>
+                <div>Verificado</div>
+              </div>
+              <div class="security-badge">
+                <i class="fab fa-stripe"></i>
+                <div>Stripe</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Botón para volver -->
+        <div class="text-center mt-3">
+          <a href="demo.html" class="text-white text-decoration-none">
+            <i class="fas fa-arrow-left me-2"></i>Volver a la página anterior
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../assets/scripts/stripe-config.js"></script>
+    <script src="../assets/scripts/stripe-integration.js"></script>
+    <script src="../assets/scripts/generate-licenses.js"></script>
+    <script src="../assets/scripts/license-admin.js"></script>
+    <script src="../assets/scripts/license-manager.js"></script>
+    <!-- Cargar license-ui.html para tener acceso a notifyAdministrator -->
+    <script>
+      // Cargar la función notifyAdministrator desde license-ui.html si está disponible
+      // Si no está disponible, definir una versión básica
+      if (typeof window.notifyAdministrator === 'undefined') {
+        window.notifyAdministrator = function (errorType, errorDetails) {
+          const adminEmail = 'samuelayalasandoval@gmail.com';
+          const timestamp = new Date().toISOString();
+
+          const subject = encodeURIComponent(
+            `[TitanFleet ERP] Error ${errorType} - ${errorDetails.tenantId || 'N/A'}`
+          );
+          const body = encodeURIComponent(`ERROR EN SISTEMA DE PAGOS - TITANFLEET ERP
+
+TIPO DE ERROR: ${errorType}
+FECHA: ${new Date(timestamp).toLocaleString('es-MX')}
+
+TenantId: ${errorDetails.tenantId || 'N/A'}
+Plan: ${errorDetails.plan || 'N/A'}
+Error: ${errorDetails.errorMessage || 'N/A'}
+
+Por favor, revisa y actualiza manualmente si es necesario.`);
+
+          try {
+            window.location.href = `mailto:${adminEmail}?subject=${subject}&body=${body}`;
+            console.log('📧 Notificación enviada al administrador');
+          } catch (e) {
+            console.error('❌ Error enviando notificación:', e);
+          }
+        };
+      }
+    </script>
+    <script>
+      // Cargar datos del pago desde sessionStorage
+      document.addEventListener('DOMContentLoaded', function () {
+        const paymentData = sessionStorage.getItem('titanfleet_payment_data');
+
+        if (!paymentData) {
+          alert('No se encontraron datos de pago. Serás redirigido a la página de demo.');
+          window.location.href = 'demo.html';
+          return;
+        }
+
+        try {
+          const data = JSON.parse(paymentData);
+
+          // Mostrar resumen
+          document.getElementById('summaryPlan').textContent = data.plan || '-';
+          document.getElementById('summaryPeriod').textContent = data.periodo || '-';
+
+          // Formatear precio con descuento de primera compra (20%)
+          const precioOriginal = data.precio || 0;
+          const descuentoPorcentaje = 20; // Descuento para primera compra
+          const descuento = precioOriginal * (descuentoPorcentaje / 100);
+          const precioConDescuento = precioOriginal - descuento;
+
+          const precioOriginalFormatted = new Intl.NumberFormat('es-MX', {
+            style: 'currency',
+            currency: 'MXN',
+            minimumFractionDigits: 0
+          }).format(precioOriginal);
+
+          const precioConDescuentoFormatted = new Intl.NumberFormat('es-MX', {
+            style: 'currency',
+            currency: 'MXN',
+            minimumFractionDigits: 0
+          }).format(precioConDescuento);
+
+          const descuentoFormatted = new Intl.NumberFormat('es-MX', {
+            style: 'currency',
+            currency: 'MXN',
+            minimumFractionDigits: 0
+          }).format(descuento);
+
+          // Mostrar precio con descuento
+          const summaryPriceEl = document.getElementById('summaryPrice');
+          const discountInfoEl = document.getElementById('discountInfo');
+
+          if (summaryPriceEl) {
+            summaryPriceEl.innerHTML = `
+            <div>
+              <div class="d-flex align-items-center justify-content-end gap-2 mb-1">
+                <span class="text-decoration-line-through text-muted small">${precioOriginalFormatted}</span>
+                <span class="badge bg-success">-${descuentoPorcentaje}%</span>
+              </div>
+              <div class="fs-5 fw-bold text-success">
+                ${precioConDescuentoFormatted}
+              </div>
+            </div>
+          `;
+          }
+
+          if (discountInfoEl) {
+            discountInfoEl.innerHTML = `
+            <div class="d-flex align-items-center gap-2">
+              <i class="fas fa-gift text-success"></i>
+              <div>
+                <strong class="text-success">Descuento de Primera Compra Aplicado</strong>
+                <div class="small text-muted">Ahorro de ${descuentoFormatted} (${descuentoPorcentaje}% de descuento)</div>
+              </div>
+            </div>
+          `;
+            discountInfoEl.style.display = 'block';
+          }
+
+          // Guardar datos globalmente
+          window.paymentData = data;
+        } catch (error) {
+          console.error('Error cargando datos de pago:', error);
+          alert('Error al cargar los datos de pago. Serás redirigido.');
+          window.location.href = 'demo.html';
+        }
+      });
+
+      // Manejar clic en botón para proceder a Stripe
+      document.getElementById('btnProceedToStripe').addEventListener('click', async function (e) {
+        e.preventDefault();
+
+        const btnSubmit = document.getElementById('btnProceedToStripe');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        const btnText = document.getElementById('btnText');
+
+        // Verificar que hay datos de pago
+        if (!window.paymentData) {
+          alert('Error: No se encontraron datos de pago. Por favor, regresa e intenta nuevamente.');
+          window.location.href = 'demo.html';
+          return;
+        }
+
+        // Mostrar loading
+        btnSubmit.disabled = true;
+        loadingSpinner.style.display = 'inline-block';
+        btnText.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Redirigiendo a Stripe...';
+
+        // Verificar si Stripe está configurado (REQUERIDO en producción)
+        if (!window.isStripeConfigured || !window.isStripeConfigured()) {
+          // Stripe es requerido - no usar simulación
+          console.error(
+            '❌ Stripe no está configurado. La integración con Stripe es requerida para procesar pagos.'
+          );
+          btnSubmit.disabled = false;
+          loadingSpinner.style.display = 'none';
+          btnText.innerHTML =
+            '<i class="fas fa-credit-card me-2"></i>Continuar con Stripe Checkout';
+          alert(
+            '❌ Error de Configuración\n\n' +
+              'Stripe no está configurado correctamente. Para procesar pagos, es necesario:\n\n' +
+              '1. Configurar tu Publishable Key en assets/scripts/stripe-config.js\n' +
+              '2. Configurar la URL del backend en stripe-config.js\n' +
+              '3. Asegurarse de que el backend esté corriendo y configurado con tu Secret Key\n\n' +
+              'Por favor, contacta al administrador del sistema.'
+          );
+          return;
+        }
+
+        // Procesar pago con Stripe
+        try {
+          // Obtener información de actualización si existe
+          const pendingUpdate = sessionStorage.getItem('pendingPlanUpdate');
+          let updateInfo = null;
+          if (pendingUpdate) {
+            try {
+              updateInfo = JSON.parse(pendingUpdate);
+              console.log('🔄 Información de actualización encontrada:', updateInfo);
+            } catch (error) {
+              console.error('❌ Error parseando pendingPlanUpdate:', error);
+            }
+          }
+
+          const paymentData = {
+            plan: window.paymentData.plan,
+            periodo: window.paymentData.periodo,
+            precio: window.paymentData.precio,
+            cliente: window.paymentData.cliente,
+            solicitudId: window.paymentData.solicitudId,
+            // Incluir información de actualización si existe
+            isPlanUpdate: window.paymentData.isPlanUpdate || false,
+            tenantId: window.paymentData.tenantId || updateInfo?.tenantId || null,
+            planLevel: updateInfo?.planLevel || updateInfo?.planType || null,
+            paymentPeriod: updateInfo?.paymentPeriod || null
+          };
+
+          // Guardar datos en sessionStorage para después del pago
+          sessionStorage.setItem('titanfleet_payment_pending', JSON.stringify(paymentData));
+
+          // Procesar pago con Stripe
+          const result = await window.stripeIntegration.processPayment(paymentData);
+
+          if (!result.success) {
+            // Error al procesar pago - mostrar mensaje claro
+            btnSubmit.disabled = false;
+            loadingSpinner.style.display = 'none';
+            btnText.innerHTML =
+              '<i class="fas fa-credit-card me-2"></i>Continuar con Stripe Checkout';
+
+            let errorMessage = 'Error al procesar el pago';
+            if (result.error === 'BACKEND_NOT_AVAILABLE') {
+              errorMessage =
+                '❌ Error de Conexión\n\n' +
+                'No se pudo conectar con el servidor de pagos. Por favor, verifica:\n\n' +
+                '1. Que el backend esté corriendo en la URL configurada\n' +
+                '2. Que la URL del backend en stripe-config.js sea correcta\n' +
+                '3. Que no haya problemas de red o firewall\n\n' +
+                'Contacta al administrador si el problema persiste.';
+            } else {
+              errorMessage = 'Error al procesar el pago: ' + (result.error || 'Error desconocido');
+            }
+
+            alert(errorMessage);
+            return;
+          }
+
+          // Si llegamos aquí, la redirección a Stripe ya se hizo
+          // El usuario será redirigido a Stripe Checkout
+        } catch (error) {
+          console.error('❌ Error procesando pago:', error);
+          btnSubmit.disabled = false;
+          loadingSpinner.style.display = 'none';
+          btnText.innerHTML =
+            '<i class="fas fa-credit-card me-2"></i>Continuar con Stripe Checkout';
+
+          let errorMessage = 'Error inesperado al procesar el pago';
+          if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+            errorMessage =
+              '❌ Error de Conexión\n\n' +
+              'No se pudo conectar con el servidor de pagos. Por favor, verifica:\n\n' +
+              '1. Que el backend esté corriendo en la URL configurada\n' +
+              '2. Que la URL del backend en stripe-config.js sea correcta\n' +
+              '3. Que no haya problemas de red o firewall\n\n' +
+              'Contacta al administrador si el problema persiste.';
+          } else {
+            errorMessage = 'Error inesperado: ' + error.message;
+          }
+
+          alert(errorMessage);
+        }
+      });
+
+      /**
+       * Validar datos antes de actualizar el plan
+       */
+      function validatePlanUpdateData() {
+        // Verificar que existan los datos de pago
+        if (!window.paymentData) {
+          return { valid: false, error: 'No se encontraron datos de pago' };
+        }
+
+        // Verificar que sea una actualización
+        if (!window.paymentData.isPlanUpdate) {
+          return { valid: false, error: 'Los datos no corresponden a una actualización de plan' };
+        }
+
+        // Verificar que exista tenantId
+        if (!window.paymentData.tenantId) {
+          return { valid: false, error: 'No se encontró el TenantId en los datos de pago' };
+        }
+
+        // Verificar que exista pendingPlanUpdate
+        const pendingUpdate = sessionStorage.getItem('pendingPlanUpdate');
+        if (!pendingUpdate) {
+          return { valid: false, error: 'No se encontraron datos de actualización pendiente' };
+        }
+
+        try {
+          const updateData = JSON.parse(pendingUpdate);
+
+          // Validar campos requeridos
+          if (!updateData.planLevel) {
+            return { valid: false, error: 'No se especificó el nivel del plan' };
+          }
+
+          if (!updateData.paymentPeriod) {
+            return { valid: false, error: 'No se especificó el período de pago' };
+          }
+
+          if (!updateData.tenantId) {
+            return {
+              valid: false,
+              error: 'No se encontró el TenantId en los datos de actualización'
+            };
+          }
+
+          // Validar que el tenantId coincida
+          if (updateData.tenantId !== window.paymentData.tenantId) {
+            return {
+              valid: false,
+              error: 'El TenantId no coincide entre los datos de pago y actualización'
+            };
+          }
+
+          // Validar planLevel
+          const validPlanLevels = ['basico', 'estandar', 'premium', 'enterprise'];
+          if (!validPlanLevels.includes(updateData.planLevel.toLowerCase())) {
+            return { valid: false, error: 'Nivel de plan no válido: ' + updateData.planLevel };
+          }
+
+          // Validar paymentPeriod
+          const validPaymentPeriods = ['mensual', 'anual'];
+          if (!validPaymentPeriods.includes(updateData.paymentPeriod.toLowerCase())) {
+            return {
+              valid: false,
+              error: 'Período de pago no válido: ' + updateData.paymentPeriod
+            };
+          }
+
+          // Validar que el precio coincida con el plan
+          const planPrices = {
+            basico: { mensual: 1999, anual: 21989 },
+            estandar: { mensual: 4999, anual: 54989 },
+            premium: { mensual: 8999, anual: 98989 },
+            enterprise: { mensual: 14999, anual: 164989 }
+          };
+
+          const expectedPrice =
+            planPrices[updateData.planLevel.toLowerCase()]?.[
+              updateData.paymentPeriod.toLowerCase()
+            ];
+          const actualPrice = window.paymentData.precio;
+
+          if (expectedPrice && Math.abs(expectedPrice - actualPrice) > 1) {
+            console.warn(
+              '⚠️ El precio no coincide exactamente. Esperado:',
+              expectedPrice,
+              'Actual:',
+              actualPrice
+            );
+            // No fallar por esto, solo advertir
+          }
+
+          return { valid: true, data: updateData };
+        } catch (error) {
+          return {
+            valid: false,
+            error: 'Error al parsear los datos de actualización: ' + error.message
+          };
+        }
+      }
+
+      /**
+       * Validar datos antes de renovar la licencia
+       */
+      function validateLicenseRenewalData() {
+        // Verificar que existan los datos de pago
+        if (!window.paymentData) {
+          return { valid: false, error: 'No se encontraron datos de pago' };
+        }
+
+        // Verificar que sea una renovación
+        if (!window.paymentData.isRenewal) {
+          return { valid: false, error: 'Los datos no corresponden a una renovación de licencia' };
+        }
+
+        // Verificar que exista tenantId
+        if (!window.paymentData.tenantId) {
+          return { valid: false, error: 'No se encontró el TenantId en los datos de pago' };
+        }
+
+        // Verificar que exista pendingLicenseRenewal
+        const pendingRenewal = sessionStorage.getItem('pendingLicenseRenewal');
+        if (!pendingRenewal) {
+          return { valid: false, error: 'No se encontraron datos de renovación pendiente' };
+        }
+
+        try {
+          const renewalData = JSON.parse(pendingRenewal);
+
+          // Validar campos requeridos
+          if (!renewalData.tenantId) {
+            return { valid: false, error: 'No se encontró el TenantId en los datos de renovación' };
+          }
+
+          if (!renewalData.planType) {
+            return { valid: false, error: 'No se especificó el tipo de plan' };
+          }
+
+          // Validar que el tenantId coincida
+          if (renewalData.tenantId !== window.paymentData.tenantId) {
+            return {
+              valid: false,
+              error: 'El TenantId no coincide entre los datos de pago y renovación'
+            };
+          }
+
+          return { valid: true, data: renewalData };
+        } catch (error) {
+          return {
+            valid: false,
+            error: 'Error al parsear los datos de renovación: ' + error.message
+          };
+        }
+      }
+
+      // NOTA: La función processPaymentSimulation() ha sido eliminada.
+      // En producción, todos los pagos deben procesarse a través de Stripe.
+      // Si Stripe no está configurado, se mostrará un error claro al usuario.
+    </script>
+  </body>
+</html>

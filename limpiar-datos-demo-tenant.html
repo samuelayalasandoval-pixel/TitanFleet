@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Limpiar Datos demo_tenant</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .collection-card {
+            margin-bottom: 1rem;
+        }
+        .document-item {
+            padding: 0.5rem;
+            margin: 0.25rem 0;
+            background-color: #f8f9fa;
+            border-radius: 0.25rem;
+            font-size: 0.875rem;
+        }
+        .danger-zone {
+            background-color: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-top: 2rem;
+        }
+        .stats {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        .stat-card {
+            flex: 1;
+            padding: 1rem;
+            background-color: #e9ecef;
+            border-radius: 0.25rem;
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #dc3545;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <div class="alert alert-warning">
+            <h4><i class="fas fa-exclamation-triangle"></i> Advertencia</h4>
+            <p>Este script eliminará <strong>físicamente</strong> todos los documentos con <code>tenantId: 'demo_tenant'</code> o <code>tenantId: 'demo'</code> de las siguientes colecciones:</p>
+            <ul>
+                <li><strong>Colecciones principales:</strong>
+                    <ul>
+                        <li><code>logistica</code></li>
+                        <li><code>trafico</code></li>
+                        <li><code>facturacion</code></li>
+                        <li><code>cxc</code> (Cuentas por Cobrar)</li>
+                        <li><code>cxp</code> (Cuentas por Pagar)</li>
+                        <li><code>operadores</code></li>
+                        <li><code>diesel</code></li>
+                        <li><code>mantenimiento</code></li>
+                        <li><code>tesoreria</code></li>
+                        <li><code>inventario</code></li>
+                        <li><code>reportes</code></li>
+                    </ul>
+                </li>
+                <li><strong>Configuración:</strong>
+                    <ul>
+                        <li><code>configuracion/tractocamiones</code> (económicos)</li>
+                        <li><code>configuracion/operadores</code></li>
+                        <li><code>configuracion/usuarios</code></li>
+                        <li><code>configuracion/clientes</code></li>
+                        <li><code>configuracion/proveedores</code></li>
+                        <li><code>configuracion/cuentas_bancarias</code> (cuentas bancarias)</li>
+                        <li><code>configuracion/estancias</code></li>
+                        <li><code>configuracion/almacenes</code></li>
+                    </ul>
+                </li>
+                <li><strong>Sistema:</strong>
+                    <ul>
+                        <li><code>system/active_registration_number_demo_tenant</code></li>
+                    </ul>
+                </li>
+            </ul>
+            <p><strong>Esta acción NO se puede deshacer.</strong></p>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5><i class="fas fa-list"></i> Pasos a seguir</h5>
+            </div>
+            <div class="card-body">
+                <ol>
+                    <li>Haz clic en <strong>"Escanear Documentos"</strong> para buscar todos los documentos con <code>demo_tenant</code></li>
+                    <li>Revisa la lista de documentos que se encontraron</li>
+                    <li>Si estás seguro, haz clic en <strong>"Eliminar Todos"</strong> para eliminarlos físicamente</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <button id="btnEscanear" class="btn btn-primary" onclick="escanearDocumentos()">
+                <i class="fas fa-search"></i> Escanear Documentos
+            </button>
+            <button id="btnEliminar" class="btn btn-danger" onclick="eliminarTodos()" disabled>
+                <i class="fas fa-trash"></i> Eliminar Todos
+            </button>
+            <button id="btnLimpiar" class="btn btn-secondary" onclick="limpiarResultados()">
+                <i class="fas fa-broom"></i> Limpiar Resultados
+            </button>
+        </div>
+
+        <div id="estadisticas" class="stats" style="display: none;">
+            <div class="stat-card">
+                <div class="stat-number" id="totalDocumentos">0</div>
+                <div>Total de Documentos</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="totalColecciones">0</div>
+                <div>Colecciones Afectadas</div>
+            </div>
+        </div>
+
+        <div id="resultados"></div>
+
+        <div id="progreso" class="mt-4" style="display: none;">
+            <div class="progress">
+                <div id="barraProgreso" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%"></div>
+            </div>
+            <p class="text-center mt-2" id="textoProgreso">Procesando...</p>
+        </div>
+    </div>
+
+    <!-- Firebase -->
+    <script type="module">
+        import { initializeApp, getApps, getApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+        import { getAuth } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+        import { getFirestore, collection, getDocs, doc, deleteDoc, query, where, getDoc, setDoc, updateDoc } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+
+        // Configuración de Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyBh_x0zUdauLERfWn-LMC2xnbxftfTXhhg",
+            authDomain: "titanfleet-60931.firebaseapp.com",
+            databaseURL: "https://titanfleet-60931-default-rtdb.firebaseio.com",
+            projectId: "titanfleet-60931",
+            storageBucket: "titanfleet-60931.firebasestorage.app",
+            messagingSenderId: "638195392578",
+            appId: "1:638195392578:web:4afc3e07bf448dedb60ddb",
+            measurementId: "G-LB745PEHGV"
+        };
+
+        // Inicializar Firebase (evitar inicialización duplicada)
+        let app;
+        try {
+            const existingApps = getApps();
+            if (existingApps.length > 0) {
+                app = getApp();
+                console.log('✅ Usando instancia de Firebase existente');
+            } else {
+                app = initializeApp(firebaseConfig);
+                console.log('✅ Firebase inicializado correctamente');
+            }
+        } catch (error) {
+            console.warn('⚠️ Error al verificar app existente, inicializando nueva:', error);
+            app = initializeApp(firebaseConfig);
+        }
+        
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // Hacer disponible globalmente
+        window.firebaseDb = db;
+        window.firebaseAuth = auth;
+        window.fs = { collection, getDocs, doc, deleteDoc, query, where, getDoc, setDoc, updateDoc };
+
+        console.log('✅ Firebase inicializado');
+
+        // Variables globales
+        window.documentosEncontrados = [];
+
+        // Función para escanear documentos
+        window.escanearDocumentos = async function() {
+            console.log('🔍 Iniciando escaneo de documentos con demo_tenant...');
+            
+            const btnEscanear = document.getElementById('btnEscanear');
+            const btnEliminar = document.getElementById('btnEliminar');
+            const resultados = document.getElementById('resultados');
+            const estadisticas = document.getElementById('estadisticas');
+            const progreso = document.getElementById('progreso');
+            const barraProgreso = document.getElementById('barraProgreso');
+            const textoProgreso = document.getElementById('textoProgreso');
+
+            btnEscanear.disabled = true;
+            btnEscanear.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Escaneando...';
+            resultados.innerHTML = '';
+            window.documentosEncontrados = [];
+            progreso.style.display = 'block';
+            barraProgreso.style.width = '0%';
+            textoProgreso.textContent = 'Iniciando escaneo...';
+
+            const colecciones = [
+                { nombre: 'logistica', ruta: 'logistica' },
+                { nombre: 'trafico', ruta: 'trafico' },
+                { nombre: 'facturacion', ruta: 'facturacion' },
+                { nombre: 'cxc', ruta: 'cxc' },
+                { nombre: 'cxp', ruta: 'cxp' },
+                { nombre: 'operadores', ruta: 'operadores' },
+                { nombre: 'diesel', ruta: 'diesel' },
+                { nombre: 'mantenimiento', ruta: 'mantenimiento' },
+                { nombre: 'tesoreria', ruta: 'tesoreria' },
+                { nombre: 'inventario', ruta: 'inventario' },
+                { nombre: 'reportes', ruta: 'reportes' },
+                { nombre: 'system', documento: 'active_registration_number_demo_tenant' }
+            ];
+
+            let totalProcesado = 0;
+            let totalEncontrados = 0;
+            // Documentos de configuración: [nombreDocumento, nombreCampo]
+            const configCollections = [
+                { doc: 'tractocamiones', campo: 'tractocamiones' }, // Económicos
+                { doc: 'operadores', campo: 'operadores' },
+                { doc: 'usuarios', campo: 'usuarios' },
+                { doc: 'clientes', campo: 'clientes' },
+                { doc: 'proveedores', campo: 'proveedores' },
+                { doc: 'cuentas_bancarias', campo: 'cuentasBancarias' }, // Cuentas bancarias (con guión bajo en doc, camelCase en campo)
+                { doc: 'estancias', campo: 'estancias' },
+                { doc: 'almacenes', campo: 'almacenes' }
+            ];
+
+            try {
+                // Escanear colecciones principales (excluyendo 'system' que se maneja después)
+                const coleccionesPrincipales = colecciones.filter(c => c.ruta && c.nombre !== 'system');
+                const totalColecciones = coleccionesPrincipales.length + 1 + configCollections.length; // +1 por system, +configCollections
+                
+                for (const col of coleccionesPrincipales) {
+                    textoProgreso.textContent = `Escaneando ${col.nombre}...`;
+                    barraProgreso.style.width = `${(totalProcesado / colecciones.length) * 100}%`;
+
+                    try {
+                        const colRef = collection(db, col.ruta);
+                        const snapshot = await getDocs(colRef);
+                        
+                        let encontradosEnColeccion = 0;
+                        snapshot.forEach((docSnap) => {
+                            const data = docSnap.data();
+                            const tenantId = data.tenantId;
+                            
+                            if (tenantId === 'demo_tenant' || tenantId === 'demo') {
+                                window.documentosEncontrados.push({
+                                    coleccion: col.nombre,
+                                    id: docSnap.id,
+                                    tenantId: tenantId,
+                                    data: data,
+                                    tipo: 'documento'
+                                });
+                                encontradosEnColeccion++;
+                                totalEncontrados++;
+                            }
+                        });
+
+                        if (encontradosEnColeccion > 0) {
+                            console.log(`✅ ${col.nombre}: ${encontradosEnColeccion} documentos encontrados`);
+                        } else {
+                            console.log(`ℹ️ ${col.nombre}: 0 documentos con demo_tenant`);
+                        }
+                    } catch (error) {
+                        console.error(`❌ Error escaneando ${col.nombre}:`, error);
+                    }
+
+                    totalProcesado++;
+                }
+
+                // Escanear documento específico de system
+                textoProgreso.textContent = 'Escaneando system...';
+                barraProgreso.style.width = `${(coleccionesPrincipales.length / totalColecciones) * 100}%`;
+                try {
+                    const systemDocRef = doc(db, 'system', 'active_registration_number_demo_tenant');
+                    const systemDocSnap = await getDoc(systemDocRef);
+                    if (systemDocSnap.exists()) {
+                        window.documentosEncontrados.push({
+                            coleccion: 'system',
+                            id: 'active_registration_number_demo_tenant',
+                            tenantId: systemDocSnap.data().tenantId || 'demo_tenant',
+                            data: systemDocSnap.data(),
+                            tipo: 'documento'
+                        });
+                        totalEncontrados++;
+                    }
+                } catch (error) {
+                    console.warn('⚠️ Documento system/active_registration_number_demo_tenant no existe o error:', error);
+                }
+                totalProcesado++;
+
+                // Escanear configuracion (documentos especiales)
+                textoProgreso.textContent = 'Escaneando configuración...';
+                let configProcesadas = 0;
+                const porcentajeConfig = ((coleccionesPrincipales.length + 1) / totalColecciones) * 100;
+                barraProgreso.style.width = `${porcentajeConfig}%`;
+                for (const configItem of configCollections) {
+                    const configDocName = configItem.doc; // Nombre del documento (ej: 'cuentas_bancarias')
+                    const configCampoName = configItem.campo; // Nombre del campo dentro del documento (ej: 'cuentasBancarias')
+                    
+                    try {
+                        const configDocRef = doc(db, 'configuracion', configDocName);
+                        const configDocSnap = await getDoc(configDocRef);
+                        
+                        if (configDocSnap.exists()) {
+                            const data = configDocSnap.data();
+                            let encontradosEnConfig = 0;
+
+                            // Buscar arrays o objetos dentro del documento usando el nombre del campo correcto
+                            if (Array.isArray(data[configCampoName])) {
+                                data[configCampoName].forEach((item, index) => {
+                                    if (item.tenantId === 'demo_tenant' || item.tenantId === 'demo') {
+                                        window.documentosEncontrados.push({
+                                            coleccion: `configuracion/${configDocName}`,
+                                            id: `${configDocName}_item_${index}`,
+                                            tenantId: item.tenantId,
+                                            data: item,
+                                            tipo: 'item_en_documento',
+                                            campo: configCampoName,
+                                            documentoPath: `configuracion/${configDocName}`
+                                        });
+                                        encontradosEnConfig++;
+                                        totalEncontrados++;
+                                    }
+                                });
+                            } else if (typeof data[configCampoName] === 'object' && data[configCampoName] !== null) {
+                                Object.keys(data[configCampoName]).forEach(key => {
+                                    const item = data[configCampoName][key];
+                                    if (item && (item.tenantId === 'demo_tenant' || item.tenantId === 'demo')) {
+                                        window.documentosEncontrados.push({
+                                            coleccion: `configuracion/${configDocName}`,
+                                            id: `${configDocName}_item_${key}`,
+                                            tenantId: item.tenantId,
+                                            data: item,
+                                            tipo: 'item_en_documento',
+                                            campo: configCampoName,
+                                            documentoPath: `configuracion/${configDocName}`
+                                        });
+                                        encontradosEnConfig++;
+                                        totalEncontrados++;
+                                    }
+                                });
+                            }
+
+                            if (encontradosEnConfig > 0) {
+                                console.log(`✅ configuracion/${configDocName}: ${encontradosEnConfig} elementos encontrados`);
+                            } else {
+                                console.log(`ℹ️ configuracion/${configDocName}: 0 elementos con demo_tenant`);
+                            }
+                        } else {
+                            console.log(`ℹ️ configuracion/${configDocName}: documento no existe`);
+                        }
+                    } catch (error) {
+                        console.error(`❌ Error escaneando configuracion/${configDocName}:`, error);
+                    }
+                    
+                    configProcesadas++;
+                    const porcentajeConfigActualizado = ((coleccionesPrincipales.length + 1 + (configProcesadas / configCollections.length)) / totalColecciones) * 100;
+                    barraProgreso.style.width = `${Math.min(porcentajeConfigActualizado, 95)}%`;
+                }
+
+                barraProgreso.style.width = '100%';
+                textoProgreso.textContent = 'Escaneo completado';
+
+                // Mostrar resultados
+                mostrarResultados();
+
+                // Actualizar estadísticas
+                const coleccionesUnicas = new Set(window.documentosEncontrados.map(d => d.coleccion));
+                document.getElementById('totalDocumentos').textContent = totalEncontrados;
+                document.getElementById('totalColecciones').textContent = coleccionesUnicas.size;
+                estadisticas.style.display = 'flex';
+
+                if (totalEncontrados > 0) {
+                    btnEliminar.disabled = false;
+                } else {
+                    alert('✅ No se encontraron documentos con demo_tenant');
+                }
+
+            } catch (error) {
+                console.error('❌ Error en el escaneo:', error);
+                alert('❌ Error al escanear: ' + error.message);
+            } finally {
+                btnEscanear.disabled = false;
+                btnEscanear.innerHTML = '<i class="fas fa-search"></i> Escanear Documentos';
+                setTimeout(() => {
+                    progreso.style.display = 'none';
+                }, 1000);
+            }
+        };
+
+        // Función para mostrar resultados
+        function mostrarResultados() {
+            const resultados = document.getElementById('resultados');
+            resultados.innerHTML = '';
+
+            // Agrupar por colección
+            const agrupados = {};
+            window.documentosEncontrados.forEach(doc => {
+                if (!agrupados[doc.coleccion]) {
+                    agrupados[doc.coleccion] = [];
+                }
+                agrupados[doc.coleccion].push(doc);
+            });
+
+            // Crear tarjetas por colección
+            Object.keys(agrupados).forEach(coleccion => {
+                const docs = agrupados[coleccion];
+                const card = document.createElement('div');
+                card.className = 'card collection-card';
+                card.innerHTML = `
+                    <div class="card-header">
+                        <h6><i class="fas fa-folder"></i> ${coleccion} <span class="badge bg-danger">${docs.length}</span></h6>
+                    </div>
+                    <div class="card-body">
+                        ${docs.map(doc => `
+                            <div class="document-item">
+                                <strong>ID:</strong> ${doc.id}<br>
+                                <strong>TenantId:</strong> ${doc.tenantId}<br>
+                                ${doc.tipo === 'item_en_documento' ? '<em class="text-warning">⚠️ Item dentro de documento configuracion (requiere actualización manual del documento)</em><br>' : ''}
+                                ${doc.data.numeroRegistro ? `<strong>Número Registro:</strong> ${doc.data.numeroRegistro}<br>` : ''}
+                                ${doc.data.nombre ? `<strong>Nombre:</strong> ${doc.data.nombre}<br>` : ''}
+                                ${doc.data.email ? `<strong>Email:</strong> ${doc.data.email}<br>` : ''}
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+                resultados.appendChild(card);
+            });
+        }
+
+        // Función para eliminar todos
+        window.eliminarTodos = async function() {
+            if (window.documentosEncontrados.length === 0) {
+                alert('⚠️ No hay documentos para eliminar. Escanea primero.');
+                return;
+            }
+
+            const confirmacion = confirm(
+                `¿Estás SEGURO de que deseas eliminar ${window.documentosEncontrados.length} documentos?\n\n` +
+                `Esta acción NO se puede deshacer.\n\n` +
+                `Presiona OK para continuar o Cancel para cancelar.`
+            );
+
+            if (!confirmacion) {
+                return;
+            }
+
+            const btnEliminar = document.getElementById('btnEliminar');
+            const progreso = document.getElementById('progreso');
+            const barraProgreso = document.getElementById('barraProgreso');
+            const textoProgreso = document.getElementById('textoProgreso');
+
+            btnEliminar.disabled = true;
+            btnEliminar.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Eliminando...';
+            progreso.style.display = 'block';
+            barraProgreso.style.width = '0%';
+            textoProgreso.textContent = 'Iniciando eliminación...';
+
+            let eliminados = 0;
+            let errores = 0;
+
+            try {
+                // Separar documentos normales de items en configuracion
+                const docsNormales = window.documentosEncontrados.filter(d => d.tipo === 'documento');
+                const itemsConfig = window.documentosEncontrados.filter(d => d.tipo === 'item_en_documento');
+
+                // Eliminar documentos normales
+                for (let i = 0; i < docsNormales.length; i++) {
+                    const docEncontrado = docsNormales[i];
+                    textoProgreso.textContent = `Eliminando ${docEncontrado.coleccion}/${docEncontrado.id}... (${i + 1}/${docsNormales.length})`;
+                    barraProgreso.style.width = `${((i + 1) / window.documentosEncontrados.length) * 100}%`;
+
+                    try {
+                        // Para system, usar doc()
+                        if (docEncontrado.coleccion === 'system') {
+                            const docRef = doc(db, 'system', docEncontrado.id);
+                            await deleteDoc(docRef);
+                        } else {
+                            const docRef = doc(db, docEncontrado.coleccion, docEncontrado.id);
+                            await deleteDoc(docRef);
+                        }
+                        eliminados++;
+                        console.log(`✅ Eliminado: ${docEncontrado.coleccion}/${docEncontrado.id}`);
+                    } catch (error) {
+                        errores++;
+                        console.error(`❌ Error eliminando ${docEncontrado.coleccion}/${docEncontrado.id}:`, error);
+                    }
+                }
+
+                // Actualizar documentos de configuración (eliminar items con demo_tenant)
+                let itemsConfigActualizados = 0;
+                if (itemsConfig.length > 0) {
+                    textoProgreso.textContent = 'Actualizando documentos de configuración...';
+                    
+                    // Agrupar items por documento de configuración
+                    const itemsPorDocumento = {};
+                    itemsConfig.forEach(item => {
+                        const docPath = item.coleccion; // ej: "configuracion/usuarios"
+                        if (!itemsPorDocumento[docPath]) {
+                            itemsPorDocumento[docPath] = [];
+                        }
+                        itemsPorDocumento[docPath].push(item);
+                    });
+
+                    // Actualizar cada documento de configuración
+                    for (const [docPath, items] of Object.entries(itemsPorDocumento)) {
+                        try {
+                            const [coleccion, docId] = docPath.split('/');
+                            const configDocRef = doc(db, coleccion, docId);
+                            const configDocSnap = await getDoc(configDocRef);
+                            
+                            if (configDocSnap.exists()) {
+                                const data = configDocSnap.data();
+                                // Obtener el nombre del campo del primer item (todos los items del mismo documento tienen el mismo campo)
+                                const campo = items[0]?.campo;
+                                
+                                if (!campo) {
+                                    console.warn(`⚠️ ${docPath}: No se pudo determinar el nombre del campo, saltando...`);
+                                    continue;
+                                }
+                                
+                                let actualizado = false;
+                                
+                                // Actualizar array o objeto según corresponda
+                                if (Array.isArray(data[campo])) {
+                                    const nuevoArray = data[campo].filter(item => {
+                                        const tieneDemoTenant = item.tenantId === 'demo_tenant' || item.tenantId === 'demo';
+                                        return !tieneDemoTenant;
+                                    });
+                                    
+                                    if (nuevoArray.length !== data[campo].length) {
+                                        await updateDoc(configDocRef, { [campo]: nuevoArray });
+                                        actualizado = true;
+                                        itemsConfigActualizados += (data[campo].length - nuevoArray.length);
+                                        console.log(`✅ Actualizado ${docPath}: eliminados ${data[campo].length - nuevoArray.length} items`);
+                                    }
+                                } else if (typeof data[campo] === 'object' && data[campo] !== null) {
+                                    const nuevoObjeto = {};
+                                    let eliminadosDelObjeto = 0;
+                                    
+                                    Object.keys(data[campo]).forEach(key => {
+                                        const item = data[campo][key];
+                                        if (item && (item.tenantId === 'demo_tenant' || item.tenantId === 'demo')) {
+                                            eliminadosDelObjeto++;
+                                        } else {
+                                            nuevoObjeto[key] = item;
+                                        }
+                                    });
+                                    
+                                    if (eliminadosDelObjeto > 0) {
+                                        await updateDoc(configDocRef, { [campo]: nuevoObjeto });
+                                        actualizado = true;
+                                        itemsConfigActualizados += eliminadosDelObjeto;
+                                        console.log(`✅ Actualizado ${docPath}: eliminados ${eliminadosDelObjeto} items`);
+                                    }
+                                } else {
+                                    console.warn(`⚠️ ${docPath}: Campo '${campo}' no es array ni objeto, tipo: ${typeof data[campo]}`);
+                                }
+                                
+                                if (!actualizado) {
+                                    console.log(`ℹ️ ${docPath}: no se requirió actualización`);
+                                }
+                            } else {
+                                console.warn(`⚠️ ${docPath}: Documento no existe en Firebase`);
+                            }
+                        } catch (error) {
+                            errores++;
+                            console.error(`❌ Error actualizando ${docPath}:`, error);
+                        }
+                    }
+                }
+
+                barraProgreso.style.width = '100%';
+                textoProgreso.textContent = 'Eliminación completada';
+
+                const totalEliminados = eliminados + itemsConfigActualizados;
+                alert(
+                    `✅ Eliminación completada:\n\n` +
+                    `- Documentos eliminados: ${eliminados}\n` +
+                    `- Items de configuración eliminados: ${itemsConfigActualizados}\n` +
+                    `- Total eliminado: ${totalEliminados}\n` +
+                    `- Errores: ${errores}`
+                );
+
+                // Limpiar resultados
+                window.documentosEncontrados = [];
+                document.getElementById('resultados').innerHTML = '';
+                document.getElementById('estadisticas').style.display = 'none';
+
+            } catch (error) {
+                console.error('❌ Error en la eliminación:', error);
+                alert('❌ Error al eliminar: ' + error.message);
+            } finally {
+                btnEliminar.disabled = false;
+                btnEliminar.innerHTML = '<i class="fas fa-trash"></i> Eliminar Todos';
+                setTimeout(() => {
+                    progreso.style.display = 'none';
+                }, 2000);
+            }
+        };
+
+        // Función para limpiar resultados
+        window.limpiarResultados = function() {
+            window.documentosEncontrados = [];
+            document.getElementById('resultados').innerHTML = '';
+            document.getElementById('estadisticas').style.display = 'none';
+            document.getElementById('btnEliminar').disabled = true;
+        };
+    </script>
+</body>
+</html>
+

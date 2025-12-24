@@ -1,0 +1,334 @@
+// =============================================================================
+// COMPONENTE: BOTONES
+// =============================================================================
+
+@use 'sass:color';
+@use '../base/variables' as *;
+@use '../base/mixins' as *;
+
+// =============================================================================
+// BOTÓN BASE
+// =============================================================================
+
+.btn {
+  @include button-base;
+  
+  // Estados
+  &:focus {
+    @include focus-visible;
+  }
+  
+  // Tamaños
+  &--sm {
+    @include button-size($spacing-sm, $spacing-lg, $font-size-sm);
+  }
+  
+  &--md {
+    @include button-size($spacing-md, $spacing-xl, $font-size-md);
+  }
+  
+  &--lg {
+    @include button-size($spacing-lg, $spacing-2xl, $font-size-lg);
+  }
+  
+  &--xl {
+    @include button-size($spacing-xl, $spacing-3xl, $font-size-xl);
+  }
+  
+  // Variantes de color
+  &--primary {
+    @include button-variant($brand-primary, white, color.adjust($brand-primary, $lightness: -10%));
+  }
+  
+  &--secondary {
+    @include button-variant($brand-secondary, white, color.adjust($brand-secondary, $lightness: -10%));
+  }
+  
+  &--accent {
+    @include button-variant($brand-accent, white, color.adjust($brand-accent, $lightness: -10%));
+  }
+  
+  &--success {
+    @include button-variant($brand-success, white, color.adjust($brand-success, $lightness: -10%));
+  }
+  
+  &--warning {
+    @include button-variant($brand-warning, white, color.adjust($brand-warning, $lightness: -10%));
+  }
+  
+  &--danger {
+    @include button-variant($brand-danger, white, color.adjust($brand-danger, $lightness: -10%));
+  }
+  
+  &--info {
+    @include button-variant($brand-info, white, color.adjust($brand-info, $lightness: -10%));
+  }
+  
+  // Variantes de estilo
+  &--outline {
+    background: transparent;
+    border: $border-width-md solid currentColor;
+    
+    &.btn--primary {
+      color: $brand-primary;
+      border-color: $brand-primary;
+      
+      &:hover:not(:disabled) {
+        background: $brand-primary;
+        color: white;
+      }
+    }
+    
+    &.btn--secondary {
+      color: $brand-secondary;
+      border-color: $brand-secondary;
+      
+      &:hover:not(:disabled) {
+        background: $brand-secondary;
+        color: white;
+      }
+    }
+    
+    &.btn--accent {
+      color: $brand-accent;
+      border-color: $brand-accent;
+      
+      &:hover:not(:disabled) {
+        background: $brand-accent;
+        color: white;
+      }
+    }
+  }
+  
+  &--ghost {
+    background: transparent;
+    
+    &.btn--primary {
+      color: $brand-primary;
+      
+      &:hover:not(:disabled) {
+        background: rgba($brand-primary, 0.1);
+      }
+    }
+    
+    &.btn--secondary {
+      color: $brand-secondary;
+      
+      &:hover:not(:disabled) {
+        background: rgba($brand-secondary, 0.1);
+      }
+    }
+    
+    &.btn--accent {
+      color: $brand-accent;
+      
+      &:hover:not(:disabled) {
+        background: rgba($brand-accent, 0.1);
+      }
+    }
+  }
+  
+  // Estados especiales
+  &--loading {
+    position: relative;
+    color: transparent;
+    
+    &::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 20px;
+      height: 20px;
+      margin: -10px 0 0 -10px;
+      border: 2px solid transparent;
+      border-top: 2px solid currentColor;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+  }
+  
+  &--block {
+    width: 100%;
+  }
+  
+  &--rounded {
+    border-radius: $border-radius-full;
+  }
+  
+  &--square {
+    border-radius: $border-radius-md;
+  }
+  
+  // Iconos en botones
+  &__icon {
+    margin-right: $spacing-sm;
+    
+    &:last-child {
+      margin-right: 0;
+      margin-left: $spacing-sm;
+    }
+  }
+  
+  &__text {
+    display: inline-block;
+  }
+}
+
+// =============================================================================
+// GRUPO DE BOTONES
+// =============================================================================
+
+.btn-group {
+  display: inline-flex;
+  border-radius: $border-radius-lg;
+  overflow: hidden;
+  
+  .btn {
+    border-radius: 0;
+    border-right: 1px solid rgba(255, 255, 255, 0.2);
+    
+    &:first-child {
+      border-top-left-radius: $border-radius-lg;
+      border-bottom-left-radius: $border-radius-lg;
+    }
+    
+    &:last-child {
+      border-right: none;
+      border-top-right-radius: $border-radius-lg;
+      border-bottom-right-radius: $border-radius-lg;
+    }
+    
+    &:hover {
+      z-index: 1;
+    }
+  }
+  
+  &--vertical {
+    flex-direction: column;
+    
+    .btn {
+      border-right: none;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      
+      &:first-child {
+        border-top-left-radius: $border-radius-lg;
+        border-top-right-radius: $border-radius-lg;
+        border-bottom-left-radius: 0;
+      }
+      
+      &:last-child {
+        border-bottom: none;
+        border-top-left-radius: 0;
+        border-top-right-radius: 0;
+        border-bottom-left-radius: $border-radius-lg;
+        border-bottom-right-radius: $border-radius-lg;
+      }
+    }
+  }
+}
+
+// =============================================================================
+// BOTONES ESPECIALES
+// =============================================================================
+
+.btn-float {
+  position: fixed;
+  bottom: $spacing-2xl;
+  right: $spacing-2xl;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  @include button-variant($brand-primary, white, color.adjust($brand-primary, $lightness: -10%));
+  @include hover-lift;
+  z-index: $z-index-fixed;
+  
+  @include respond-below('md') {
+    bottom: $spacing-xl;
+    right: $spacing-xl;
+    width: 48px;
+    height: 48px;
+  }
+}
+
+.btn-close {
+  position: relative;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  @include flex-center;
+  
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    width: 16px;
+    height: 2px;
+    background: $text-secondary;
+    transition: all $transition-normal;
+  }
+  
+  &::before {
+    transform: rotate(45deg);
+  }
+  
+  &::after {
+    transform: rotate(-45deg);
+  }
+  
+  &:hover {
+    &::before,
+    &::after {
+      background: $text-primary;
+      transform: rotate(45deg) scale(1.1);
+    }
+    
+    &::after {
+      transform: rotate(-45deg) scale(1.1);
+    }
+  }
+}
+
+// =============================================================================
+// ANIMACIONES
+// =============================================================================
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+// =============================================================================
+// RESPONSIVE
+// =============================================================================
+
+@include respond-below('md') {
+  .btn {
+    &--lg,
+    &--xl {
+      @include button-size($spacing-md, $spacing-xl, $font-size-md);
+    }
+  }
+  
+  .btn-group {
+    flex-direction: column;
+    
+    .btn {
+      border-right: none;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      
+      &:first-child {
+        border-radius: $border-radius-lg $border-radius-lg 0 0;
+      }
+      
+      &:last-child {
+        border-bottom: none;
+        border-radius: 0 0 $border-radius-lg $border-radius-lg;
+      }
+    }
+  }
+}
+

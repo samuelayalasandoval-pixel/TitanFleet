@@ -1,0 +1,1419 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/png" sizes="16x16" href="../assets/img/Logo TF.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="../assets/img/Logo TF.png" />
+    <link rel="icon" type="image/png" sizes="64x64" href="../assets/img/Logo TF.png" />
+    <title>Pago Exitoso - TitanFleet</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link rel="stylesheet" href="../styles/styles.css" />
+    <style>
+      body {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 2rem 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .success-container {
+        max-width: 700px;
+        margin: 0 auto;
+      }
+      .success-card {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        animation: slideInUp 0.5s ease;
+      }
+      @keyframes slideInUp {
+        from {
+          transform: translateY(30px);
+          opacity: 0;
+        }
+        to {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+      .success-header {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+        padding: 3rem 2rem;
+        text-align: center;
+      }
+      .success-icon {
+        font-size: 5rem;
+        margin-bottom: 1rem;
+        animation: scaleIn 0.5s ease 0.3s both;
+      }
+      @keyframes scaleIn {
+        from {
+          transform: scale(0);
+        }
+        to {
+          transform: scale(1);
+        }
+      }
+      .success-body {
+        padding: 2.5rem;
+      }
+      .license-box {
+        background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+        border: 2px dashed #10b981;
+        border-radius: 12px;
+        padding: 2rem;
+        margin: 2rem 0;
+        text-align: center;
+        position: relative;
+      }
+      .license-key {
+        font-family: 'Courier New', monospace;
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #03363d;
+        letter-spacing: 2px;
+        margin: 1rem 0;
+        word-break: break-all;
+      }
+      .copy-btn {
+        margin-top: 1rem;
+      }
+      .info-section {
+        background: #f8f9fa;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin: 1.5rem 0;
+      }
+      .info-section h6 {
+        color: #03363d;
+        margin-bottom: 1rem;
+        font-weight: 700;
+      }
+      .info-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #e9ecef;
+      }
+      .info-item:last-child {
+        border-bottom: none;
+      }
+      .steps-list {
+        list-style: none;
+        padding: 0;
+      }
+      .steps-list li {
+        padding: 0.75rem 0;
+        padding-left: 2rem;
+        position: relative;
+      }
+      .steps-list li:before {
+        content: counter(step-counter);
+        counter-increment: step-counter;
+        position: absolute;
+        left: 0;
+        background: #10b981;
+        color: white;
+        width: 1.5rem;
+        height: 1.5rem;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 0.875rem;
+      }
+      .steps-list {
+        counter-reset: step-counter;
+      }
+      .alert-success-custom {
+        background: #d1fae5;
+        border: 1px solid #10b981;
+        color: #065f46;
+        border-radius: 8px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="success-container">
+        <div class="success-card">
+          <div class="success-header">
+            <div class="success-icon">
+              <i class="fas fa-check-circle"></i>
+            </div>
+            <h1 class="mb-2">¡Pago Exitoso!</h1>
+            <p class="mb-0">Tu pago ha sido procesado correctamente</p>
+          </div>
+
+          <div class="success-body">
+            <!-- Información del Pago -->
+            <div class="info-section">
+              <h6><i class="fas fa-receipt me-2"></i>Detalles de tu Compra</h6>
+              <div class="info-item">
+                <span><strong>Plan:</strong></span>
+                <span id="successPlan">-</span>
+              </div>
+              <div class="info-item">
+                <span><strong>Periodo:</strong></span>
+                <span id="successPeriod">-</span>
+              </div>
+              <div class="info-item">
+                <span><strong>Monto Pagado:</strong></span>
+                <span id="successPrice" class="text-success fw-bold">-</span>
+              </div>
+              <div class="info-item">
+                <span><strong>Fecha de Pago:</strong></span>
+                <span id="successDate">-</span>
+              </div>
+            </div>
+
+            <!-- Licencia Generada -->
+            <div class="license-box">
+              <h5 class="mb-3">
+                <i class="fas fa-key me-2 text-success"></i>
+                Tu Licencia de Activación
+              </h5>
+              <div class="license-key" id="licenseKeyDisplay">Cargando...</div>
+              <p class="text-muted mb-3">
+                <small>Esta licencia es única e intransferible</small>
+              </p>
+              <button class="btn btn-success copy-btn" onclick="copyLicense()">
+                <i class="fas fa-copy me-2"></i>Copiar Licencia
+              </button>
+            </div>
+
+            <!-- Información de la Licencia -->
+            <div class="info-section">
+              <h6><i class="fas fa-info-circle me-2"></i>Información de tu Licencia</h6>
+              <div class="info-item">
+                <span><strong>Tipo:</strong></span>
+                <span id="licenseType">-</span>
+              </div>
+              <div class="info-item">
+                <span><strong>Vigencia:</strong></span>
+                <span id="licenseValidity">-</span>
+              </div>
+              <div class="info-item">
+                <span><strong>Estado:</strong></span>
+                <span class="badge bg-success">Generada</span>
+              </div>
+            </div>
+
+            <!-- Instrucciones de Activación -->
+            <div class="alert alert-success-custom">
+              <h6 class="mb-3">
+                <i class="fas fa-rocket me-2"></i>
+                Instrucciones de Activación
+              </h6>
+              <ol class="steps-list mb-0">
+                <li>Accede a tu sistema TitanFleet ERP</li>
+                <li>Cuando se te solicite, ingresa la licencia mostrada arriba</li>
+                <li>Tu sistema se activará automáticamente</li>
+                <li>¡Comienza a usar todas las funcionalidades!</li>
+              </ol>
+            </div>
+
+            <!-- Nota sobre Email -->
+            <div class="alert alert-info">
+              <i class="fas fa-envelope me-2"></i>
+              <strong>Correo Enviado:</strong> Hemos enviado un correo electrónico a tu dirección
+              con todos los detalles de tu compra y tu licencia. Revisa tu bandeja de entrada (y
+              spam si no lo encuentras).
+            </div>
+
+            <!-- Botones de Acción -->
+            <div class="d-grid gap-2 mt-4">
+              <button class="btn btn-primary btn-lg" onclick="redirectToIndex('?activate=1')">
+                <i class="fas fa-rocket me-2"></i>Activar mi Licencia Ahora
+              </button>
+              <button class="btn btn-outline-secondary" onclick="redirectToIndex()">
+                <i class="fas fa-home me-2"></i>Ir a la Página Principal
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="../assets/scripts/stripe-config.js"></script>
+    <script src="../assets/scripts/stripe-integration.js"></script>
+    <script src="../assets/scripts/license-manager.js"></script>
+    <script src="../assets/scripts/generate-licenses.js"></script>
+    <script src="../assets/scripts/license-admin.js"></script>
+    <script>
+      /**
+       * Función helper para obtener la ruta correcta a index.html
+       * Detecta si estamos en public/ y ajusta la ruta
+       */
+      function getIndexPath() {
+        const currentPath = window.location.pathname;
+        const currentUrl = window.location.href;
+        const origin = window.location.origin;
+
+        console.log('🔍 Ruta actual (pathname):', currentPath);
+        console.log('🔍 URL completa:', currentUrl);
+        console.log('🔍 Origin:', origin);
+
+        // Verificar de múltiples formas si estamos en public/
+        const isInPublic =
+          currentPath.includes('/public/') ||
+          currentPath.startsWith('/public/') ||
+          currentUrl.includes('/public/');
+
+        console.log('🔍 ¿Está en public?:', isInPublic);
+
+        if (isInPublic) {
+          // Si estamos en public/pages/pago-success.html
+          // Construir la URL completa a public/index.html
+          try {
+            const url = new URL(currentUrl);
+            const pathParts = url.pathname.split('/').filter(p => p);
+            const publicIndex = pathParts.indexOf('public');
+
+            if (publicIndex !== -1) {
+              // Construir ruta absoluta: /public/index.html
+              const absolutePath =
+                '/' + pathParts.slice(0, publicIndex + 1).join('/') + '/index.html';
+              console.log('🔗 Ruta absoluta construida:', absolutePath);
+              console.log('🔗 URL completa será:', origin + absolutePath);
+              return absolutePath;
+            }
+          } catch (e) {
+            console.warn('Error construyendo URL absoluta:', e);
+          }
+
+          // Fallback: intentar con ruta relativa
+          // Desde public/pages/, ../index.html debería llevarnos a public/index.html
+          console.log('🔗 Usando ruta relativa: ../index.html');
+          return '../index.html';
+        } else {
+          // Si estamos en pages/pago-success.html (no en public/)
+          // ../index.html nos lleva a index.html (raíz)
+          console.log('🔗 No está en public/, usando: ../index.html');
+          return '../index.html';
+        }
+      }
+
+      /**
+       * Función para redirigir a index.html con la ruta correcta
+       * @param {string} queryString - Query string opcional (ej: '?activate=1')
+       */
+      window.redirectToIndex = function (queryString = '') {
+        const currentUrl = window.location.href;
+        const origin = window.location.origin;
+        const currentPath = window.location.pathname;
+
+        console.log('🔍 === INICIO redirectToIndex ===');
+        console.log('🔍 currentUrl:', currentUrl);
+        console.log('🔍 origin:', origin);
+        console.log('🔍 currentPath:', currentPath);
+        console.log('🔍 queryString:', queryString);
+
+        // Siempre intentar redirigir a public/index.html
+        // Si estamos en pages/pago-success.html, necesitamos ir a public/index.html
+        // Desde pages/, necesitamos subir un nivel y luego entrar a public/
+        let targetUrl;
+
+        // Verificar si estamos en public/ de múltiples formas
+        const check1 = currentPath.includes('/public/');
+        const check2 = currentPath.startsWith('/public/');
+        const check3 = currentUrl.includes('/public/');
+        const check4 = currentUrl.includes('/public/pages/');
+        const check5 = currentPath.includes('public');
+
+        const isInPublic = check1 || check2 || check3 || check4 || check5;
+
+        console.log('🔍 === VERIFICACIONES ===');
+        console.log('🔍 currentPath.includes("/public/"):', check1);
+        console.log('🔍 currentPath.startsWith("/public/"):', check2);
+        console.log('🔍 currentUrl.includes("/public/"):', check3);
+        console.log('🔍 currentUrl.includes("/public/pages/"):', check4);
+        console.log('🔍 currentPath.includes("public"):', check5);
+        console.log('🔍 ¿Está en public? (resultado final):', isInPublic);
+
+        if (isInPublic) {
+          console.log('✅ Detectado que estamos en public/');
+
+          // Construir URL completa a public/index.html
+          try {
+            const url = new URL(currentUrl);
+            const pathParts = url.pathname.split('/').filter(p => p);
+
+            console.log('🔍 pathParts completos:', pathParts);
+
+            const publicIndex = pathParts.indexOf('public');
+            console.log('🔍 publicIndex encontrado en:', publicIndex);
+
+            if (publicIndex !== -1) {
+              // Construir ruta absoluta: /public/index.html
+              const absolutePath =
+                '/' + pathParts.slice(0, publicIndex + 1).join('/') + '/index.html';
+              targetUrl = origin + absolutePath + queryString;
+              console.log('✅ Ruta absoluta construida:', absolutePath);
+              console.log('✅ URL completa:', targetUrl);
+              window.location.replace(targetUrl);
+              return;
+            } else {
+              console.warn('⚠️ No se encontró "public" en pathParts');
+            }
+          } catch (e) {
+            console.error('❌ Error construyendo URL completa:', e);
+          }
+
+          // Fallback: construir URL completa desde ruta relativa usando new URL
+          try {
+            const baseUrl = new URL(currentUrl);
+            // Desde public/pages/, ../index.html debería llevarnos a public/index.html
+            const relativePath = '../index.html';
+            targetUrl = new URL(relativePath, baseUrl).href + queryString;
+            console.log('✅ URL construida desde relativa:', targetUrl);
+
+            // Verificar que la URL resultante contiene /public/index.html
+            if (targetUrl.includes('/public/index.html')) {
+              console.log('✅ URL verificada: contiene /public/index.html');
+              window.location.replace(targetUrl);
+              return;
+            } else {
+              console.warn('⚠️ URL construida no contiene /public/index.html:', targetUrl);
+            }
+          } catch (e) {
+            console.error('❌ Error construyendo URL desde relativa:', e);
+          }
+
+          // Método 3: construir manualmente buscando /pages/
+          try {
+            // Si estamos en http://origin/public/pages/pago-success.html
+            // Queremos ir a http://origin/public/index.html
+            const url = new URL(currentUrl);
+            const pagesIndex = url.pathname.indexOf('/pages/');
+
+            if (pagesIndex !== -1) {
+              const pathBeforePages = url.pathname.substring(0, pagesIndex);
+              targetUrl = origin + pathBeforePages + '/index.html' + queryString;
+              console.log('✅ URL construida manualmente (método /pages/):', targetUrl);
+              window.location.replace(targetUrl);
+              return;
+            }
+          } catch (e) {
+            console.error('❌ Error en construcción manual:', e);
+          }
+
+          // Método 4: usar new URL con ruta relativa (debería funcionar)
+          try {
+            const baseUrl = new URL(currentUrl);
+            // Desde public/pages/, ../index.html debería resolver a public/index.html
+            const resolvedUrl = new URL('../index.html', baseUrl);
+            targetUrl = resolvedUrl.href + queryString;
+            console.log('✅ URL resuelta con new URL:', targetUrl);
+
+            // Verificar que contiene public/index.html
+            if (targetUrl.includes('public') && targetUrl.includes('index.html')) {
+              window.location.replace(targetUrl);
+              return;
+            }
+          } catch (e) {
+            console.error('❌ Error usando new URL:', e);
+          }
+
+          // Último fallback: ruta relativa simple
+          targetUrl = '../index.html' + queryString;
+          console.log('⚠️ Usando fallback (relativa):', targetUrl);
+          window.location.href = targetUrl;
+        } else {
+          // No está en public/, pero queremos ir a public/index.html
+          // Desde pages/pago-success.html, necesitamos ir a public/index.html
+          // Opción 1: Intentar con ruta relativa ../public/index.html
+          try {
+            const baseUrl = new URL(currentUrl);
+            // Desde pages/, ../public/index.html debería llevarnos a public/index.html
+            const relativePath = '../public/index.html';
+            targetUrl = new URL(relativePath, baseUrl).href + queryString;
+            console.log('✅ URL construida (../public/index.html):', targetUrl);
+
+            if (targetUrl.includes('public') && targetUrl.includes('index.html')) {
+              window.location.replace(targetUrl);
+              return;
+            }
+          } catch (e) {
+            console.error('❌ Error construyendo ../public/index.html:', e);
+          }
+
+          // Opción 2: Construir URL absoluta directamente
+          try {
+            targetUrl = origin + '/public/index.html' + queryString;
+            console.log('✅ URL absoluta construida:', targetUrl);
+            window.location.replace(targetUrl);
+            return;
+          } catch (e) {
+            console.error('❌ Error construyendo URL absoluta:', e);
+          }
+
+          // Fallback: ruta relativa normal (puede no funcionar)
+          targetUrl = '../index.html' + queryString;
+          console.log('⚠️ Usando fallback (relativa):', targetUrl);
+          window.location.href = targetUrl;
+        }
+      };
+
+      /**
+       * Verificar pago de Stripe y generar licencia
+       */
+      async function verifyStripePayment(sessionId) {
+        try {
+          console.log('🔍 Verificando pago de Stripe con session_id:', sessionId);
+
+          // Verificar el pago con el backend
+          const result = await window.stripeIntegration.verifyPaymentSession(sessionId);
+
+          if (!result.success) {
+            alert('Error al verificar el pago: ' + (result.error || 'Error desconocido'));
+            window.location.href = getIndexPath();
+            return;
+          }
+
+          // Generar licencia desde el pago verificado
+          await generateLicenseFromPayment(result.payment);
+        } catch (error) {
+          console.error('❌ Error verificando pago de Stripe:', error);
+          alert('Error al verificar el pago. Serás redirigido a la página principal.');
+          window.location.href = getIndexPath();
+        }
+      }
+
+      /**
+       * Generar licencia desde datos de pago
+       */
+      async function generateLicenseFromPayment(payment) {
+        try {
+          // 🔍 VERIFICAR SI ES ACTUALIZACIÓN DE PLAN
+          console.log('🔍 Verificando si es actualización de plan...');
+          const pendingUpdate = sessionStorage.getItem('pendingPlanUpdate');
+          const paymentData = sessionStorage.getItem('titanfleet_payment_data');
+
+          console.log('📦 pendingPlanUpdate:', pendingUpdate);
+          console.log('📦 paymentData:', paymentData);
+          console.log('📦 payment.metadata:', payment.metadata);
+
+          let isPlanUpdate = false;
+          let updateData = null;
+
+          if (pendingUpdate) {
+            try {
+              updateData = JSON.parse(pendingUpdate);
+              isPlanUpdate =
+                updateData.isUpdate === true ||
+                updateData.planLevel !== undefined ||
+                updateData.planType !== undefined;
+              console.log('🔄 Actualización de plan detectada en pendingPlanUpdate:', updateData);
+              console.log('✅ isPlanUpdate:', isPlanUpdate);
+            } catch (error) {
+              console.error('❌ Error parseando pendingPlanUpdate:', error);
+            }
+          }
+
+          // También verificar en paymentData
+          if (!isPlanUpdate && paymentData) {
+            try {
+              const data = JSON.parse(paymentData);
+              isPlanUpdate = data.isPlanUpdate === true;
+              if (isPlanUpdate) {
+                console.log('🔄 Actualización de plan detectada en paymentData');
+                // Si no tenemos updateData, intentar construirlo desde paymentData
+                if (!updateData && data.tenantId) {
+                  // Intentar obtener planLevel y paymentPeriod desde payment o metadata
+                  const planLevel =
+                    payment.metadata?.planLevel ||
+                    payment.plan?.toLowerCase().replace('plan ', '') ||
+                    'basico';
+                  const paymentPeriod =
+                    payment.metadata?.paymentPeriod || payment.periodo?.toLowerCase() || 'mensual';
+                  updateData = {
+                    planLevel: planLevel,
+                    paymentPeriod: paymentPeriod,
+                    tenantId: data.tenantId,
+                    isUpdate: true
+                  };
+                  console.log('📝 updateData construido desde paymentData:', updateData);
+                }
+              }
+            } catch (error) {
+              console.error('❌ Error parseando paymentData:', error);
+            }
+          }
+
+          // Verificar en metadata de Stripe
+          if (!isPlanUpdate && payment.metadata) {
+            isPlanUpdate =
+              payment.metadata.isPlanUpdate === 'true' || payment.metadata.isUpdate === 'true';
+            if (isPlanUpdate) {
+              console.log('🔄 Actualización de plan detectada en metadata de Stripe');
+              // Construir updateData desde metadata si no existe
+              if (!updateData && payment.metadata.tenantId) {
+                updateData = {
+                  planLevel: payment.metadata.planLevel || 'basico',
+                  paymentPeriod: payment.metadata.paymentPeriod || 'mensual',
+                  tenantId: payment.metadata.tenantId,
+                  isUpdate: true
+                };
+                console.log('📝 updateData construido desde metadata:', updateData);
+              }
+            }
+          }
+
+          // Verificar si window.updateLicensePlan está disponible
+          console.log('🔍 window.updateLicensePlan disponible:', typeof window.updateLicensePlan);
+          console.log('🔍 window.licenseManager disponible:', typeof window.licenseManager);
+
+          // Si es actualización de plan, actualizar el plan en lugar de generar nueva licencia
+          if (isPlanUpdate) {
+            console.log('✅ Es actualización de plan. updateData:', updateData);
+
+            // Si no tenemos updateData pero sabemos que es actualización, intentar obtenerlo de otra forma
+            if (!updateData) {
+              console.warn(
+                '⚠️ isPlanUpdate es true pero updateData es null. Intentando obtener datos del pago...'
+              );
+              // Intentar obtener desde payment
+              const planLevel =
+                payment.metadata?.planLevel ||
+                payment.plan?.toLowerCase().replace('plan ', '') ||
+                'basico';
+              const paymentPeriod =
+                payment.metadata?.paymentPeriod || payment.periodo?.toLowerCase() || 'mensual';
+              const tenantId =
+                payment.metadata?.tenantId || window.licenseManager?.getLicenseInfo()?.tenantId;
+
+              if (tenantId) {
+                updateData = {
+                  planLevel: planLevel,
+                  paymentPeriod: paymentPeriod,
+                  tenantId: tenantId,
+                  isUpdate: true
+                };
+                console.log('📝 updateData construido desde payment:', updateData);
+              } else {
+                console.error('❌ No se pudo obtener tenantId para actualización');
+              }
+            }
+
+            if (updateData && window.licenseManager && window.licenseManager.updateLicensePlan) {
+              console.log('✅ Iniciando actualización de plan...', {
+                planLevel: updateData.planLevel || updateData.planType,
+                paymentPeriod: updateData.paymentPeriod,
+                tenantId: updateData.tenantId
+              });
+
+              try {
+                // Llamar a updateLicensePlan directamente desde licenseManager para evitar alert y recarga
+                const result = await window.licenseManager.updateLicensePlan(
+                  null, // No se necesita nueva clave
+                  updateData.planLevel || updateData.planType,
+                  updateData.paymentPeriod
+                );
+
+                if (result && result.success) {
+                  console.log('✅ Plan actualizado exitosamente:', result);
+
+                  // Limpiar datos pendientes
+                  sessionStorage.removeItem('pendingPlanUpdate');
+
+                  // Preparar datos para mostrar (sin generar nueva licencia)
+                  const periodo = payment.periodo || updateData.paymentPeriod || '';
+                  let tipoNombre = 'Anual';
+                  if (periodo.toLowerCase().includes('mensual')) {
+                    tipoNombre = 'Mensual';
+                  } else if (periodo.toLowerCase().includes('trimestral')) {
+                    tipoNombre = 'Trimestral';
+                  } else if (periodo.toLowerCase().includes('anual')) {
+                    tipoNombre = 'Anual';
+                  }
+
+                  // Obtener precio
+                  let precio = 0;
+                  if (payment.amount_total) {
+                    precio = payment.amount_total / 100;
+                  } else if (payment.precio) {
+                    precio = payment.precio;
+                  } else {
+                    const planPrices = {
+                      basico: { mensual: 1999, anual: 21989 },
+                      estandar: { mensual: 4999, anual: 54989 },
+                      premium: { mensual: 8999, anual: 98989 },
+                      enterprise: { mensual: 14999, anual: 164989 }
+                    };
+                    const planLevel = updateData.planLevel?.toLowerCase() || 'basico';
+                    const paymentPeriod = updateData.paymentPeriod?.toLowerCase() || 'mensual';
+                    precio = planPrices[planLevel]?.[paymentPeriod] || 0;
+                  }
+
+                  const precioFormatted = new Intl.NumberFormat('es-MX', {
+                    style: 'currency',
+                    currency: 'MXN',
+                    minimumFractionDigits: 0
+                  }).format(precio);
+
+                  let vigencia = '12 meses';
+                  if (tipoNombre === 'Mensual') vigencia = '1 mes';
+                  else if (tipoNombre === 'Trimestral') vigencia = '3 meses';
+
+                  // Obtener información de la licencia actualizada
+                  const currentLicense = window.licenseManager?.getLicenseInfo();
+                  const licenseKey = currentLicense?.licenseKey || 'N/A (Plan actualizado)';
+
+                  // Formatear nombre del plan
+                  const planLevel = updateData.planLevel || updateData.planType || '';
+                  let planName = payment.plan || 'N/A';
+                  if (planLevel) {
+                    const planNames = {
+                      basico: 'Plan Básico',
+                      estandar: 'Plan Estándar',
+                      premium: 'Plan Premium',
+                      enterprise: 'Plan Enterprise'
+                    };
+                    planName =
+                      planNames[planLevel.toLowerCase()] ||
+                      `Plan ${planLevel.charAt(0).toUpperCase() + planLevel.slice(1)}`;
+                  }
+
+                  const successData = {
+                    plan: planName,
+                    periodo: periodo || 'N/A',
+                    precio: precio,
+                    cliente: payment.cliente || {},
+                    licenseKey: licenseKey,
+                    tipoLicencia: tipoNombre,
+                    isPlanUpdate: true
+                  };
+
+                  console.log('💰 Precio calculado para mostrar:', precio, 'MXN');
+
+                  // Guardar en sessionStorage
+                  sessionStorage.setItem('titanfleet_payment_success', JSON.stringify(successData));
+
+                  // Mostrar datos en la página
+                  displayPaymentSuccess(successData, precioFormatted, tipoNombre, vigencia);
+
+                  // Mostrar un solo mensaje de éxito (no duplicar con el de updateLicensePlan)
+                  console.log('✅ Plan actualizado exitosamente. Datos mostrados en la página.');
+                  console.log('📋 Mensaje de actualización:', result.message);
+
+                  // Limpiar session_id de la URL para evitar que se vuelva a procesar al recargar
+                  if (window.history && window.history.replaceState) {
+                    const url = new URL(window.location);
+                    url.searchParams.delete('session_id');
+                    window.history.replaceState({}, '', url);
+                    console.log('🔧 session_id eliminado de la URL para evitar reprocesamiento');
+                  }
+
+                  // Marcar que ya se procesó esta actualización
+                  sessionStorage.setItem('plan_update_processed', 'true');
+
+                  // Mostrar mensaje de éxito una sola vez
+                  alert('✅ ' + result.message);
+
+                  // Generar y descargar PDF automáticamente
+                  setTimeout(() => {
+                    generateAndDownloadPDF(successData, precioFormatted, tipoNombre, vigencia);
+                  }, 1000);
+
+                  // Enviar correos (simulado)
+                  sendEmails(successData, tipoNombre, precioFormatted, vigencia);
+
+                  return; // Salir de la función, no generar nueva licencia
+                } else {
+                  console.error(
+                    '❌ Error actualizando plan:',
+                    result?.message || 'Error desconocido'
+                  );
+                  alert(
+                    '⚠️ El pago fue exitoso, pero hubo un error al actualizar el plan. Por favor, contacta al soporte con tu TenantId: ' +
+                      (updateData.tenantId || 'N/A')
+                  );
+                  // Continuar con el flujo normal como fallback
+                }
+              } catch (error) {
+                console.error('❌ Error crítico al actualizar plan:', error);
+                console.error('❌ Stack trace:', error.stack);
+                alert(
+                  '⚠️ El pago fue exitoso, pero hubo un error al actualizar el plan. Por favor, contacta al soporte. Error: ' +
+                    (error.message || 'Error desconocido')
+                );
+                // Continuar con el flujo normal como fallback
+              }
+            }
+          } else if (isPlanUpdate && !updateData) {
+            console.error('❌ Es actualización pero no se pudo obtener updateData');
+            alert(
+              '⚠️ El pago fue exitoso, pero no se pudieron obtener los datos de actualización. Por favor, contacta al soporte.'
+            );
+            // Continuar con el flujo normal como fallback
+          } else if (isPlanUpdate && !window.licenseManager) {
+            console.error('❌ Es actualización pero window.licenseManager no está disponible');
+            console.error('❌ Intentando esperar a que se cargue...');
+            // Esperar un poco y reintentar
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            if (window.licenseManager && window.licenseManager.updateLicensePlan) {
+              console.log('✅ window.licenseManager ahora disponible, reintentando...');
+              // Reintentar la lógica de actualización
+              try {
+                const result = await window.licenseManager.updateLicensePlan(
+                  null,
+                  updateData.planLevel || updateData.planType,
+                  updateData.paymentPeriod
+                );
+                if (result && result.success) {
+                  console.log('✅ Plan actualizado exitosamente en reintento:', result);
+                  sessionStorage.removeItem('pendingPlanUpdate');
+                  // Limpiar session_id de la URL
+                  if (window.history && window.history.replaceState) {
+                    const url = new URL(window.location);
+                    url.searchParams.delete('session_id');
+                    window.history.replaceState({}, '', url);
+                  }
+                  sessionStorage.setItem('plan_update_processed', 'true');
+                  // Continuar con el flujo de mostrar datos (similar al código anterior)
+                  return; // Salir para no generar nueva licencia
+                }
+              } catch (error) {
+                console.error('❌ Error en reintento:', error);
+              }
+            }
+            alert(
+              '⚠️ El pago fue exitoso, pero la función de actualización no está disponible. Por favor, contacta al soporte.'
+            );
+            // Continuar con el flujo normal como fallback
+          }
+
+          // Si NO es actualización, continuar con el flujo normal de generar nueva licencia
+          if (!isPlanUpdate) {
+            console.log('📝 Generando nueva licencia (no es actualización de plan)');
+          } else {
+            console.log(
+              '⚠️ Es actualización pero no se pudo procesar. Generando nueva licencia como fallback.'
+            );
+          }
+
+          // Determinar tipo de licencia según el periodo
+          const periodo = payment.periodo || '';
+          let tipoLicencia = 'A'; // Por defecto Anual
+          let tipoNombre = 'Anual';
+
+          if (periodo.toLowerCase().includes('mensual')) {
+            tipoLicencia = 'M';
+            tipoNombre = 'Mensual';
+          } else if (periodo.toLowerCase().includes('trimestral')) {
+            tipoLicencia = 'T';
+            tipoNombre = 'Trimestral';
+          } else if (periodo.toLowerCase().includes('anual')) {
+            tipoLicencia = 'A';
+            tipoNombre = 'Anual';
+          }
+
+          // Generar licencia automáticamente
+          const fecha = new Date();
+          const añoStr = String(fecha.getFullYear()).slice(-2);
+          const mesStr = String(fecha.getMonth() + 1).padStart(2, '0');
+
+          let licenseKey = null;
+          if (typeof LicenseGenerator !== 'undefined') {
+            const generator = new LicenseGenerator();
+            licenseKey = generator.generateLicense(añoStr, mesStr, tipoLicencia);
+
+            // Guardar licencia en el sistema de administración
+            if (typeof LicenseAdmin !== 'undefined') {
+              const admin = new LicenseAdmin();
+              admin.addLicenses([licenseKey], tipoNombre);
+            }
+          }
+
+          // Preparar datos para mostrar
+          // Obtener precio desde amount_total de Stripe (está en centavos) o desde precio en metadata
+          let precio = 0;
+          if (payment.amount_total) {
+            // Convertir de centavos a pesos
+            precio = payment.amount_total / 100;
+          } else if (payment.precio) {
+            precio = payment.precio;
+          } else {
+            // Si no hay precio, calcular desde los metadatos del plan
+            const planPrices = {
+              basico: { mensual: 1999, anual: 21989 },
+              estandar: { mensual: 4999, anual: 54989 },
+              premium: { mensual: 8999, anual: 98989 },
+              enterprise: { mensual: 14999, anual: 164989 }
+            };
+            const planLevel =
+              payment.plan?.toLowerCase() || payment.metadata?.planLevel?.toLowerCase() || 'basico';
+            const paymentPeriod =
+              payment.periodo?.toLowerCase() ||
+              payment.metadata?.paymentPeriod?.toLowerCase() ||
+              'mensual';
+            const planKey =
+              planLevel.includes('básico') || planLevel.includes('basico')
+                ? 'basico'
+                : planLevel.includes('estándar') || planLevel.includes('estandar')
+                  ? 'estandar'
+                  : planLevel.includes('premium')
+                    ? 'premium'
+                    : planLevel.includes('enterprise')
+                      ? 'enterprise'
+                      : 'basico';
+            const periodKey = paymentPeriod.includes('anual') ? 'anual' : 'mensual';
+            precio = planPrices[planKey]?.[periodKey] || 0;
+          }
+
+          const precioFormatted = new Intl.NumberFormat('es-MX', {
+            style: 'currency',
+            currency: 'MXN',
+            minimumFractionDigits: 0
+          }).format(precio);
+
+          let vigencia = '12 meses';
+          if (tipoNombre === 'Mensual') vigencia = '1 mes';
+          else if (tipoNombre === 'Trimestral') vigencia = '3 meses';
+
+          const successData = {
+            plan: payment.plan || 'N/A',
+            periodo: payment.periodo || 'N/A',
+            precio: precio, // Ya calculado arriba desde amount_total o metadata
+            cliente: payment.cliente || {},
+            licenseKey: licenseKey,
+            tipoLicencia: tipoNombre
+          };
+
+          console.log('💰 Precio calculado para mostrar:', precio, 'MXN');
+
+          // Guardar en sessionStorage
+          sessionStorage.setItem('titanfleet_payment_success', JSON.stringify(successData));
+
+          // Mostrar datos en la página
+          displayPaymentSuccess(successData, precioFormatted, tipoNombre, vigencia);
+
+          // Generar y descargar PDF automáticamente
+          setTimeout(() => {
+            generateAndDownloadPDF(successData, precioFormatted, tipoNombre, vigencia);
+          }, 1000);
+
+          // Enviar correos (simulado)
+          sendEmails(successData, tipoNombre, precioFormatted, vigencia);
+        } catch (error) {
+          console.error('❌ Error generando licencia:', error);
+          alert('Error al generar la licencia. Contacta a soporte.');
+          // Redirigir a index para que pueda intentar activar manualmente
+          setTimeout(() => {
+            window.location.href = getIndexPath();
+          }, 2000);
+        }
+      }
+
+      /**
+       * Mostrar datos de pago exitoso en la página
+       */
+      function displayPaymentSuccess(data, precioFormatted, tipoLicencia, vigencia) {
+        document.getElementById('successPlan').textContent = data.plan || 'N/A';
+        document.getElementById('successPeriod').textContent = data.periodo || 'N/A';
+        document.getElementById('successPrice').textContent = precioFormatted;
+        document.getElementById('successDate').textContent = new Date().toLocaleString('es-MX');
+
+        // Si es actualización de plan, mostrar mensaje diferente
+        if (data.isPlanUpdate) {
+          const licenseBoxTitle = document.querySelector('.license-box h5');
+          if (licenseBoxTitle) {
+            licenseBoxTitle.innerHTML =
+              '<i class="fas fa-sync-alt me-2 text-success"></i>Plan Actualizado Exitosamente';
+          }
+
+          const licenseKeyDisplay = document.getElementById('licenseKeyDisplay');
+          if (licenseKeyDisplay) {
+            if (data.licenseKey && data.licenseKey !== 'N/A (Plan actualizado)') {
+              licenseKeyDisplay.textContent = data.licenseKey;
+            } else {
+              licenseKeyDisplay.innerHTML =
+                '<span class="text-success"><i class="fas fa-check-circle me-2"></i>Tu plan ha sido actualizado correctamente</span>';
+            }
+          }
+
+          const licenseTypeEl = document.getElementById('licenseType');
+          if (licenseTypeEl) {
+            licenseTypeEl.textContent = tipoLicencia;
+          }
+
+          const licenseValidityEl = document.getElementById('licenseValidity');
+          if (licenseValidityEl) {
+            licenseValidityEl.textContent = `${vigencia} desde la actualización`;
+          }
+
+          // Ocultar botón de copiar si no hay licencia nueva
+          const copyBtn = document.querySelector('.copy-btn');
+          if (copyBtn && (!data.licenseKey || data.licenseKey === 'N/A (Plan actualizado)')) {
+            copyBtn.style.display = 'none';
+          }
+        } else {
+          // Flujo normal: nueva licencia
+          if (data.licenseKey) {
+            document.getElementById('licenseKeyDisplay').textContent = data.licenseKey;
+            document.getElementById('licenseType').textContent = tipoLicencia;
+            document.getElementById('licenseValidity').textContent =
+              `${vigencia} desde la activación`;
+          }
+        }
+      }
+
+      /**
+       * Enviar correos (simulado - en producción sería un servidor)
+       */
+      function sendEmails(data, tipoNombre, precioFormatted, vigencia) {
+        const cliente = data.cliente || {};
+        const clienteEmail = cliente.email || '';
+        const clienteNombre = cliente.nombre || 'Cliente';
+
+        // Log para desarrollo
+        console.log('📧 Correo preparado para el cliente:', clienteEmail);
+        console.log('📧 Correo preparado para el administrador: samuelayalasandoval@gmail.com');
+
+        // En producción, aquí se haría una llamada al backend para enviar los correos
+      }
+
+      // Cargar datos desde sessionStorage o verificar sesión de Stripe
+      document.addEventListener('DOMContentLoaded', async function () {
+        // Verificar si hay un session_id de Stripe en la URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const sessionId = urlParams.get('session_id');
+
+        // Verificar si ya se procesó esta actualización para evitar bucles
+        const alreadyProcessed = sessionStorage.getItem('plan_update_processed');
+
+        if (alreadyProcessed === 'true') {
+          console.log(
+            '✅ Actualización ya procesada anteriormente. Mostrando datos guardados sin reprocesar.'
+          );
+          // Limpiar el flag después de usarlo
+          sessionStorage.removeItem('plan_update_processed');
+          // Limpiar session_id de la URL si existe
+          if (sessionId && window.history && window.history.replaceState) {
+            const url = new URL(window.location);
+            url.searchParams.delete('session_id');
+            window.history.replaceState({}, '', url);
+          }
+          // Continuar con el flujo normal de mostrar datos desde sessionStorage (más abajo)
+        } else if (sessionId && window.isStripeConfigured && window.isStripeConfigured()) {
+          // Solo procesar si hay session_id y no se ha procesado antes
+          console.log('🔄 Procesando pago de Stripe por primera vez...');
+          await verifyStripePayment(sessionId);
+          return; // Salir aquí, no continuar con el flujo de sessionStorage
+        }
+
+        // Si no hay session_id, cargar desde sessionStorage (modo simulación)
+        const paymentData = sessionStorage.getItem('titanfleet_payment_success');
+
+        if (!paymentData) {
+          // Si no hay datos, redirigir a index
+          alert('No se encontraron datos de pago. Serás redirigido a la página principal.');
+          window.location.href = getIndexPath();
+          return;
+        }
+
+        try {
+          const data = JSON.parse(paymentData);
+
+          // Mostrar información del pago
+          document.getElementById('successPlan').textContent = data.plan || 'N/A';
+          document.getElementById('successPeriod').textContent = data.periodo || 'N/A';
+
+          // Obtener precio - puede venir como número o necesitar cálculo
+          let precio = data.precio || 0;
+
+          // Si el precio es 0, intentar calcularlo desde el plan
+          if (precio === 0 || !precio) {
+            const planPrices = {
+              basico: { mensual: 1999, anual: 21989 },
+              estandar: { mensual: 4999, anual: 54989 },
+              premium: { mensual: 8999, anual: 98989 },
+              enterprise: { mensual: 14999, anual: 164989 }
+            };
+            const planText = (data.plan || '').toLowerCase();
+            const periodoText = (data.periodo || '').toLowerCase();
+
+            const planKey =
+              planText.includes('básico') || planText.includes('basico')
+                ? 'basico'
+                : planText.includes('estándar') || planText.includes('estandar')
+                  ? 'estandar'
+                  : planText.includes('premium')
+                    ? 'premium'
+                    : planText.includes('enterprise')
+                      ? 'enterprise'
+                      : 'basico';
+            const periodKey = periodoText.includes('anual') ? 'anual' : 'mensual';
+            precio = planPrices[planKey]?.[periodKey] || 0;
+          }
+
+          const precioFormatted = new Intl.NumberFormat('es-MX', {
+            style: 'currency',
+            currency: 'MXN',
+            minimumFractionDigits: 0
+          }).format(precio);
+          document.getElementById('successPrice').textContent = precioFormatted;
+
+          document.getElementById('successDate').textContent = new Date().toLocaleString('es-MX');
+
+          // Mostrar licencia
+          if (data.licenseKey) {
+            document.getElementById('licenseKeyDisplay').textContent = data.licenseKey;
+
+            // Mostrar tipo y vigencia
+            const tipo = data.tipoLicencia || 'Anual';
+            document.getElementById('licenseType').textContent = tipo;
+
+            let vigencia = '12 meses';
+            if (tipo === 'Mensual') vigencia = '1 mes';
+            else if (tipo === 'Trimestral') vigencia = '3 meses';
+
+            document.getElementById('licenseValidity').textContent =
+              `${vigencia} desde la activación`;
+
+            // Generar y descargar PDF automáticamente
+            setTimeout(() => {
+              generateAndDownloadPDF(data, precioFormatted, tipo, vigencia);
+            }, 1000); // Esperar 1 segundo para que la página se renderice completamente
+          } else {
+            document.getElementById('licenseKeyDisplay').textContent =
+              'Error: Licencia no encontrada';
+          }
+
+          // Limpiar sessionStorage después de mostrar
+          // No lo limpiamos inmediatamente para que el usuario pueda recargar la página
+        } catch (error) {
+          console.error('Error cargando datos:', error);
+          alert('Error al cargar los datos. Serás redirigido a la página principal.');
+          window.location.href = getIndexPath();
+        }
+      });
+
+      function copyLicense() {
+        const licenseKey = document.getElementById('licenseKeyDisplay').textContent;
+
+        if (licenseKey === 'Cargando...' || licenseKey.includes('Error')) {
+          alert('No hay licencia disponible para copiar');
+          return;
+        }
+
+        // Copiar al portapapeles
+        if (navigator.clipboard) {
+          navigator.clipboard
+            .writeText(licenseKey)
+            .then(() => {
+              const btn = event.target;
+              const originalHTML = btn.innerHTML;
+              btn.innerHTML = '<i class="fas fa-check me-2"></i>¡Copiado!';
+              btn.classList.remove('btn-success');
+              btn.classList.add('btn-primary');
+              setTimeout(() => {
+                btn.innerHTML = originalHTML;
+                btn.classList.remove('btn-primary');
+                btn.classList.add('btn-success');
+              }, 2000);
+            })
+            .catch(err => {
+              console.error('Error copiando:', err);
+              fallbackCopy(licenseKey);
+            });
+        } else {
+          fallbackCopy(licenseKey);
+        }
+      }
+
+      function fallbackCopy(text) {
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+        document.body.appendChild(textarea);
+        textarea.select();
+        try {
+          document.execCommand('copy');
+          const btn = event.target;
+          const originalHTML = btn.innerHTML;
+          btn.innerHTML = '<i class="fas fa-check me-2"></i>¡Copiado!';
+          btn.classList.remove('btn-success');
+          btn.classList.add('btn-primary');
+          setTimeout(() => {
+            btn.innerHTML = originalHTML;
+            btn.classList.remove('btn-primary');
+            btn.classList.add('btn-success');
+          }, 2000);
+        } catch (err) {
+          alert('Error al copiar. Por favor, copia manualmente: ' + text);
+        }
+        document.body.removeChild(textarea);
+      }
+
+      /**
+       * Generar y descargar PDF con los datos del pago y licencia
+       */
+      function generateAndDownloadPDF(data, precioFormatted, tipoLicencia, vigencia) {
+        try {
+          const { jsPDF } = window.jspdf;
+          const doc = new jsPDF();
+
+          // Configuración
+          const pageWidth = doc.internal.pageSize.getWidth();
+          const margin = 20;
+          let yPos = margin;
+          const lineHeight = 7;
+          const sectionSpacing = 10;
+
+          // Colores
+          const primaryColor = [16, 185, 129]; // #10b981 (verde)
+          const darkColor = [3, 54, 61]; // #03363d (oscuro)
+          const lightGray = [243, 244, 246]; // #f3f4f6
+
+          // ===== HEADER =====
+          doc.setFillColor(...primaryColor);
+          doc.rect(0, 0, pageWidth, 40, 'F');
+
+          doc.setTextColor(255, 255, 255);
+          doc.setFontSize(24);
+          doc.setFont(undefined, 'bold');
+          doc.text('¡Pago Exitoso!', pageWidth / 2, 20, { align: 'center' });
+
+          doc.setFontSize(12);
+          doc.setFont(undefined, 'normal');
+          doc.text('TitanFleet ERP - Comprobante de Pago', pageWidth / 2, 30, { align: 'center' });
+
+          yPos = 50;
+          doc.setTextColor(...darkColor);
+
+          // ===== INFORMACIÓN DEL CLIENTE =====
+          doc.setFontSize(16);
+          doc.setFont(undefined, 'bold');
+          doc.text('Información del Cliente', margin, yPos);
+          yPos += lineHeight + 2;
+
+          doc.setDrawColor(200, 200, 200);
+          doc.line(margin, yPos, pageWidth - margin, yPos);
+          yPos += 5;
+
+          doc.setFontSize(11);
+          doc.setFont(undefined, 'normal');
+
+          const cliente = data.cliente || {};
+          const clienteInfo = [
+            ['Nombre:', cliente.nombre || 'N/A'],
+            ['Email:', cliente.email || 'N/A'],
+            ['Teléfono:', cliente.telefono || 'N/A'],
+            ['Empresa:', cliente.empresa || 'N/A']
+          ];
+
+          clienteInfo.forEach(([label, value]) => {
+            doc.setFont(undefined, 'bold');
+            doc.text(label, margin, yPos);
+            doc.setFont(undefined, 'normal');
+            doc.text(value, margin + 50, yPos);
+            yPos += lineHeight;
+          });
+
+          yPos += sectionSpacing;
+
+          // ===== DETALLES DE LA COMPRA =====
+          doc.setFontSize(16);
+          doc.setFont(undefined, 'bold');
+          doc.text('Detalles de la Compra', margin, yPos);
+          yPos += lineHeight + 2;
+
+          doc.setDrawColor(200, 200, 200);
+          doc.line(margin, yPos, pageWidth - margin, yPos);
+          yPos += 5;
+
+          doc.setFontSize(11);
+          doc.setFont(undefined, 'normal');
+
+          const compraInfo = [
+            ['Plan:', data.plan || 'N/A'],
+            ['Período de Pago:', data.periodo || 'N/A'],
+            ['Monto Pagado:', precioFormatted],
+            [
+              'Fecha de Pago:',
+              new Date().toLocaleString('es-MX', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+              })
+            ]
+          ];
+
+          compraInfo.forEach(([label, value]) => {
+            doc.setFont(undefined, 'bold');
+            doc.text(label, margin, yPos);
+            doc.setFont(undefined, 'normal');
+            if (label === 'Monto Pagado:') {
+              doc.setTextColor(...primaryColor);
+              doc.setFont(undefined, 'bold');
+            }
+            doc.text(value, margin + 50, yPos);
+            doc.setTextColor(...darkColor);
+            yPos += lineHeight;
+          });
+
+          yPos += sectionSpacing;
+
+          // Verificar si necesitamos una nueva página
+          if (yPos > 250) {
+            doc.addPage();
+            yPos = margin;
+          }
+
+          // ===== LICENCIA DE ACTIVACIÓN =====
+          doc.setFillColor(...lightGray);
+          doc.setDrawColor(...primaryColor);
+          doc.setLineWidth(2);
+          doc.roundedRect(margin, yPos - 5, pageWidth - margin * 2, 35, 3, 3, 'FD');
+
+          doc.setFontSize(16);
+          doc.setFont(undefined, 'bold');
+          doc.setTextColor(...primaryColor);
+          doc.text('Licencia de Activación', margin + 5, yPos + 5);
+          yPos += lineHeight + 5;
+
+          doc.setFontSize(10);
+          doc.setFont(undefined, 'normal');
+          doc.setTextColor(...darkColor);
+          doc.text('Clave de Licencia:', margin + 5, yPos);
+
+          doc.setFontSize(14);
+          doc.setFont(undefined, 'bold');
+          doc.setTextColor(...primaryColor);
+          doc.text(data.licenseKey || 'N/A', margin + 5, yPos + 7);
+          yPos += lineHeight + 10;
+
+          doc.setFontSize(10);
+          doc.setFont(undefined, 'normal');
+          doc.setTextColor(...darkColor);
+
+          const licenciaInfo = [
+            ['Tipo:', tipoLicencia],
+            ['Vigencia:', `${vigencia} desde la activación`],
+            ['Estado:', 'Generada']
+          ];
+
+          licenciaInfo.forEach(([label, value]) => {
+            doc.setFont(undefined, 'bold');
+            doc.text(label, margin + 5, yPos);
+            doc.setFont(undefined, 'normal');
+            doc.text(value, margin + 30, yPos);
+            yPos += lineHeight;
+          });
+
+          yPos += sectionSpacing + 5;
+
+          // ===== INSTRUCCIONES DE ACTIVACIÓN =====
+          doc.setFontSize(14);
+          doc.setFont(undefined, 'bold');
+          doc.setTextColor(...darkColor);
+          doc.text('Instrucciones de Activación', margin, yPos);
+          yPos += lineHeight + 2;
+
+          doc.setFontSize(10);
+          doc.setFont(undefined, 'normal');
+
+          const instrucciones = [
+            '1. Accede a tu sistema TitanFleet ERP',
+            '2. Cuando se te solicite, ingresa la licencia mostrada arriba',
+            '3. Tu sistema se activará automáticamente',
+            '4. ¡Comienza a usar todas las funcionalidades!'
+          ];
+
+          instrucciones.forEach(instruccion => {
+            doc.text(instruccion, margin + 5, yPos);
+            yPos += lineHeight + 2;
+          });
+
+          yPos += sectionSpacing;
+
+          // ===== NOTA IMPORTANTE =====
+          if (yPos > 250) {
+            doc.addPage();
+            yPos = margin;
+          }
+
+          doc.setFillColor(255, 243, 224); // Color amarillo claro
+          doc.setDrawColor(255, 193, 7);
+          doc.setLineWidth(1);
+          doc.roundedRect(margin, yPos - 5, pageWidth - margin * 2, 25, 3, 3, 'FD');
+
+          doc.setFontSize(10);
+          doc.setFont(undefined, 'bold');
+          doc.setTextColor(184, 134, 11);
+          doc.text('⚠️ Nota Importante', margin + 5, yPos + 5);
+
+          doc.setFont(undefined, 'normal');
+          doc.setTextColor(133, 77, 14);
+          doc.text(
+            'Guarda este documento en un lugar seguro. Tu licencia es única e',
+            margin + 5,
+            yPos + 12,
+            { maxWidth: pageWidth - margin * 2 - 10 }
+          );
+          doc.text(
+            'intransferible. Si la pierdes, contacta a soporte técnico.',
+            margin + 5,
+            yPos + 19,
+            { maxWidth: pageWidth - margin * 2 - 10 }
+          );
+
+          yPos += 30;
+
+          // ===== FOOTER =====
+          const footerY = doc.internal.pageSize.getHeight() - 20;
+          doc.setDrawColor(200, 200, 200);
+          doc.line(margin, footerY - 10, pageWidth - margin, footerY - 10);
+
+          doc.setFontSize(8);
+          doc.setFont(undefined, 'normal');
+          doc.setTextColor(128, 128, 128);
+          doc.text('TitanFleet ERP - Sistema de Gestión Empresarial', pageWidth / 2, footerY, {
+            align: 'center'
+          });
+          doc.text(
+            'Este documento es un comprobante de pago y activación de licencia.',
+            pageWidth / 2,
+            footerY + 5,
+            { align: 'center' }
+          );
+          doc.text(
+            `Generado el ${new Date().toLocaleString('es-MX')}`,
+            pageWidth / 2,
+            footerY + 10,
+            { align: 'center' }
+          );
+
+          // ===== GUARDAR PDF =====
+          const clienteNombre = cliente.nombre || 'Cliente';
+          const nombreArchivo = `TitanFleet_Comprobante_${clienteNombre.replace(/\s+/g, '_')}_${Date.now()}.pdf`;
+          doc.save(nombreArchivo);
+
+          console.log('✅ PDF generado y descargado:', nombreArchivo);
+        } catch (error) {
+          console.error('❌ Error generando PDF:', error);
+          // No mostrar alerta al usuario, solo loguear el error
+        }
+      }
+    </script>
+  </body>
+</html>

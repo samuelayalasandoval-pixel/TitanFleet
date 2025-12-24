@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diagnóstico de TenantId - Logística</title>
+    <style> 
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+        h2 {
+            color: #666;
+            margin-top: 20px;
+        }
+        .info-box {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 15px;
+            margin: 10px 0;
+        }
+        .warning-box {
+            background: #fff3e0;
+            border-left: 4px solid #ff9800;
+            padding: 15px;
+            margin: 10px 0;
+        }
+        .error-box {
+            background: #ffebee;
+            border-left: 4px solid #f44336;
+            padding: 15px;
+            margin: 10px 0;
+        }
+        .success-box {
+            background: #e8f5e9;
+            border-left: 4px solid #4caf50;
+            padding: 15px;
+            margin: 10px 0;
+        }
+        pre {
+            background: #f5f5f5;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+            font-size: 12px;
+        }
+        button {
+            background: #2196f3;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #1976d2;
+        }
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+        }
+        .data-table th,
+        .data-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        .data-table th {
+            background: #f5f5f5;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 Diagnóstico de TenantId - Logística</h1>
+    
+    <div class="container">
+        <h2>Información del Usuario Actual</h2>
+        <div id="userInfo"></div>
+    </div>
+    
+    <div class="container">
+        <h2>Repositorio de Logística</h2>
+        <div id="repoInfo"></div>
+    </div>
+    
+    <div class="container">
+        <h2>Registros en Firebase</h2>
+        <button onclick="verificarRegistrosFirebase()">🔍 Verificar Registros en Firebase</button>
+        <div id="firebaseRegistros"></div>
+    </div>
+    
+    <div class="container">
+        <h2>Registros en localStorage</h2>
+        <button onclick="verificarRegistrosLocalStorage()">🔍 Verificar Registros en localStorage</button>
+        <div id="localStorageRegistros"></div>
+    </div>
+    
+    <div class="container">
+        <h2>Acciones</h2>
+        <button onclick="diagnosticoCompleto()">🔄 Ejecutar Diagnóstico Completo</button>
+        <button onclick="sincronizarTenantId()">🔧 Sincronizar TenantId</button>
+    </div>
+
+    <script type="module">
+        import { getFirestore, doc, getDoc, collection, getDocs, query, where } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+        
+        const firebaseConfig = {
+            apiKey: 'AIzaSyBh_x0zUdauLERfWn-LMC2xnbxftfTXhhg',
+            authDomain: 'titanfleet-60931.firebaseapp.com',
+            projectId: 'titanfleet-60931'
+        };
+        
+        // Esperar a que Firebase esté disponible
+        async function waitForFirebase() {
+            while (!window.firebaseDb) {
+                await new Promise(resolve => setTimeout(resolve, 100));
+            }
+            return window.firebaseDb;
+        }
+        
+        // Mostrar información del usuario
+        async function mostrarInfoUsuario() {
+            const userInfoDiv = document.getElementById('userInfo');
+            const user = window.firebaseAuth?.currentUser;
+            const currentUser = JSON.parse(localStorage.getItem('erpCurrentUser') || 'null');
+            
+            let html = '<table class="data-table">';
+            html += '<tr><th>Campo</th><th>Valor</th></tr>';
+            
+            if (user) {
+                html += `<tr><td>Email (Firebase Auth)</td><td>${user.email || 'N/A'}</td></tr>`;
+                html += `<tr><td>UID (Firebase Auth)</td><td>${user.uid}</td></tr>`;
+            } else {
+                html += '<tr><td>Usuario Firebase Auth</td><td>❌ No autenticado</td></tr>';
+            }
+            
+            if (currentUser) {
+                html += `<tr><td>Email (localStorage)</td><td>${currentUser.email || 'N/A'}</td></tr>`;
+                html += `<tr><td>TenantId (localStorage)</td><td>${currentUser.tenantId || '❌ NO TIENE'}</td></tr>`;
+                html += `<tr><td>Nombre</td><td>${currentUser.nombre || 'N/A'}</td></tr>`;
+            } else {
+                html += '<tr><td>Usuario localStorage</td><td>❌ No encontrado</td></tr>';
+            }
+            
+            // Obtener tenantId del documento de usuario en Firebase
+            if (user) {
+                try {
+                    const db = await waitForFirebase();
+                    const userDocRef = doc(db, 'users', user.uid);
+                    const userDoc = await getDoc(userDocRef);
+                    
+                    if (userDoc.exists()) {
+                        const userData = userDoc.data();
+                        html += `<tr><td>TenantId (Firebase users/)</td><td>${userData.tenantId || '❌ NO TIENE'}</td></tr>`;
+                    } else {
+                        html += '<tr><td>Documento users/</td><td>❌ No existe en Firebase</td></tr>';
+                    }
+                } catch (error) {
+                    html += `<tr><td>Error obteniendo datos</td><td>${error.message}</td></tr>`;
+                }
+            }
+            
+            html += '</table>';
+            userInfoDiv.innerHTML = html;
+        }
+        
+        // Mostrar información del repositorio
+        async function mostrarInfoRepositorio() {
+            const repoInfoDiv = document.getElementById('repoInfo');
+            let repo = window.firebaseRepos?.logistica;
+            
+            if (!repo) {
+                repoInfoDiv.innerHTML = '<div class="error-box">❌ Repositorio de logística no disponible. Intentando inicializar...</div>';
+                
+                // Intentar cargar el script si no está disponible
+                if (!window.FirebaseRepoBase) {
+                    const script = document.createElement('script');
+                    script.src = '../assets/scripts/firebase-repo-base.js';
+                    await new Promise((resolve, reject) => {
+                        script.onload = resolve;
+                        script.onerror = reject;
+                        document.head.appendChild(script);
+                    });
+                }
+                
+                if (!window.firebaseRepos) {
+                    const script = document.createElement('script');
+                    script.src = '../assets/scripts/firebase-repos.js';
+                    await new Promise((resolve, reject) => {
+                        script.onload = () => {
+                            setTimeout(resolve, 1000); // Esperar a que se inicialice
+                        };
+                        script.onerror = reject;
+                        document.head.appendChild(script);
+                    });
+                }
+                
+                repo = window.firebaseRepos?.logistica;
+                
+                if (!repo) {
+                    repoInfoDiv.innerHTML = '<div class="error-box">❌ No se pudo inicializar el repositorio. Verifica que los scripts se carguen correctamente.</div>';
+                    return;
+                }
+                
+                // Intentar inicializar el repositorio
+                if (typeof repo.init === 'function') {
+                    try {
+                        await repo.init();
+                    } catch (error) {
+                        console.warn('Error inicializando repositorio:', error);
+                    }
+                }
+            }
+            
+            let html = '<table class="data-table">';
+            html += '<tr><th>Campo</th><th>Valor</th></tr>';
+            html += `<tr><td>DB disponible</td><td>${repo.db ? '✅' : '❌'}</td></tr>`;
+            html += `<tr><td>TenantId</td><td>${repo.tenantId || '❌ NO TIENE'}</td></tr>`;
+            html += `<tr><td>UserId</td><td>${repo.userId || '❌ NO TIENE'}</td></tr>`;
+            html += `<tr><td>Collection Name</td><td>${repo.collectionName || 'N/A'}</td></tr>`;
+            html += '</table>';
+            
+            if (!repo.tenantId) {
+                html += '<div class="warning-box">⚠️ El repositorio no tiene tenantId asignado. Esto puede causar que no se muestren los registros.</div>';
+            }
+            
+            repoInfoDiv.innerHTML = html;
+        }
+        
+        // Verificar registros en Firebase
+        window.verificarRegistrosFirebase = async function() {
+            const div = document.getElementById('firebaseRegistros');
+            div.innerHTML = '<div class="info-box">⏳ Verificando registros en Firebase...</div>';
+            
+            try {
+                const db = await waitForFirebase();
+                const collectionRef = collection(db, 'logistica');
+                const snapshot = await getDocs(collectionRef);
+                
+                const registros = [];
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    registros.push({
+                        id: doc.id,
+                        numeroRegistro: data.numeroRegistro || data.id || 'N/A',
+                        tenantId: data.tenantId || '❌ NO TIENE',
+                        userId: data.userId || '❌ NO TIENE',
+                        tipo: data.tipo || 'N/A',
+                        deleted: data.deleted || false
+                    });
+                });
+                
+                let html = `<div class="info-box">📊 Total de registros en Firebase: ${registros.length}</div>`;
+                
+                if (registros.length > 0) {
+                    html += '<table class="data-table">';
+                    html += '<tr><th>ID</th><th>Número Registro</th><th>TenantId</th><th>UserId</th><th>Tipo</th><th>Deleted</th></tr>';
+                    registros.forEach(reg => {
+                        html += `<tr>
+                            <td>${reg.id}</td>
+                            <td>${reg.numeroRegistro}</td>
+                            <td>${reg.tenantId}</td>
+                            <td>${reg.userId}</td>
+                            <td>${reg.tipo}</td>
+                            <td>${reg.deleted ? '✅' : '❌'}</td>
+                        </tr>`;
+                    });
+                    html += '</table>';
+                    
+                    // Agrupar por tenantId
+                    const porTenantId = {};
+                    registros.forEach(reg => {
+                        const tid = reg.tenantId || 'SIN_TENANTID';
+                        if (!porTenantId[tid]) porTenantId[tid] = [];
+                        porTenantId[tid].push(reg);
+                    });
+                    
+                    html += '<h3>Registros agrupados por TenantId:</h3>';
+                    html += '<ul>';
+                    Object.keys(porTenantId).forEach(tid => {
+                        html += `<li><strong>${tid}</strong>: ${porTenantId[tid].length} registros</li>`;
+                    });
+                    html += '</ul>';
+                } else {
+                    html += '<div class="warning-box">⚠️ No hay registros en Firebase</div>';
+                }
+                
+                div.innerHTML = html;
+            } catch (error) {
+                div.innerHTML = `<div class="error-box">❌ Error: ${error.message}</div>`;
+            }
+        };
+        
+        // Verificar registros en localStorage
+        window.verificarRegistrosLocalStorage = function() {
+            const div = document.getElementById('localStorageRegistros');
+            
+            try {
+                const sharedData = JSON.parse(localStorage.getItem('erp_shared_data') || '{}');
+                const registros = sharedData.registros || {};
+                const registrosArray = Object.values(registros).filter(r => r !== null && r !== undefined);
+                
+                let html = `<div class="info-box">📊 Total de registros en localStorage: ${registrosArray.length}</div>`;
+                
+                if (registrosArray.length > 0) {
+                    html += '<table class="data-table">';
+                    html += '<tr><th>Número Registro</th><th>TenantId</th><th>UserId</th></tr>';
+                    registrosArray.slice(0, 20).forEach(reg => {
+                        html += `<tr>
+                            <td>${reg.numeroRegistro || reg.id || 'N/A'}</td>
+                            <td>${reg.tenantId || '❌ NO TIENE'}</td>
+                            <td>${reg.userId || '❌ NO TIENE'}</td>
+                        </tr>`;
+                    });
+                    html += '</table>';
+                    
+                    if (registrosArray.length > 20) {
+                        html += `<div class="info-box">... y ${registrosArray.length - 20} registros más</div>`;
+                    }
+                    
+                    // Agrupar por tenantId
+                    const porTenantId = {};
+                    registrosArray.forEach(reg => {
+                        const tid = reg.tenantId || 'SIN_TENANTID';
+                        if (!porTenantId[tid]) porTenantId[tid] = [];
+                        porTenantId[tid].push(reg);
+                    });
+                    
+                    html += '<h3>Registros agrupados por TenantId:</h3>';
+                    html += '<ul>';
+                    Object.keys(porTenantId).forEach(tid => {
+                        html += `<li><strong>${tid}</strong>: ${porTenantId[tid].length} registros</li>`;
+                    });
+                    html += '</ul>';
+                } else {
+                    html += '<div class="warning-box">⚠️ No hay registros en localStorage</div>';
+                }
+                
+                div.innerHTML = html;
+            } catch (error) {
+                div.innerHTML = `<div class="error-box">❌ Error: ${error.message}</div>`;
+            }
+        };
+        
+        // Diagnóstico completo
+        window.diagnosticoCompleto = async function() {
+            await mostrarInfoUsuario();
+            await mostrarInfoRepositorio();
+            await window.verificarRegistrosFirebase();
+            window.verificarRegistrosLocalStorage();
+            
+            // Comparar tenantIds
+            const user = JSON.parse(localStorage.getItem('erpCurrentUser') || 'null');
+            const repo = window.firebaseRepos?.logistica;
+            
+            if (user && repo) {
+                const userTenantId = user.tenantId;
+                const repoTenantId = repo.tenantId;
+                
+                // Verificar también los tenantIds de los registros
+                const registrosFirebase = await obtenerRegistrosFirebase();
+                const tenantIdsRegistros = [...new Set(registrosFirebase.map(r => r.tenantId || 'SIN_TENANTID'))];
+                
+                let mensaje = '';
+                if (userTenantId !== repoTenantId) {
+                    mensaje = `⚠️ DISCREPANCIA DE TENANTID:\n\nUsuario tenantId: ${userTenantId || 'N/A'}\nRepositorio tenantId: ${repoTenantId || 'N/A'}\n\nEsto puede causar que no se muestren los registros.`;
+                } else if (userTenantId && repoTenantId) {
+                    mensaje = `✅ Los tenantIds coinciden: ${userTenantId}`;
+                }
+                
+                if (tenantIdsRegistros.length > 0) {
+                    mensaje += `\n\n📊 TenantIds en registros de Firebase:\n${tenantIdsRegistros.join(', ')}`;
+                    
+                    if (userTenantId && !tenantIdsRegistros.includes(userTenantId)) {
+                        mensaje += `\n\n❌ PROBLEMA: Tu tenantId (${userTenantId}) NO coincide con ningún registro en Firebase.`;
+                        mensaje += `\n\n💡 SOLUCIÓN:`;
+                        mensaje += `\n1. Actualizar el tenantId de los registros en Firebase a "${userTenantId}"`;
+                        mensaje += `\n2. O actualizar tu tenantId a uno de los existentes: ${tenantIdsRegistros.join(', ')}`;
+                    } else if (userTenantId && tenantIdsRegistros.includes(userTenantId)) {
+                        mensaje += `\n\n✅ Hay registros con tu tenantId (${userTenantId})`;
+                    }
+                }
+                
+                alert(mensaje);
+            }
+            
+            // Función auxiliar para obtener registros de Firebase
+            async function obtenerRegistrosFirebase() {
+                try {
+                    const db = await waitForFirebase();
+                    const collectionRef = collection(db, 'logistica');
+                    const snapshot = await getDocs(collectionRef);
+                    
+                    const registros = [];
+                    snapshot.forEach(doc => {
+                        const data = doc.data();
+                        registros.push({
+                            id: doc.id,
+                            numeroRegistro: data.numeroRegistro || data.id || 'N/A',
+                            tenantId: data.tenantId || null,
+                            userId: data.userId || null
+                        });
+                    });
+                    return registros;
+                } catch (error) {
+                    console.error('Error obteniendo registros:', error);
+                    return [];
+                }
+            }
+        };
+        
+        // Sincronizar tenantId
+        window.sincronizarTenantId = async function() {
+            const user = JSON.parse(localStorage.getItem('erpCurrentUser') || 'null');
+            const repo = window.firebaseRepos?.logistica;
+            
+            if (!user || !repo) {
+                alert('❌ No se puede sincronizar: usuario o repositorio no disponible');
+                return;
+            }
+            
+            if (user.tenantId && !repo.tenantId) {
+                repo.tenantId = user.tenantId;
+                alert(`✅ TenantId sincronizado: ${user.tenantId}\n\nRecarga la página para aplicar los cambios.`);
+            } else if (!user.tenantId && repo.tenantId) {
+                user.tenantId = repo.tenantId;
+                localStorage.setItem('erpCurrentUser', JSON.stringify(user));
+                alert(`✅ TenantId sincronizado: ${repo.tenantId}\n\nRecarga la página para aplicar los cambios.`);
+            } else {
+                alert('ℹ️ Los tenantIds ya están sincronizados o ambos están vacíos.');
+            }
+        };
+        
+        // Ejecutar al cargar
+        window.addEventListener('load', async () => {
+            await waitForFirebase();
+            await mostrarInfoUsuario();
+            await mostrarInfoRepositorio();
+        });
+    </script>
+    
+    <script src="../assets/scripts/firebase-init.js" type="module"></script>
+</body>
+</html>
+

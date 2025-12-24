@@ -1,0 +1,1189 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/png" sizes="16x16" href="../assets/img/Logo TF.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="../assets/img/Logo TF.png" />
+    <link rel="icon" type="image/png" sizes="64x64" href="../assets/img/Logo TF.png" />
+    <title>Tráfico</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link rel="stylesheet" href="../styles/styles.css" />
+    <link rel="stylesheet" href="../styles/trafico.css" />
+    <link rel="stylesheet" href="../styles/backend-indicator.css" />
+    <!-- Estilos para el componente searchable-select -->
+    <link rel="stylesheet" href="../assets/styles/searchable-select.css" />
+
+    <!-- Bootstrap JavaScript (requerido para modales) - SIN defer para que cargue inmediatamente -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      // Verificar que Bootstrap se cargó correctamente
+      if (typeof bootstrap === 'undefined') {
+        console.error('❌ Bootstrap no se cargó correctamente');
+      } else {
+        console.log('✅ Bootstrap cargado correctamente');
+      }
+    </script>
+
+    <!-- CRÍTICO: Ocultar elementos del sidebar INMEDIATAMENTE para evitar parpadeo -->
+    <style>
+      /* Ocultar todos los módulos del sidebar inicialmente */
+      .nav-item:not(#nav-menu) {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        height: 0 !important;
+        overflow: hidden !important;
+      }
+      /* Permitir que auth.js muestre los elementos con permisos */
+      .nav-item.permission-granted {
+        display: list-item !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        height: auto !important;
+        overflow: visible !important;
+      }
+    </style>
+
+    <!-- Script crítico: Restaurar estado del sidebar ANTES de renderizar para evitar parpadeo -->
+    <script src="../assets/scripts/trafico/sidebar-state.js"></script>
+    <!-- Script para actualizar período automáticamente -->
+    <script src="../assets/scripts/periodo.js"></script>
+
+    <!-- Performance Optimizations y Loaders Comunes -->
+    <script src="../assets/scripts/performance/performance-init.js" defer></script>
+
+    <!-- CRÍTICO: auth.js DEBE cargarse ANTES de common-head-loader.js -->
+    <!-- para que los permisos se apliquen antes de que se oculten elementos -->
+    <script src="../assets/scripts/auth.js"></script>
+
+    <!-- Ahora cargar common-head-loader.js que esperará a que auth.js esté listo -->
+    <script src="../assets/scripts/performance/common-head-loader.js"></script>
+    <script src="../assets/scripts/script-loader.js" defer></script>
+
+    <!-- ===== FASE 1: Scripts Críticos (SIN defer) ===== -->
+    <!-- CRÍTICO: cache-manager.js debe cargarse ANTES de otros scripts que usan caché -->
+    <script src="../assets/scripts/cache-manager.js"></script>
+    <!-- CRÍTICO: license-manager.js y plan-limits-manager.js deben cargarse ANTES de data-persistence.js -->
+    <script src="../assets/scripts/license-manager.js"></script>
+    <script src="../assets/scripts/plan-limits-manager.js"></script>
+    <!-- CRÍTICO: data-persistence.js debe cargarse ANTES de form-submit-handler.js para que saveTraficoData esté disponible -->
+    <script src="../assets/scripts/data-persistence.js"></script>
+
+    <!-- ===== FASE 3: Scripts Base del Sistema (SIN defer) ===== -->
+    <!-- CRÍTICO: main.js debe cargarse SIN defer para que funciones base estén disponibles -->
+    <script src="../assets/scripts/main.js"></script>
+
+    <!-- ===== FASE 4: Firebase (SIN defer) ===== -->
+    <!-- CRÍTICO: firebase-init.js debe cargarse PRIMERO para inicializar Firebase -->
+    <script type="module" src="../assets/scripts/firebase-init.js"></script>
+    <!-- CRÍTICO: firebase-ready.js debe cargarse DESPUÉS de firebase-init.js para verificar disponibilidad -->
+    <script src="../assets/scripts/firebase-ready.js"></script>
+    <!-- CRÍTICO: registration-number-binding.js debe cargarse DESPUÉS de firebase-ready.js pero ANTES de main.js -->
+    <script src="../assets/scripts/registration-number-binding.js"></script>
+
+    <!-- ===== FASE 5: Scripts con defer (se ejecutan cuando DOM está listo) ===== -->
+    <!-- CRÍTICO: firebase-repo-base.js debe cargarse para que FirebaseRepoBase esté disponible -->
+    <script src="../assets/scripts/firebase-repo-base.js" defer></script>
+    <!-- CRÍTICO: firebase-repos.js debe cargarse DESPUÉS de firebase-repo-base.js para crear los repositorios -->
+    <script src="../assets/scripts/firebase-repos.js" defer></script>
+
+    <!-- Scripts específicos del módulo -->
+    <script src="../assets/scripts/trafico-contador.js" defer></script>
+    <!-- CRÍTICO: buzon-pendientes.js debe cargarse ANTES de page-init.js para que mostrarBuzonPendientesTrafico esté disponible -->
+    <script src="../assets/scripts/trafico/buzon-pendientes.js" defer></script>
+    <!-- CRÍTICO: form-handler.js debe cargarse ANTES de page-init.js para que buscarDatosConValidacion esté disponible -->
+    <script src="../assets/scripts/trafico/form-handler.js" defer></script>
+    <!-- CRÍTICO: autocomplete-manager.js debe cargarse para que desplegarListaEconomicos esté disponible -->
+    <!-- NOTA: Este script se mantiene temporalmente para compatibilidad, pero será reemplazado por el nuevo componente -->
+    <script src="../assets/scripts/trafico/autocomplete-manager.js" defer></script>
+    <!-- Scripts del componente searchable-select -->
+    <script src="../assets/scripts/searchable-select.js"></script>
+    <!-- Scripts de inicialización para searchable-select en trafico -->
+    <script src="../assets/scripts/trafico/searchable-select-economicos.js" defer></script>
+    <script src="../assets/scripts/trafico/searchable-select-operadores.js" defer></script>
+    <script src="../assets/scripts/trafico/searchable-select-gastos-operadores.js" defer></script>
+    <!-- CRÍTICO: trafico-gastos-operadores.js debe cargarse para que cargarMotivosPagoEnSelect esté disponible -->
+    <script src="../assets/scripts/trafico-gastos-operadores.js" defer></script>
+    <!-- CRÍTICO: form-submit-handler.js debe cargarse ANTES de page-init.js para que manejarEnvioFormulario esté disponible -->
+    <script src="../assets/scripts/trafico/form-submit-handler.js" defer></script>
+    <!-- CRÍTICO: edit-manager.js debe cargarse para que editarRegistroTrafico esté disponible -->
+    <script src="../assets/scripts/trafico/edit-manager.js" defer></script>
+    <!-- CRÍTICO: descarga-manager.js debe cargarse ANTES de registros-loader.js para que abrirModalDescarga esté disponible -->
+    <script src="../assets/scripts/trafico/descarga-manager.js" defer></script>
+    <script src="../assets/scripts/paginacion.js" defer></script>
+    <script src="../assets/scripts/shared/event-handlers.js" defer></script>
+    <!-- CRÍTICO: filtros-manager.js debe cargarse ANTES de event-handlers.js para que aplicarFiltrosTrafico esté disponible -->
+    <script src="../assets/scripts/trafico/filtros-manager.js"></script>
+    <script src="../assets/scripts/trafico/event-handlers.js" defer></script>
+    <script src="../assets/scripts/trafico/export-utils.js" defer></script>
+    <script src="../assets/scripts/trafico/registros-loader.js" defer></script>
+    <script src="../assets/scripts/trafico/registros-actions.js" defer></script>
+    <script src="../assets/scripts/trafico/page-init.js" defer></script>
+    <!-- CRÍTICO: trafico-firebase.js debe cargarse para que refreshEstanciasListTrafico esté disponible -->
+    <script src="../assets/scripts/trafico-firebase.js" defer></script>
+
+    <!-- Sistema de limpieza automática de localStorage -->
+    <script src="../assets/scripts/localstorage-cleanup.js" defer></script>
+
+    <script src="../assets/scripts/economicos-repo.js" defer></script>
+  </head>
+
+  <body>
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="logo">
+          <img src="../assets/img/Logo TF.png" alt="TitanFleet" class="logo-img-standard" />
+          <span class="logo-text">TitanFleet</span>
+        </div>
+        <button class="btn-close-sidebar" id="closeSidebar"><i class="fas fa-times"></i></button>
+      </div>
+      <nav class="sidebar-nav">
+        <ul class="nav-menu">
+          <li class="nav-item" id="nav-menu">
+            <a href="menu.html" class="nav-link"
+              ><i class="fa-solid fa-house-chimney"></i><span>Menú</span></a
+            >
+          </li>
+          <li class="nav-item" id="nav-logistica">
+            <a href="logistica.html" class="nav-link"
+              ><i class="fas fa-truck"></i><span>Logística</span></a
+            >
+          </li>
+          <li class="nav-item" id="nav-facturacion">
+            <a href="facturacion.html" class="nav-link"
+              ><i class="fas fa-file-invoice"></i><span>Facturación</span></a
+            >
+          </li>
+          <li class="nav-item active" id="nav-trafico">
+            <a href="trafico.html" class="nav-link"
+              ><i class="fas fa-route"></i><span>Tráfico</span></a
+            >
+          </li>
+          <li class="nav-item" id="nav-operadores">
+            <a href="operadores.html" class="nav-link"
+              ><i class="fas fa-user"></i><span>Operadores</span></a
+            >
+          </li>
+          <li class="nav-item" id="nav-diesel">
+            <a href="diesel.html" class="nav-link"
+              ><i class="fa-solid fa-gas-pump"></i><span>Diesel</span></a
+            >
+          </li>
+          <li class="nav-item" id="nav-mantenimiento">
+            <a href="mantenimiento.html" class="nav-link"
+              ><i class="fa-solid fa-screwdriver-wrench"></i><span>Mantenimiento</span></a
+            >
+          </li>
+          <li class="nav-item" id="nav-tesoreria">
+            <a href="tesoreria.html" class="nav-link"
+              ><i class="fa-solid fa-money-bill"></i><span>Tesoreria</span></a
+            >
+          </li>
+          <li class="nav-item" id="nav-cxc">
+            <a href="CXC.html" class="nav-link"
+              ><i class="fas fa-hand-holding-usd"></i><span>Cuentas x Cobrar</span></a
+            >
+          </li>
+          <li class="nav-item" id="nav-cxp">
+            <a href="CXP.html" class="nav-link"
+              ><i class="fas fa-credit-card"></i><span>Cuentas x Pagar</span></a
+            >
+          </li>
+          <li class="nav-item" id="nav-inventario">
+            <a href="inventario.html" class="nav-link"
+              ><i class="fa-solid fa-cart-flatbed"></i><span>Inventario</span></a
+            >
+          </li>
+          <li class="nav-item" id="nav-configuracion">
+            <a href="configuracion.html" class="nav-link"
+              ><i class="fa-solid fa-gears"></i><span>Configuración</span></a
+            >
+          </li>
+          <li class="nav-item" id="nav-reportes">
+            <a href="reportes.html" class="nav-link"
+              ><i class="fas fa-chart-line"></i><span>Reportes</span></a
+            >
+          </li>
+        </ul>
+      </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+      <!-- Top Bar -->
+      <div class="top-bar">
+        <button class="btn-toggle-sidebar" id="toggleSidebar">
+          <i class="fas fa-bars"></i>
+        </button>
+        <div class="top-bar-content">
+          <div class="page-title-section">
+            <h1 class="page-title">
+              <i class="fas fa-route"></i>
+              Gestión Tráfico
+              <span
+                id="backendReadyIndicator"
+                class="backend-loading-indicator"
+                style="display: none"
+              >
+                <span
+                  class="spinner-border spinner-border-sm"
+                  role="status"
+                  aria-hidden="true"
+                ></span>
+                <span class="ms-2">Cargando datos...</span>
+              </span>
+              <span id="backendReadyBadge" class="backend-ready-badge" style="display: none">
+                <i class="fas fa-check-circle"></i>
+                <span class="ms-2">Listo para trabajar</span>
+              </span>
+            </h1>
+            <div class="current-period">
+              <small class="text-muted">Registro: </small>
+              <span class="period-info" id="currentPeriod">-</span>
+            </div>
+          </div>
+          <div class="user-info">
+            <div class="user-details">
+              <i class="fas fa-user-circle"></i>
+              <span id="currentUserName">Usuario ERP</span>
+            </div>
+            <div class="user-actions">
+              <button class="btn btn-outline-light btn-sm logout-btn" data-action="logout">
+                <i class="fas fa-sign-out-alt"></i> <span class="logout-text">Cerrar Sesión</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Content Area -->
+      <div class="content-wrapper" style="padding: 8px">
+        <div class="container-fluid">
+          <!-- Page Header -->
+          <div class="page-header">
+            <div class="row align-items-center">
+              <div class="col-md-8">
+                <h2 class="mb-2">Gestión Tráfico</h2>
+                <p class="text-muted mb-0">
+                  Selecciona el numero de registro para acceder a la información y llenar la parte
+                  correspondiente.
+                </p>
+              </div>
+              <div class="col-md-4 text-end">
+                <button class="btn btn-warning" id="btnBuzonPendientesTrafico">
+                  <i class="fas fa-inbox"></i> Buzón de Pendientes
+                  <span class="badge bg-danger ms-1" id="contadorPendientesTrafico">0</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Form -->
+          <div class="card">
+            <div class="card-body">
+              <form class="needs-validation" novalidate>
+                <!-- Número de Registro -->
+                <div class="form-section">
+                  <h4 class="section-title">
+                    <i class="fas fa-hashtag"></i>
+                    Información del Registro
+                  </h4>
+                  <div class="row g-3">
+                    <div class="col-md-6">
+                      <label for="numeroRegistro" class="form-label">Número de Registro *</label>
+                      <div class="input-group">
+                        <input type="text" class="form-control" id="numeroRegistro" required />
+                        <button
+                          class="btn btn-outline-primary"
+                          type="button"
+                          data-action="buscarDatosConValidacion"
+                        >
+                          <i class="fas fa-search"></i> Buscar
+                        </button>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <label for="fechaCreacion" class="form-label">Fecha de Creación</label>
+                      <input type="date" class="form-control" id="fechaCreacion" />
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Datos del Cliente -->
+                <div class="form-section">
+                  <h4 class="section-title">
+                    <i class="fas fa-truck"></i>
+                    Datos de Logistica
+                  </h4>
+                  <div class="row g-3">
+                    <div class="col-md-6">
+                      <label for="cliente" class="form-label">Cliente </label>
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="cliente"
+                        placeholder="Se llena en Automatico"
+                        readonly
+                      />
+                      <input type="hidden" id="rfcCliente_value" />
+                      <div class="invalid-feedback">Por favor ingrese el nombre del cliente</div>
+                    </div>
+                    <div class="col-md-6">
+                      <label for="rfcCliente" class="form-label">RFC del Cliente </label>
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="rfcCliente"
+                        placeholder="Se llena automáticamente"
+                        readonly
+                      />
+                    </div>
+                    <div class="col-md-6">
+                      <label for="origen" class="form-label">Ciudad Origen </label>
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="origen"
+                        placeholder="Se llena en Automatico"
+                        readonly
+                      />
+                      <div class="invalid-feedback">Por favor ingrese la ciudad de origen</div>
+                    </div>
+                    <div class="col-md-6">
+                      <label for="destino" class="form-label">Ciudad Destino </label>
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="destino"
+                        placeholder="Se llena en Automatico"
+                        readonly
+                      />
+                      <div class="invalid-feedback">Por favor ingrese la ciudad de destino</div>
+                    </div>
+                    <div class="col-md-6">
+                      <label for="referencia cliente" class="form-label"
+                        >Referencia del Cliente
+                      </label>
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="referencia cliente"
+                        placeholder="Se llena en Automatico"
+                        readonly
+                      />
+                      <div class="invalid-feedback">
+                        Por favor ingrese la Referencia del Cliente
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <label for="tipo de servicio" class="form-label">Tipo de Servicio </label>
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="tiposervicio"
+                        placeholder="Se llena en Automatico"
+                        readonly
+                      />
+                      <div class="invalid-feedback">Por favor ingrese el tipo de servicio</div>
+                    </div>
+                    <div class="col-md-6">
+                      <label for="embalajeespecial" class="form-label">Embalaje Especial </label>
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="embalajeEspecial"
+                        placeholder="Se llena en Automatico"
+                        readonly
+                      />
+                      <div class="invalid-feedback">Por favor ingrese el embalaje especial</div>
+                    </div>
+                  </div>
+
+                  <!-- Detalles adicionales del envío -->
+                  <div class="row g-3 mt-2">
+                    <div class="col-md-4">
+                      <label for="plataforma" class="form-label">Tipo de Plataforma </label>
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="plataforma"
+                        placeholder="Se llena en Automatico"
+                        readonly
+                      />
+                    </div>
+                    <div class="col-md-8">
+                      <label for="mercancia" class="form-label">Tipo de Mercancía </label>
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="mercancia"
+                        placeholder="Se llena en Automatico"
+                        readonly
+                      />
+                    </div>
+                  </div>
+
+                  <div class="row g-3 mt-2">
+                    <div class="col-md-4">
+                      <label for="peso" class="form-label">Peso (kg) </label>
+                      <div class="input-group">
+                        <input
+                          type="number"
+                          class="form-control"
+                          id="peso"
+                          placeholder="Se llena en Automatico"
+                          readonly
+                        />
+                        <span class="input-group-text">kg</span>
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <label for="largo" class="form-label">Largo (m) </label>
+                      <div class="input-group">
+                        <input
+                          type="number"
+                          class="form-control"
+                          id="largo"
+                          placeholder="Se llena en Automatico"
+                          readonly
+                        />
+                        <span class="input-group-text">m</span>
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <label for="ancho" class="form-label">Ancho (m) </label>
+                      <div class="input-group">
+                        <input
+                          type="number"
+                          class="form-control"
+                          id="ancho"
+                          placeholder="Se llena en Automatico"
+                          readonly
+                        />
+                        <span class="input-group-text">m</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="row g-3 mt-2">
+                    <div class="col-md-6">
+                      <label for="fechaEnvio" class="form-label">Fecha de Envío </label>
+                      <input
+                        type="date"
+                        class="form-control"
+                        id="fechaEnvio"
+                        placeholder="Se llena en Automatico"
+                        readonly
+                      />
+                    </div>
+                    <div class="col-md-6">
+                      <label for="observacionesLogistica" class="form-label"
+                        >Observaciones de Logística
+                      </label>
+                      <textarea
+                        class="form-control"
+                        id="observacionesLogistica"
+                        rows="2"
+                        placeholder="Se llena en Automatico"
+                        readonly
+                      ></textarea>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Datos del servicio -->
+                <div class="form-section">
+                  <h4 class="section-title">
+                    <i class="fa-solid fa-boxes-packing"></i>
+                    Detalles del Servicio
+                  </h4>
+                  <div class="row g-3">
+                    <div class="col-md-6">
+                      <label for="LugarOrigen" class="form-label">Lugar de Origen *</label>
+                      <div class="input-group">
+                        <select class="form-select" id="LugarOrigen" required>
+                          <option value="">Seleccione una estancia...</option>
+                        </select>
+                        <button
+                          class="btn btn-outline-secondary"
+                          type="button"
+                          data-action="refreshEstanciasListTrafico"
+                          title="Actualizar lista"
+                        >
+                          <i class="fas fa-sync-alt"></i>
+                        </button>
+                      </div>
+                      <div class="invalid-feedback">Por favor seleccione el Lugar de Origen</div>
+                    </div>
+
+                    <div class="col-md-6">
+                      <label for="LugarDestino" class="form-label">Lugar de Destino *</label>
+                      <div class="input-group">
+                        <select class="form-select" id="LugarDestino" required>
+                          <option value="">Seleccione una estancia...</option>
+                        </select>
+                        <button
+                          class="btn btn-outline-secondary"
+                          type="button"
+                          data-action="refreshEstanciasListTrafico"
+                          title="Actualizar lista"
+                        >
+                          <i class="fas fa-sync-alt"></i>
+                        </button>
+                      </div>
+                      <div class="invalid-feedback">Por favor seleccione el Lugar de Destino</div>
+                    </div>
+                  </div>
+
+                  <!-- Campos adicionales requeridos en servicio -->
+                  <div class="row g-3 mt-1">
+                    <div class="col-md-4">
+                      <label for="plataformaServicio" class="form-label">Plataforma *</label>
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="plataformaServicio"
+                        placeholder="Descripción de la plataforma"
+                        required
+                      />
+                      <div class="invalid-feedback">Por favor ingrese la Plataforma</div>
+                    </div>
+                    <div class="col-md-4">
+                      <label for="placasPlataforma" class="form-label">Placas Plataforma *</label>
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="placasPlataforma"
+                        placeholder="Placas de la plataforma"
+                        required
+                      />
+                      <div class="invalid-feedback">
+                        Por favor ingrese las Placas de la Plataforma
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <label for="tipoPlataforma" class="form-label">Tipo de Plataforma *</label>
+                      <select id="tipoPlataforma" class="form-select" required>
+                        <option value="">Seleccione...</option>
+                        <option value="48ft">48 ft</option>
+                        <option value="53ft">53 ft</option>
+                        <option value="extendible">Extendible</option>
+                        <option value="step-deck">Step-Deck</option>
+                        <option value="lowboy">Lowboy</option>
+                      </select>
+                      <div class="invalid-feedback">Por favor seleccione el Tipo de Plataforma</div>
+                    </div>
+                  </div>
+
+                  <div class="row g-1">
+                    <div class="col-md-4">
+                      <label for="economico" class="form-label">Económico Tractocamión *</label>
+                      <div class="searchable-select-container">
+                        <div class="search-input-wrapper">
+                          <input
+                            type="text"
+                            id="economico"
+                            class="form-control"
+                            placeholder="Escriba para buscar económico..."
+                            autocomplete="off"
+                            required
+                          />
+                          <i class="fas fa-search search-icon"></i>
+                          <button
+                            id="btn-clear-economico"
+                            class="btn btn-outline-secondary btn-sm btn-clear"
+                            type="button"
+                            title="Limpiar"
+                          >
+                            <i class="fas fa-times"></i>
+                          </button>
+                        </div>
+                        <div id="select-economico" class="filtered-select"></div>
+                      </div>
+                      <input type="hidden" id="economico_value" />
+                      <div class="invalid-feedback">Por favor seleccione un económico</div>
+                      <small class="text-muted"
+                        >Los datos se llenarán automáticamente al seleccionar</small
+                      >
+                    </div>
+
+                    <div class="col-md-4">
+                      <label for="Placas" class="form-label">Placas</label>
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="Placas"
+                        placeholder="Se llena automáticamente"
+                        readonly
+                      />
+                    </div>
+
+                    <div class="col-md-4">
+                      <label for="PermisoSCT" class="form-label">Permiso SCT</label>
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="permisosct"
+                        placeholder="Se llena automáticamente"
+                        readonly
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Datos Operadores -->
+                <div class="form-section">
+                  <h4 class="section-title">
+                    <i class="fa-solid fa-user-gear"></i>
+                    Detalle de Operadores
+                  </h4>
+                  <div class="row g-3">
+                    <div class="col-md-6">
+                      <label for="operadorprincipal" class="form-label">Operador Principal *</label>
+                      <div class="searchable-select-container">
+                        <div class="search-input-wrapper">
+                          <input
+                            type="text"
+                            id="operadorprincipal"
+                            class="form-control"
+                            placeholder="Escriba para buscar operador principal..."
+                            autocomplete="off"
+                            required
+                          />
+                          <i class="fas fa-search search-icon"></i>
+                          <button
+                            id="btn-clear-operadorprincipal"
+                            class="btn btn-outline-secondary btn-sm btn-clear"
+                            type="button"
+                            title="Limpiar"
+                          >
+                            <i class="fas fa-times"></i>
+                          </button>
+                        </div>
+                        <div id="select-operadorprincipal" class="filtered-select"></div>
+                      </div>
+                      <input type="hidden" id="operadorprincipal_value" />
+                      <div class="invalid-feedback">Por favor seleccione un operador principal</div>
+                      <small class="text-muted"
+                        >Los datos se llenarán automáticamente al seleccionar</small
+                      >
+                    </div>
+
+                    <div class="col-md-6">
+                      <label for="Licencia" class="form-label">Licencia</label>
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="Licencia"
+                        placeholder="Se llena automáticamente"
+                        readonly
+                      />
+                    </div>
+                  </div>
+
+                  <div class="row g-3">
+                    <div class="col-md-6">
+                      <label for="operadorsecundario" class="form-label">Operador Secundario</label>
+                      <div class="searchable-select-container">
+                        <div class="search-input-wrapper">
+                          <input
+                            type="text"
+                            id="operadorsecundario"
+                            class="form-control"
+                            placeholder="Escriba para buscar operador secundario..."
+                            autocomplete="off"
+                          />
+                          <i class="fas fa-search search-icon"></i>
+                          <button
+                            id="btn-clear-operadorsecundario"
+                            class="btn btn-outline-secondary btn-sm btn-clear"
+                            type="button"
+                            title="Limpiar"
+                          >
+                            <i class="fas fa-times"></i>
+                          </button>
+                        </div>
+                        <div id="select-operadorsecundario" class="filtered-select"></div>
+                      </div>
+                      <input type="hidden" id="operadorsecundario_value" />
+                      <small class="text-muted"
+                        >Opcional - Los datos se llenarán automáticamente</small
+                      >
+                    </div>
+
+                    <div class="col-md-6">
+                      <label for="LicenciaSecundaria" class="form-label"
+                        >Licencia Operador Secundario</label
+                      >
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="LicenciaSecundaria"
+                        placeholder="Se llena automáticamente"
+                        readonly
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Gastos Operadores -->
+                <div class="form-section">
+                  <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h4 class="section-title mb-0">
+                      <i class="fa-solid fa-coins"></i>
+                      Gastos Operadores
+                    </h4>
+                  </div>
+
+                  <!-- Fila de gastos -->
+                  <div class="row g-3 mb-3">
+                    <div class="col-md-3">
+                      <label class="form-label">Operador</label>
+                      <div class="searchable-select-container">
+                        <div class="search-input-wrapper">
+                          <input
+                            type="text"
+                            id="gasto_operador_1"
+                            class="form-control"
+                            placeholder="Escriba para buscar operador..."
+                            autocomplete="off"
+                          />
+                          <i class="fas fa-search search-icon"></i>
+                          <button
+                            id="btn-clear-gasto_operador_1"
+                            class="btn btn-outline-secondary btn-sm btn-clear"
+                            type="button"
+                            title="Limpiar"
+                          >
+                            <i class="fas fa-times"></i>
+                          </button>
+                        </div>
+                        <div id="select-gasto_operador_1" class="filtered-select"></div>
+                      </div>
+                      <input type="hidden" id="gasto_operador_1_value" />
+                    </div>
+                    <div class="col-md-3">
+                      <label class="form-label">Motivo de Pago</label>
+                      <select class="form-select" id="gasto_motivo_1">
+                        <option value="">Seleccione motivo...</option>
+                      </select>
+                    </div>
+                    <div class="col-md-2">
+                      <label class="form-label">Monto</label>
+                      <input
+                        type="number"
+                        class="form-control"
+                        id="gasto_monto_1"
+                        min="0"
+                        step="0.01"
+                        placeholder="0.00"
+                      />
+                    </div>
+                    <div class="col-md-3">
+                      <label class="form-label">Evidencia</label>
+                      <input
+                        type="file"
+                        class="form-control"
+                        id="gasto_evidencia_1"
+                        accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                      />
+                    </div>
+                    <div class="col-md-1 d-flex align-items-center justify-content-center">
+                      <div class="w-100">
+                        <label class="form-label">&nbsp;</label>
+                        <button
+                          type="button"
+                          class="btn btn-outline-danger btn-sm w-100"
+                          data-action="eliminarGastoOperador"
+                          data-indice="1"
+                          title="Eliminar gasto"
+                        >
+                          <i class="fas fa-trash"></i>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Botón para agregar más gastos -->
+                  <div class="row">
+                    <div class="col-12">
+                      <button
+                        type="button"
+                        class="btn btn-outline-primary"
+                        data-action="agregarGastoOperador"
+                      >
+                        <i class="fas fa-plus"></i> Agregar Gasto
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Contenedor para filas adicionales -->
+                  <div id="gastosOperadoresAdicionales"></div>
+                </div>
+                <!-- Observaciones -->
+                <div class="form-section">
+                  <h4 class="section-title">
+                    <i class="fa-solid fa-clipboard"></i>
+                    Observaciones
+                  </h4>
+                  <div class="row g-3">
+                    <div class="col-12">
+                      <div class="form-check form-check-inline">
+                        <input
+                          class="form-check-input"
+                          type="radio"
+                          name="observaciones"
+                          id="observacionesSi"
+                          value="si"
+                        />
+                        <label class="form-check-label" for="observacionesSi">Sí</label>
+                      </div>
+                      <div class="form-check form-check-inline">
+                        <input
+                          class="form-check-input"
+                          type="radio"
+                          name="observaciones"
+                          id="observacionesNo"
+                          value="no"
+                          checked
+                        />
+                        <label class="form-check-label" for="observacionesNo">No</label>
+                      </div>
+                    </div>
+                    <div
+                      class="col-12 descripcion-observaciones-hidden"
+                      id="descripcionObservaciones"
+                    >
+                      <label for="descripcion" class="form-label">Describe tus Observaciones</label>
+                      <textarea
+                        class="form-control"
+                        id="descripcion"
+                        rows="3"
+                        placeholder="Describe tus Observaciones"
+                      ></textarea>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Botones de Acción -->
+                <div class="form-actions">
+                  <button
+                    type="button"
+                    class="btn btn-outline-warning me-2"
+                    data-action="clearCurrentForm"
+                  >
+                    <i class="fas fa-times"></i> Limpiar
+                  </button>
+                  <button type="submit" class="btn btn-primary me-2" id="btnRegistrarEnvio">
+                    <i class="fas fa-check"></i> Registrar Envío
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <!-- Lista de Registros de Tráfico -->
+          <div class="card mt-4">
+            <div class="card-header bg-warning text-dark">
+              <div class="d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0"><i class="fas fa-truck"></i> Registros de Tráfico</h5>
+                <div class="d-flex align-items-center gap-2">
+                  <!-- Botón Exportar -->
+                  <button
+                    type="button"
+                    class="btn btn-outline-light btn-sm exportar-btn-header"
+                    data-action="exportarTraficoExcel"
+                  >
+                    <i class="fas fa-file-excel"></i> Exportar
+                  </button>
+                  <!-- Filtros rápidos -->
+                  <div class="btn-group btn-group-sm" role="group">
+                    <button
+                      type="button"
+                      class="btn btn-outline-dark"
+                      data-action="filtrarPorEstadoPlataforma"
+                      data-estado=""
+                    >
+                      Todos <span class="badge bg-dark" id="badgeTodos">0</span>
+                    </button>
+                    <button
+                      type="button"
+                      class="btn btn-outline-warning"
+                      data-action="filtrarPorEstadoPlataforma"
+                      data-estado="cargado"
+                    >
+                      Cargados <span class="badge bg-warning" id="badgeCargados">0</span>
+                    </button>
+                    <button
+                      type="button"
+                      class="btn btn-outline-success"
+                      data-action="filtrarPorEstadoPlataforma"
+                      data-estado="descargado"
+                    >
+                      Descargados <span class="badge bg-success" id="badgeDescargados">0</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- Filtros -->
+            <div class="card-body border-bottom card-body-filters">
+              <h6 class="mb-3"><i class="fas fa-filter"></i> Filtros de Búsqueda</h6>
+              <div class="row g-3">
+                <div class="col-md-2">
+                  <label for="filtroNumeroRegistro" class="form-label small">N° Registro</label>
+                  <input
+                    type="text"
+                    class="form-control form-control-sm"
+                    id="filtroNumeroRegistro"
+                    placeholder="Ej: 2500001"
+                    data-action="aplicarFiltrosTrafico"
+                  />
+                </div>
+                <div class="col-md-2">
+                  <label for="filtroCliente" class="form-label small">Cliente</label>
+                  <input
+                    type="text"
+                    class="form-control form-control-sm"
+                    id="filtroCliente"
+                    placeholder="Nombre cliente"
+                    data-action="aplicarFiltrosTrafico"
+                  />
+                </div>
+                <div class="col-md-2">
+                  <label for="filtroPlataforma" class="form-label small">Plataforma</label>
+                  <input
+                    type="text"
+                    class="form-control form-control-sm"
+                    id="filtroPlataforma"
+                    placeholder="# de Plataforma"
+                    data-action="aplicarFiltrosTrafico"
+                  />
+                </div>
+                <div class="col-md-2">
+                  <label for="filtroEconomico" class="form-label small">Económico</label>
+                  <input
+                    type="text"
+                    class="form-control form-control-sm"
+                    id="filtroEconomico"
+                    placeholder="Número económico"
+                    data-action="aplicarFiltrosTrafico"
+                  />
+                </div>
+                <div class="col-md-2">
+                  <label for="filtroFechaOrigen" class="form-label small">Fecha Origen</label>
+                  <input
+                    type="date"
+                    class="form-control form-control-sm"
+                    id="filtroFechaOrigen"
+                    data-action="aplicarFiltrosTrafico"
+                  />
+                </div>
+                <div class="col-md-2">
+                  <label for="filtroFechaDestino" class="form-label small">Fecha Destino</label>
+                  <input
+                    type="date"
+                    class="form-control form-control-sm"
+                    id="filtroFechaDestino"
+                    data-action="aplicarFiltrosTrafico"
+                  />
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                  <button
+                    type="button"
+                    class="btn btn-outline-secondary btn-sm w-100"
+                    data-action="limpiarFiltrosTrafico"
+                  >
+                    <i class="fas fa-times"></i> Limpiar Filtros
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="table-responsive">
+                <table class="table table-striped table-hover" id="tablaRegistrosTrafico">
+                  <thead class="table-dark">
+                    <tr>
+                      <th>N° Registro</th>
+                      <th>Cliente</th>
+                      <th>Origen</th>
+                      <th>Destino</th>
+                      <th>Operador Principal</th>
+                      <th>Plataforma</th>
+                      <th>Placas Tractor</th>
+                      <th>Estado</th>
+                      <th>Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody id="cuerpoTablaTrafico">
+                    <tr>
+                      <td colspan="9" class="text-center text-muted">
+                        <i class="fas fa-inbox"></i> No hay registros de Tráfico
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div id="paginacionTrafico"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scripts redundantes eliminados - ya se cargan en el head -->
+
+    <!-- Modal para Registrar Descarga -->
+    <div
+      class="modal fade"
+      id="modalDescargaPlataforma"
+      tabindex="-1"
+      aria-labelledby="modalDescargaLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header bg-success text-white">
+            <h5 class="modal-title" id="modalDescargaLabel">
+              <i class="fas fa-truck-loading"></i> Registrar Descarga de Plataforma
+            </h5>
+            <button
+              type="button"
+              class="btn-close btn-close-white"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <div class="alert alert-info">
+              <strong>Registro:</strong> <span id="descargaRegistroId"></span><br />
+              <strong>Plataforma:</strong> <span id="descargaPlataforma"></span><br />
+              <strong>Ubicación:</strong> <span id="descargaUbicacion"></span>
+            </div>
+
+            <form id="formDescarga">
+              <!-- Fecha de Descarga - SIEMPRE visible y editable -->
+              <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                  <label for="descargaFecha" class="form-label">Fecha de Descarga *</label>
+                  <input type="date" class="form-control" id="descargaFecha" required />
+                </div>
+              </div>
+
+              <!-- Checkbox para usar mismos datos -->
+              <div class="form-check mb-3">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  id="mismosDatos"
+                  data-action="toggleCamposDescarga"
+                  checked
+                />
+                <label class="form-check-label" for="mismosDatos">
+                  <strong>Usar mismo Tractocamión y Operadores del viaje</strong>
+                </label>
+              </div>
+
+              <!-- Campos para datos diferentes (ocultos por defecto) -->
+              <div id="camposDiferentes" class="campos-diferentes-hidden">
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <label for="descargaTractocamion" class="form-label">Tractocamión *</label>
+                    <select class="form-select select-modal-high-z" id="descargaTractocamion">
+                      <option value="">Seleccionar...</option>
+                    </select>
+                  </div>
+                  <div class="col-md-6">
+                    <label for="descargaOperadorPrincipal" class="form-label"
+                      >Operador Principal *</label
+                    >
+                    <select class="form-select select-modal-high-z" id="descargaOperadorPrincipal">
+                      <option value="">Seleccionar...</option>
+                    </select>
+                  </div>
+                  <div class="col-md-6">
+                    <label for="descargaOperadorSecundario" class="form-label"
+                      >Operador Secundario</label
+                    >
+                    <select class="form-select select-modal-high-z" id="descargaOperadorSecundario">
+                      <option value="">Seleccionar...</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row g-3 mt-2">
+                <div class="col-12">
+                  <label for="descargaNotas" class="form-label">Notas de Descarga</label>
+                  <textarea
+                    class="form-control"
+                    id="descargaNotas"
+                    rows="3"
+                    placeholder="Observaciones sobre la descarga..."
+                  ></textarea>
+                </div>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+              <i class="fas fa-times"></i> Cancelar
+            </button>
+            <button type="button" class="btn btn-success" data-action="confirmarDescarga">
+              <i class="fas fa-check"></i> Confirmar Descarga
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal para Ver Detalles del Registro -->
+    <div
+      class="modal fade"
+      id="modalVerRegistroTrafico"
+      tabindex="-1"
+      aria-labelledby="modalVerRegistroTraficoLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+          <div class="modal-header modal-header-trafico">
+            <h5 class="modal-title" id="modalVerRegistroTraficoLabel">
+              <i class="fas fa-eye"></i> Detalles del Registro de Tráfico
+            </h5>
+            <button
+              type="button"
+              class="btn-close btn-close-white"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body" id="modalVerRegistroTraficoBody">
+            <div class="text-center">
+              <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Cargando...</span>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+              <i class="fas fa-times"></i> Cerrar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Script para indicador de carga del backend (compartido) -->
+    <script src="../assets/scripts/backend-ready-indicator.js"></script>
+  </body>
+</html>

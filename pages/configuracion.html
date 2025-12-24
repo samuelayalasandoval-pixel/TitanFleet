@@ -1,0 +1,3814 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/png" sizes="16x16" href="../assets/img/Logo TF.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="../assets/img/Logo TF.png" />
+    <link rel="icon" type="image/png" sizes="64x64" href="../assets/img/Logo TF.png" />
+    <title>Configuración</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link rel="stylesheet" href="../styles/styles.css" />
+    <link rel="stylesheet" href="../styles/configuracion.css" />
+    <link rel="stylesheet" href="../styles/backend-indicator.css" />
+
+    <!-- Bootstrap JavaScript (requerido para tabs y modales) - SIN defer para que cargue inmediatamente -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      // Verificar que Bootstrap se cargó correctamente
+      if (typeof bootstrap === 'undefined') {
+        console.error('❌ Bootstrap no se cargó correctamente');
+      }
+    </script>
+
+    <!-- CRÍTICO: Ocultar elementos del sidebar INMEDIATAMENTE para evitar parpadeo -->
+    <style>
+      /* Ocultar todos los módulos del sidebar inicialmente (solo dentro del sidebar) */
+      .sidebar .nav-item:not(#nav-menu),
+      .sidebar-nav .nav-item:not(#nav-menu) {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        height: 0 !important;
+        overflow: hidden !important;
+      }
+      /* Permitir que auth.js muestre los elementos con permisos */
+      .sidebar .nav-item.permission-granted,
+      .sidebar-nav .nav-item.permission-granted {
+        display: list-item !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        height: auto !important;
+        overflow: visible !important;
+      }
+      /* Asegurar que las pestañas de configuración sean visibles */
+      #configTabs {
+        display: flex !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        margin-top: 20px !important;
+        margin-bottom: 0 !important;
+        height: auto !important;
+        overflow: visible !important;
+        position: relative !important;
+        z-index: 1 !important;
+      }
+      #configTabs .nav-item {
+        display: list-item !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        height: auto !important;
+        overflow: visible !important;
+      }
+      #configTabs .nav-link {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+      }
+    </style>
+
+    <!-- Performance Optimizations y Loaders Comunes -->
+    <script src="../assets/scripts/performance/performance-init.js" defer></script>
+
+    <!-- CRÍTICO: auth.js DEBE cargarse ANTES de common-head-loader.js -->
+    <!-- para que los permisos se apliquen antes de que se oculten elementos -->
+    <script src="../assets/scripts/auth.js"></script>
+
+    <!-- Ahora cargar common-head-loader.js que esperará a que auth.js esté listo -->
+    <script src="../assets/scripts/performance/common-head-loader.js"></script>
+    <script src="../assets/scripts/script-loader.js" defer></script>
+
+    <!-- Scripts críticos específicos de la página -->
+    <!-- Script crítico: Restaurar estado del sidebar ANTES de renderizar para evitar parpadeo -->
+    <script src="../assets/scripts/menu/sidebar-state.js"></script>
+    <!-- Script para actualizar período automáticamente -->
+    <script src="../assets/scripts/periodo.js"></script>
+
+    <!-- ===== FASE 3: Scripts Base del Sistema (SIN defer) ===== -->
+    <!-- CRÍTICO: main.js debe cargarse SIN defer para que funciones base estén disponibles -->
+    <script src="../assets/scripts/main.js"></script>
+    <!-- CRÍTICO: cache-manager.js debe cargarse ANTES de otros scripts que usan caché -->
+    <script src="../assets/scripts/cache-manager.js"></script>
+
+    <!-- ===== FASE 4: Firebase (SIN defer) ===== -->
+    <!-- CRÍTICO: firebase-init.js debe cargarse PRIMERO para inicializar Firebase -->
+    <script type="module" src="../assets/scripts/firebase-init.js"></script>
+    <!-- CRÍTICO: firebase-ready.js debe cargarse DESPUÉS de firebase-init.js para verificar disponibilidad -->
+    <script src="../assets/scripts/firebase-ready.js"></script>
+
+    <!-- ===== FASE 5: Scripts con defer (se ejecutan cuando DOM está listo) ===== -->
+    <!-- CRÍTICO: firebase-repo-base.js debe cargarse para que FirebaseRepoBase esté disponible -->
+    <script src="../assets/scripts/firebase-repo-base.js" defer></script>
+    <!-- CRÍTICO: firebase-repos.js debe cargarse DESPUÉS de firebase-repo-base.js para crear los repositorios -->
+    <script src="../assets/scripts/firebase-repos.js" defer></script>
+
+    <!-- Scripts específicos del módulo (con defer) -->
+    <script src="../assets/scripts/license-manager.js"></script>
+    <script src="../assets/scripts/plan-limits-manager.js"></script>
+    <script src="../assets/scripts/configuracion-sidebar.js" defer></script>
+    <script src="../assets/scripts/shared/event-handlers.js" defer></script>
+    <script src="../assets/scripts/configuracion/event-handlers.js" defer></script>
+    <script src="../assets/scripts/configuracion/tabs-init.js" defer></script>
+    <script src="../assets/scripts/configuracion/general-tab.js" defer></script>
+
+    <!-- Sistema de limpieza automática de localStorage -->
+    <script src="../assets/scripts/localstorage-cleanup.js" defer></script>
+  </head>
+
+  <body>
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="logo">
+          <img src="../assets/img/Logo TF.png" alt="TitanFleet" class="sidebar-logo-img" />
+          <span class="logo-text">TitanFleet</span>
+        </div>
+        <button class="btn-close-sidebar" id="closeSidebar"><i class="fas fa-times"></i></button>
+      </div>
+      <nav class="sidebar-nav">
+        <ul class="nav-menu">
+          <li class="nav-item" id="nav-menu">
+            <a href="menu.html" class="nav-link"
+              ><i class="fa-solid fa-house-chimney"></i><span>Menú</span></a
+            >
+          </li>
+          <li class="nav-item" id="nav-logistica">
+            <a href="logistica.html" class="nav-link"
+              ><i class="fas fa-truck"></i><span>Logística</span></a
+            >
+          </li>
+          <li class="nav-item" id="nav-facturacion">
+            <a href="facturacion.html" class="nav-link"
+              ><i class="fas fa-file-invoice"></i><span>Facturación</span></a
+            >
+          </li>
+          <li class="nav-item" id="nav-trafico">
+            <a href="trafico.html" class="nav-link"
+              ><i class="fas fa-route"></i><span>Tráfico</span></a
+            >
+          </li>
+          <li class="nav-item" id="nav-operadores">
+            <a href="operadores.html" class="nav-link"
+              ><i class="fas fa-user"></i><span>Operadores</span></a
+            >
+          </li>
+          <li class="nav-item" id="nav-diesel">
+            <a href="diesel.html" class="nav-link"
+              ><i class="fa-solid fa-gas-pump"></i><span>Diesel</span></a
+            >
+          </li>
+          <li class="nav-item" id="nav-mantenimiento">
+            <a href="mantenimiento.html" class="nav-link"
+              ><i class="fa-solid fa-screwdriver-wrench"></i><span>Mantenimiento</span></a
+            >
+          </li>
+          <li class="nav-item" id="nav-tesoreria">
+            <a href="tesoreria.html" class="nav-link"
+              ><i class="fa-solid fa-money-bill"></i><span>Tesoreria</span></a
+            >
+          </li>
+          <li class="nav-item" id="nav-cxc">
+            <a href="CXC.html" class="nav-link"
+              ><i class="fas fa-hand-holding-usd"></i><span>Cuentas x Cobrar</span></a
+            >
+          </li>
+          <li class="nav-item" id="nav-cxp">
+            <a href="CXP.html" class="nav-link"
+              ><i class="fas fa-credit-card"></i><span>Cuentas x Pagar</span></a
+            >
+          </li>
+          <li class="nav-item" id="nav-inventario">
+            <a href="inventario.html" class="nav-link"
+              ><i class="fa-solid fa-cart-flatbed"></i><span>Inventario</span></a
+            >
+          </li>
+          <li class="nav-item active" id="nav-configuracion">
+            <a href="configuracion.html" class="nav-link"
+              ><i class="fa-solid fa-gears"></i><span>Configuración</span></a
+            >
+          </li>
+          <li class="nav-item" id="nav-reportes">
+            <a href="reportes.html" class="nav-link"
+              ><i class="fas fa-chart-line"></i><span>Reportes</span></a
+            >
+          </li>
+        </ul>
+      </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+      <!-- Top Bar -->
+      <div class="top-bar">
+        <button class="btn-toggle-sidebar" id="toggleSidebar">
+          <i class="fas fa-bars"></i>
+        </button>
+        <div class="top-bar-content">
+          <div class="page-title-section">
+            <h1 class="page-title">
+              <i class="fa-solid fa-gears"></i>
+              Configuración del Sistema
+              <span id="backendReadyIndicator" class="backend-loading-indicator">
+                <span
+                  class="spinner-border spinner-border-sm"
+                  role="status"
+                  aria-hidden="true"
+                ></span>
+                <span class="ms-2">Cargando datos...</span>
+              </span>
+              <span id="backendReadyBadge" class="backend-ready-badge">
+                <i class="fas fa-check-circle"></i>
+                <span class="ms-2">Listo para trabajar</span>
+              </span>
+            </h1>
+            <div class="current-period">
+              <small class="text-muted">Período: </small>
+              <span class="period-info" id="currentPeriod"></span>
+            </div>
+          </div>
+          <div class="user-info">
+            <div class="user-details">
+              <i class="fas fa-user-circle"></i>
+              <span id="currentUserName">Usuario ERP</span>
+            </div>
+            <div class="user-actions">
+              <button class="btn btn-outline-light btn-sm logout-btn" data-action="logout">
+                <i class="fas fa-sign-out-alt"></i> <span class="logout-text">Cerrar Sesión</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Content Area -->
+      <div class="content-wrapper">
+        <div class="container-fluid">
+          <!-- Page Header -->
+          <div class="page-header">
+            <div class="row align-items-center">
+              <div class="col-md-8">
+                <h2 class="mb-2">Configuración del Sistema</h2>
+                <p class="text-muted mb-0">
+                  Configure los datos de económicos y operadores para uso en el sistema
+                </p>
+              </div>
+              <div class="col-md-4 text-end">
+                <div class="mt-2">
+                  <button
+                    class="btn btn-danger btn-sm me-2"
+                    data-action="limpiarDatosConfiguracion"
+                    title="Elimina todos los datos de configuración: Económicos, Operadores, Clientes, Proveedores, Bancos, Estancias, Almacenes y Usuarios"
+                  >
+                    <i class="fas fa-cog"></i> Limpiar Datos de Configuración
+                  </button>
+                  <button
+                    class="btn btn-danger btn-sm me-2"
+                    data-action="limpiarDatosOperativos"
+                    title="Elimina todos los registros de Logística, Tráfico, Facturación, Operadores, Diesel, Mantenimiento, Tesorería, CXC, CXP e Inventarios. También resetea el contador a 2500001"
+                  >
+                    <i class="fas fa-trash-alt"></i> Limpiar Todos los Datos Operativos
+                  </button>
+                  <button
+                    class="btn btn-warning btn-sm me-2"
+                    data-action="eliminarRegistrosEspecificos"
+                    title="Elimina registros específicos que vuelven a aparecer: CXC-1758662391450, Diesel-1758663737729, Tesorería-1758663991069"
+                  >
+                    <i class="fas fa-broom"></i> Eliminar Registros Específicos
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Navigation Tabs -->
+          <ul class="nav nav-tabs" id="configTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+              <button
+                class="nav-link active"
+                id="general-tab"
+                data-bs-toggle="tab"
+                data-bs-target="#general"
+                type="button"
+                role="tab"
+                aria-controls="general"
+                aria-selected="true"
+              >
+                <i class="fas fa-info-circle"></i> General
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button
+                class="nav-link"
+                id="economicos-tab"
+                data-bs-toggle="tab"
+                data-bs-target="#economicos"
+                type="button"
+                role="tab"
+                aria-controls="economicos"
+                aria-selected="false"
+              >
+                <i class="fas fa-truck"></i> Económicos
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button
+                class="nav-link"
+                id="operadores-tab"
+                data-bs-toggle="tab"
+                data-bs-target="#operadores"
+                type="button"
+                role="tab"
+                aria-controls="operadores"
+                aria-selected="false"
+              >
+                <i class="fas fa-user"></i> Operadores
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button
+                class="nav-link"
+                id="clientes-tab"
+                data-bs-toggle="tab"
+                data-bs-target="#clientes"
+                type="button"
+                role="tab"
+                aria-controls="clientes"
+                aria-selected="false"
+              >
+                <i class="fas fa-building"></i> Clientes
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button
+                class="nav-link"
+                id="proveedores-tab"
+                data-bs-toggle="tab"
+                data-bs-target="#proveedores"
+                type="button"
+                role="tab"
+                aria-controls="proveedores"
+                aria-selected="false"
+              >
+                <i class="fas fa-truck"></i> Proveedores
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button
+                class="nav-link"
+                id="cuentas-bancarias-tab"
+                data-bs-toggle="tab"
+                data-bs-target="#cuentas-bancarias"
+                type="button"
+                role="tab"
+                aria-controls="cuentas-bancarias"
+                aria-selected="false"
+              >
+                <i class="fas fa-university"></i> Bancos
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button
+                class="nav-link"
+                id="estancias-tab"
+                data-bs-toggle="tab"
+                data-bs-target="#estancias"
+                type="button"
+                role="tab"
+                aria-controls="estancias"
+                aria-selected="false"
+              >
+                <i class="fa-solid fa-warehouse"></i> Estancias
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button
+                class="nav-link"
+                id="almacenes-tab"
+                data-bs-toggle="tab"
+                data-bs-target="#almacenes"
+                type="button"
+                role="tab"
+                aria-controls="almacenes"
+                aria-selected="false"
+              >
+                <i class="fa-solid fa-boxes-stacked"></i> Almacén
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button
+                class="nav-link"
+                id="usuarios-tab"
+                data-bs-toggle="tab"
+                data-bs-target="#usuarios"
+                type="button"
+                role="tab"
+                aria-controls="usuarios"
+                aria-selected="false"
+              >
+                <i class="fa-solid fa-users"></i> Usuarios
+              </button>
+            </li>
+          </ul>
+
+          <!-- Tab Content -->
+          <div class="tab-content" id="configTabsContent">
+            <!-- Tab General -->
+            <div
+              class="tab-pane fade show active"
+              id="general"
+              role="tabpanel"
+              aria-labelledby="general-tab"
+            >
+              <div class="card">
+                <div class="card-body">
+                  <h4 class="card-title mb-4">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Información General del Sistema
+                  </h4>
+
+                  <!-- Información de Licencia y Plan -->
+                  <div class="row mb-4">
+                    <div class="col-md-6">
+                      <div class="card border-primary">
+                        <div class="card-header bg-primary text-white">
+                          <i class="fas fa-key me-2"></i>Licencia y Plan
+                        </div>
+                        <div class="card-body">
+                          <div id="licenseInfoContainer">
+                            <p class="text-muted mb-3">
+                              No hay licencia activa. Ingresa tu licencia para comenzar.
+                            </p>
+                            <form id="licenseActivationForm">
+                              <div class="mb-3">
+                                <label for="licenseKeyInput" class="form-label"
+                                  >Clave de Licencia</label
+                                >
+                                <input
+                                  type="text"
+                                  class="form-control"
+                                  id="licenseKeyInput"
+                                  placeholder="TF2512A-XXXXXXXX-XXXXXXXX"
+                                  pattern="TF\d{2}\d{2}[AMT]-[A-Z0-9]{8}-[A-Z0-9]{8}"
+                                  required
+                                />
+                                <div class="form-text">Formato: TF2512A-XXXXXXXX-XXXXXXXX</div>
+                              </div>
+                              <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-check me-2"></i>Activar Licencia
+                              </button>
+                            </form>
+                          </div>
+                          <div id="activeLicenseInfo" style="display: none">
+                            <div class="mb-2">
+                              <strong>Licencia:</strong>
+                              <span id="displayLicenseKey" class="text-primary fw-bold"></span>
+                            </div>
+                            <div class="mb-2">
+                              <strong>Plan:</strong>
+                              <span id="displayPlan" class="badge bg-success"></span>
+                            </div>
+                            <div class="mb-2">
+                              <strong>Tipo:</strong>
+                              <span id="displayLicenseType"></span>
+                            </div>
+                            <div class="mb-2">
+                              <strong>Estado:</strong>
+                              <span id="displayLicenseStatus" class="badge bg-success">Activa</span>
+                            </div>
+                            <div class="mb-2">
+                              <strong>Activada:</strong>
+                              <span id="displayActivatedDate"></span>
+                            </div>
+                            <div id="expiresContainer" style="display: none">
+                              <strong>Expira:</strong>
+                              <span id="displayExpiresDate"></span>
+                            </div>
+                            <hr class="my-3" />
+                            <div class="d-grid gap-2">
+                              <button
+                                type="button"
+                                class="btn btn-warning btn-sm"
+                                onclick="showUpdatePlanModal()"
+                                title="Actualizar tu plan manteniendo todos tus datos"
+                              >
+                                <i class="fas fa-sync-alt me-2"></i>Actualizar Plan
+                              </button>
+                              <button
+                                type="button"
+                                class="btn btn-success btn-sm"
+                                onclick="showRenewLicenseModal()"
+                                title="Renovar tu licencia extendiendo la fecha de expiración"
+                              >
+                                <i class="fas fa-redo me-2"></i>Renovar Licencia
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="card border-info">
+                        <div class="card-header bg-info text-white">
+                          <i class="fas fa-chart-bar me-2"></i>Estadísticas de Registros
+                        </div>
+                        <div class="card-body">
+                          <div class="mb-3">
+                            <strong>Total de Registros:</strong>
+                            <h3 class="text-primary mt-2" id="totalRegistros">0</h3>
+                          </div>
+                          <div class="row">
+                            <div class="col-12 text-center">
+                              <div class="border rounded p-2">
+                                <small class="text-muted d-block">Logística</small>
+                                <strong id="registrosLogistica">0</strong>
+                              </div>
+                            </div>
+                          </div>
+                          <button
+                            class="btn btn-sm btn-outline-primary mt-3"
+                            onclick="actualizarContadorRegistros()"
+                          >
+                            <i class="fas fa-sync-alt me-2"></i>Actualizar
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Información del Cliente -->
+                  <div class="card border-success">
+                    <div class="card-header bg-success text-white">
+                      <i class="fas fa-user me-2"></i>Datos del Cliente
+                    </div>
+                    <div class="card-body">
+                      <form id="clienteInfoForm" class="needs-validation" novalidate>
+                        <div class="row g-3">
+                          <div class="col-md-6">
+                            <label for="clienteNombre" class="form-label"
+                              >Nombre Completo <span class="text-danger">*</span></label
+                            >
+                            <input type="text" class="form-control" id="clienteNombre" required />
+                            <div class="invalid-feedback">
+                              Por favor ingresa tu nombre completo.
+                            </div>
+                          </div>
+                          <div class="col-md-6">
+                            <label for="clienteEmail" class="form-label"
+                              >Email <span class="text-danger">*</span></label
+                            >
+                            <input type="email" class="form-control" id="clienteEmail" required />
+                            <div class="invalid-feedback">Por favor ingresa un email válido.</div>
+                          </div>
+                          <div class="col-md-6">
+                            <label for="clienteTelefono" class="form-label">Teléfono</label>
+                            <input
+                              type="tel"
+                              class="form-control"
+                              id="clienteTelefono"
+                              placeholder="(55) 1234-5678"
+                            />
+                          </div>
+                          <div class="col-md-6">
+                            <label for="clienteEmpresa" class="form-label">Empresa</label>
+                            <input type="text" class="form-control" id="clienteEmpresa" />
+                          </div>
+                        </div>
+                        <div class="mt-3">
+                          <button type="submit" class="btn btn-success">
+                            <i class="fas fa-save me-2"></i>Guardar Datos
+                          </button>
+                          <button
+                            type="button"
+                            class="btn btn-outline-secondary ms-2"
+                            onclick="cargarDatosCliente()"
+                          >
+                            <i class="fas fa-sync-alt me-2"></i>Recargar
+                          </button>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tab Económicos -->
+            <div
+              class="tab-pane fade"
+              id="economicos"
+              role="tabpanel"
+              aria-labelledby="economicos-tab"
+            >
+              <div class="card">
+                <div class="card-body">
+                  <form class="needs-validation" id="economicoForm" novalidate>
+                    <!-- Información del Económico -->
+                    <div class="form-section">
+                      <h4 class="section-title">
+                        <i class="fas fa-truck"></i>
+                        Información del Económico
+                      </h4>
+                      <div class="row g-3">
+                        <div class="col-md-6">
+                          <label for="numeroEconomico" class="form-label"
+                            >Número de Económico *</label
+                          >
+                          <input
+                            type="text"
+                            class="form-control"
+                            id="numeroEconomico"
+                            placeholder="Ej: 1234"
+                            required
+                          />
+                          <div class="invalid-feedback">
+                            Por favor ingrese el número de económico
+                          </div>
+                        </div>
+                        <div class="col-md-6">
+                          <label for="tipoVehiculo" class="form-label">Tipo de Vehículo *</label>
+                          <select id="tipoVehiculo" class="form-select" required>
+                            <option value="">Seleccione...</option>
+                            <option value="tractocamion">Tractocamión</option>
+                            <option value="camion">Camión</option>
+                            <option value="remolque">Remolque</option>
+                            <option value="plataforma">Plataforma</option>
+                          </select>
+                          <div class="invalid-feedback">
+                            Por favor seleccione el tipo de vehículo
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Datos de Placas -->
+                    <div class="form-section">
+                      <h4 class="section-title">
+                        <i class="fas fa-id-card"></i>
+                        Datos de Placas
+                      </h4>
+                      <div class="row g-3">
+                        <div class="col-md-4">
+                          <label for="placaTracto" class="form-label">Placa del Tracto *</label>
+                          <input
+                            type="text"
+                            class="form-control"
+                            id="placaTracto"
+                            placeholder="ABC-123"
+                            required
+                          />
+                          <div class="invalid-feedback">Por favor ingrese la placa del tracto</div>
+                        </div>
+                        <div class="col-md-4">
+                          <label for="placaRemolque" class="form-label">Placa del Remolque</label>
+                          <input
+                            type="text"
+                            class="form-control"
+                            id="placaRemolque"
+                            placeholder="XYZ-789"
+                          />
+                        </div>
+                        <div class="col-md-4">
+                          <label for="estadoPlacas" class="form-label"
+                            >Estado de las Placas *</label
+                          >
+                          <select id="estadoPlacas" class="form-select" required>
+                            <option value="">Seleccione...</option>
+                            <option value="activas">Activas</option>
+                            <option value="vencidas">Vencidas</option>
+                            <option value="renovacion">En Renovación</option>
+                            <option value="suspension">Suspendidas</option>
+                          </select>
+                          <div class="invalid-feedback">
+                            Por favor seleccione el estado de las placas
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Permisos y Documentación -->
+                    <div class="form-section">
+                      <h4 class="section-title">
+                        <i class="fas fa-file-alt"></i>
+                        Permisos y Documentación
+                      </h4>
+                      <div class="row g-3">
+                        <div class="col-md-6">
+                          <label for="permisoSCT" class="form-label">Permiso SCT *</label>
+                          <input
+                            type="text"
+                            class="form-control"
+                            id="permisoSCT"
+                            placeholder="Número de permiso SCT"
+                            required
+                          />
+                          <div class="invalid-feedback">Por favor ingrese el permiso SCT</div>
+                        </div>
+                        <div class="col-md-6">
+                          <label for="fechaVencimientoSCT" class="form-label"
+                            >Fecha de Vencimiento SCT *</label
+                          >
+                          <input
+                            type="date"
+                            class="form-control"
+                            id="fechaVencimientoSCT"
+                            required
+                          />
+                          <div class="invalid-feedback">
+                            Por favor seleccione la fecha de vencimiento
+                          </div>
+                        </div>
+                        <div class="col-md-6">
+                          <label for="seguroVehicular" class="form-label">Seguro Vehicular</label>
+                          <input
+                            type="text"
+                            class="form-control"
+                            id="seguroVehicular"
+                            placeholder="Número de póliza"
+                          />
+                        </div>
+                        <div class="col-md-6">
+                          <label for="fechaVencimientoSeguro" class="form-label"
+                            >Vencimiento del Seguro</label
+                          >
+                          <input type="date" class="form-control" id="fechaVencimientoSeguro" />
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Especificaciones Técnicas -->
+                    <div class="form-section">
+                      <h4 class="section-title">
+                        <i class="fas fa-cogs"></i>
+                        Especificaciones Técnicas
+                      </h4>
+                      <div class="row g-3">
+                        <div class="col-md-4">
+                          <label for="marca" class="form-label">Marca *</label>
+                          <input
+                            type="text"
+                            class="form-control"
+                            id="marca"
+                            placeholder="Ej: Freightliner"
+                            required
+                          />
+                          <div class="invalid-feedback">Por favor ingrese la marca</div>
+                        </div>
+                        <div class="col-md-4">
+                          <label for="modelo" class="form-label">Modelo *</label>
+                          <input
+                            type="text"
+                            class="form-control"
+                            id="modelo"
+                            placeholder="Ej: Cascadia"
+                            required
+                          />
+                          <div class="invalid-feedback">Por favor ingrese el modelo</div>
+                        </div>
+                        <div class="col-md-4">
+                          <label for="año" class="form-label">Año *</label>
+                          <input
+                            type="number"
+                            class="form-control"
+                            id="año"
+                            placeholder="2020"
+                            min="1990"
+                            max="2030"
+                            required
+                          />
+                          <div class="invalid-feedback">Por favor ingrese el año</div>
+                        </div>
+                        <div class="col-md-6">
+                          <label for="capacidadCarga" class="form-label"
+                            >Capacidad de Carga (kg)</label
+                          >
+                          <div class="input-group">
+                            <input
+                              type="number"
+                              class="form-control"
+                              id="capacidadCarga"
+                              placeholder="0"
+                            />
+                            <span class="input-group-text">kg</span>
+                          </div>
+                        </div>
+                        <div class="col-md-6">
+                          <label for="numeroMotor" class="form-label">Número de Motor</label>
+                          <input
+                            type="text"
+                            class="form-control"
+                            id="numeroMotor"
+                            placeholder="Número de motor"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Información del Operador -->
+                    <div class="form-section">
+                      <h4 class="section-title">
+                        <i class="fas fa-user"></i>
+                        Información del Operador
+                      </h4>
+                      <div class="row g-3">
+                        <div class="col-md-6">
+                          <label for="operadorAsignado" class="form-label">Operador Asignado</label>
+                          <input
+                            type="text"
+                            class="form-control"
+                            id="operadorAsignado"
+                            placeholder="Nombre del operador"
+                          />
+                        </div>
+                        <div class="col-md-6">
+                          <label for="telefonoOperador" class="form-label"
+                            >Teléfono del Operador</label
+                          >
+                          <input
+                            type="tel"
+                            class="form-control"
+                            id="telefonoOperador"
+                            placeholder="(555) 123-4567"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Estado y Observaciones -->
+                    <div class="form-section">
+                      <h4 class="section-title">
+                        <i class="fas fa-info-circle"></i>
+                        Estado y Observaciones
+                      </h4>
+                      <div class="row g-3">
+                        <div class="col-md-6">
+                          <label for="estadoVehiculo" class="form-label"
+                            >Estado del Vehículo *</label
+                          >
+                          <select id="estadoVehiculo" class="form-select" required>
+                            <option value="">Seleccione...</option>
+                            <option value="activo">Activo</option>
+                            <option value="mantenimiento">En Mantenimiento</option>
+                            <option value="reparacion">En Reparación</option>
+                            <option value="inactivo">Inactivo</option>
+                            <option value="retirado">Retirado</option>
+                          </select>
+                          <div class="invalid-feedback">
+                            Por favor seleccione el estado del vehículo
+                          </div>
+                        </div>
+                        <div class="col-md-6">
+                          <label for="fechaRegistro" class="form-label">Fecha de Registro</label>
+                          <input type="text" class="form-control" id="fechaRegistro" readonly />
+                        </div>
+                        <div class="col-12">
+                          <label for="observaciones" class="form-label">Observaciones</label>
+                          <textarea
+                            class="form-control"
+                            id="observaciones"
+                            rows="3"
+                            placeholder="Observaciones adicionales sobre el económico..."
+                          ></textarea>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Botones de Acción -->
+                    <div class="form-actions">
+                      <button type="button" class="btn btn-primary" data-action="saveEconomico">
+                        <i class="fas fa-save"></i> Guardar Económico
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+
+              <!-- Panel de Gestión de Económicos -->
+              <div class="card mt-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                  <h5 class="mb-0">
+                    <i class="fas fa-list"></i>
+                    Económicos Registrados
+                  </h5>
+                  <div class="btn-group" role="group">
+                    <button
+                      type="button"
+                      class="btn btn-outline-success btn-sm"
+                      data-action="exportEconomicos"
+                    >
+                      <i class="fas fa-download"></i> Exportar
+                    </button>
+                  </div>
+                </div>
+                <div class="card-body">
+                  <!-- Filtros y búsqueda -->
+                  <div class="row mb-3">
+                    <div class="col-md-6">
+                      <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-search"></i></span>
+                        <input
+                          type="text"
+                          class="form-control"
+                          id="searchEconomicos"
+                          placeholder="Buscar por número, placa o marca..."
+                          data-action="filterEconomicos"
+                        />
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <select
+                        class="form-select"
+                        id="filterEstadoEconomicos"
+                        data-action="filterEconomicos"
+                      >
+                        <option value="">Todos los estados</option>
+                        <option value="activo">Activo</option>
+                        <option value="mantenimiento">En Mantenimiento</option>
+                        <option value="reparacion">En Reparación</option>
+                        <option value="inactivo">Inactivo</option>
+                        <option value="retirado">Retirado</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <!-- Tabla de Económicos -->
+                  <div class="table-responsive">
+                    <table class="table table-striped table-hover" id="economicosTable">
+                      <thead class="table-dark">
+                        <tr>
+                          <th>Económico</th>
+                          <th>Placa Tracto</th>
+                          <th>Placa Remolque</th>
+                          <th>Marca/Modelo</th>
+                          <th>Año</th>
+                          <th>Operador</th>
+                          <th>Estado</th>
+                          <th>Fecha Registro</th>
+                          <th>Acciones</th>
+                        </tr>
+                      </thead>
+                      <tbody id="economicosTableBody">
+                        <tr>
+                          <td colspan="9" class="text-center text-muted">
+                            <i class="fas fa-info-circle"></i>
+                            Use "Actualizar" para cargar los económicos registrados
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+
+                  <!-- Información adicional -->
+                  <div class="mt-3">
+                    <small class="text-muted">
+                      <i class="fas fa-info-circle"></i>
+                      Total de económicos: <span id="totalEconomicos">0</span> | Activos:
+                      <span id="activosEconomicos">0</span> | En mantenimiento:
+                      <span id="mantenimientoEconomicos">0</span>
+                    </small>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tab Operadores -->
+            <div
+              class="tab-pane fade"
+              id="operadores"
+              role="tabpanel"
+              aria-labelledby="operadores-tab"
+            >
+              <div class="card">
+                <div class="card-body">
+                  <form class="needs-validation" id="operadorForm" novalidate>
+                    <!-- Información del Operador -->
+                    <div class="form-section">
+                      <h4 class="section-title">
+                        <i class="fas fa-user"></i>
+                        Información del Operador
+                      </h4>
+                      <div class="row g-3">
+                        <div class="col-md-6">
+                          <label for="nombreOperador" class="form-label">Nombre Completo *</label>
+                          <input
+                            type="text"
+                            class="form-control"
+                            id="nombreOperador"
+                            placeholder="Nombre completo del operador"
+                            required
+                          />
+                          <div class="invalid-feedback">Por favor ingrese el nombre completo</div>
+                        </div>
+                        <div class="col-md-6">
+                          <label for="numeroLicencia" class="form-label"
+                            >Número de Licencia *</label
+                          >
+                          <input
+                            type="text"
+                            class="form-control"
+                            id="numeroLicencia"
+                            placeholder="Número de licencia de conducir"
+                            required
+                          />
+                          <div class="invalid-feedback">
+                            Por favor ingrese el número de licencia
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Datos Personales -->
+                    <div class="form-section">
+                      <h4 class="section-title">
+                        <i class="fas fa-id-card"></i>
+                        Datos Personales
+                      </h4>
+                      <div class="row g-3">
+                        <div class="col-md-6">
+                          <label for="seguroSocial" class="form-label">Seguro Social *</label>
+                          <input
+                            type="text"
+                            class="form-control"
+                            id="seguroSocial"
+                            placeholder="XXX-XX-XXXX"
+                            required
+                          />
+                          <div class="invalid-feedback">
+                            Por favor ingrese el número de seguro social
+                          </div>
+                        </div>
+                        <div class="col-md-6">
+                          <label for="telefono" class="form-label">Teléfono</label>
+                          <input
+                            type="tel"
+                            class="form-control"
+                            id="telefono"
+                            placeholder="(555) 123-4567"
+                          />
+                        </div>
+                        <div class="col-md-6">
+                          <label for="fechaNacimiento" class="form-label"
+                            >Fecha de Nacimiento</label
+                          >
+                          <input type="date" class="form-control" id="fechaNacimiento" />
+                        </div>
+                        <div class="col-md-6">
+                          <label for="direccionOperador" class="form-label">Dirección</label>
+                          <input
+                            type="text"
+                            class="form-control"
+                            id="direccionOperador"
+                            placeholder="Dirección completa"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Información Laboral -->
+                    <div class="form-section">
+                      <h4 class="section-title">
+                        <i class="fas fa-briefcase"></i>
+                        Información Laboral
+                      </h4>
+                      <div class="row g-3">
+                        <div class="col-md-6">
+                          <label for="fechaIngreso" class="form-label">Fecha de Ingreso *</label>
+                          <input type="date" class="form-control" id="fechaIngreso" required />
+                          <div class="invalid-feedback">
+                            Por favor seleccione la fecha de ingreso
+                          </div>
+                        </div>
+                        <div class="col-md-6">
+                          <label for="tipoOperador" class="form-label">Tipo de Operador *</label>
+                          <select id="tipoOperador" class="form-select" required>
+                            <option value="">Seleccione...</option>
+                            <option value="principal">Operador Principal</option>
+                            <option value="secundario">Operador Secundario</option>
+                            <option value="relevo">Operador de Relevo</option>
+                            <option value="temporal">Operador Temporal</option>
+                          </select>
+                          <div class="invalid-feedback">
+                            Por favor seleccione el tipo de operador
+                          </div>
+                        </div>
+                        <div class="col-md-6">
+                          <label for="estadoOperador" class="form-label">Estado *</label>
+                          <select id="estadoOperador" class="form-select" required>
+                            <option value="">Seleccione...</option>
+                            <option value="activo">Activo</option>
+                            <option value="vacaciones">En Vacaciones</option>
+                            <option value="incapacidad">En Incapacidad</option>
+                            <option value="suspendido">Suspendido</option>
+                            <option value="inactivo">Inactivo</option>
+                          </select>
+                          <div class="invalid-feedback">
+                            Por favor seleccione el estado del operador
+                          </div>
+                        </div>
+                        <div class="col-md-6">
+                          <label for="salarioOperador" class="form-label">Salario Base</label>
+                          <div class="input-group">
+                            <span class="input-group-text">$</span>
+                            <input
+                              type="number"
+                              class="form-control"
+                              id="salarioOperador"
+                              placeholder="0.00"
+                              step="0.01"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Documentación -->
+                    <div class="form-section">
+                      <h4 class="section-title">
+                        <i class="fas fa-file-alt"></i>
+                        Documentación
+                      </h4>
+                      <div class="row g-3">
+                        <div class="col-md-6">
+                          <label for="fechaVencimientoLicencia" class="form-label"
+                            >Vencimiento de Licencia *</label
+                          >
+                          <input
+                            type="date"
+                            class="form-control"
+                            id="fechaVencimientoLicencia"
+                            required
+                          />
+                          <div class="invalid-feedback">
+                            Por favor seleccione la fecha de vencimiento
+                          </div>
+                        </div>
+                        <div class="col-md-6">
+                          <label for="certificadoMedico" class="form-label"
+                            >Certificado Médico</label
+                          >
+                          <input
+                            type="text"
+                            class="form-control"
+                            id="certificadoMedico"
+                            placeholder="Número de certificado médico"
+                          />
+                        </div>
+                        <div class="col-md-6">
+                          <label for="fechaVencimientoCertificado" class="form-label"
+                            >Vencimiento Certificado Médico</label
+                          >
+                          <input
+                            type="date"
+                            class="form-control"
+                            id="fechaVencimientoCertificado"
+                          />
+                        </div>
+                        <div class="col-md-6">
+                          <label for="fechaRegistroOperador" class="form-label"
+                            >Fecha de Registro</label
+                          >
+                          <input
+                            type="text"
+                            class="form-control"
+                            id="fechaRegistroOperador"
+                            readonly
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Observaciones -->
+                    <div class="form-section">
+                      <h4 class="section-title">
+                        <i class="fas fa-comments"></i>
+                        Observaciones
+                      </h4>
+                      <div class="row g-3">
+                        <div class="col-12">
+                          <label for="observacionesOperador" class="form-label"
+                            >Observaciones</label
+                          >
+                          <textarea
+                            class="form-control"
+                            id="observacionesOperador"
+                            rows="3"
+                            placeholder="Observaciones adicionales sobre el operador..."
+                          ></textarea>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Botones de Acción Operador -->
+                    <div class="form-actions">
+                      <button
+                        type="button"
+                        class="btn btn-outline-secondary me-2"
+                        data-action="clearOperadorForm"
+                      >
+                        <i class="fas fa-times"></i> Limpiar Formulario
+                      </button>
+                      <button
+                        type="button"
+                        class="btn btn-outline-info me-2"
+                        data-action="searchOperador"
+                      >
+                        <i class="fas fa-search"></i> Buscar Operador
+                      </button>
+                      <button
+                        type="button"
+                        class="btn btn-outline-warning me-2"
+                        data-action="updateOperador"
+                      >
+                        <i class="fas fa-edit"></i> Actualizar
+                      </button>
+                      <button type="button" class="btn btn-primary" data-action="saveOperador">
+                        <i class="fas fa-save"></i> Guardar Operador
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+
+              <!-- Panel de Gestión de Operadores -->
+              <div class="card mt-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                  <h5 class="mb-0">
+                    <i class="fas fa-list"></i>
+                    Operadores Registrados
+                  </h5>
+                  <div class="btn-group" role="group">
+                    <button
+                      type="button"
+                      class="btn btn-outline-primary btn-sm"
+                      data-action="loadOperadoresList"
+                    >
+                      <i class="fas fa-refresh"></i> Actualizar
+                    </button>
+                    <button
+                      type="button"
+                      class="btn btn-outline-success btn-sm"
+                      data-action="exportOperadores"
+                    >
+                      <i class="fas fa-download"></i> Exportar
+                    </button>
+                    <button
+                      type="button"
+                      class="btn btn-outline-info btn-sm"
+                      data-action="showOperadoresStats"
+                    >
+                      <i class="fas fa-chart-bar"></i> Estadísticas
+                    </button>
+                    <button
+                      type="button"
+                      class="btn btn-outline-danger btn-sm"
+                      data-action="limpiarTodosOperadores"
+                    >
+                      <i class="fas fa-trash"></i> Limpiar Todo
+                    </button>
+                  </div>
+                </div>
+                <div class="card-body">
+                  <!-- Filtros y búsqueda -->
+                  <div class="row mb-3">
+                    <div class="col-md-6">
+                      <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-search"></i></span>
+                        <input
+                          type="text"
+                          class="form-control"
+                          id="searchOperadores"
+                          placeholder="Buscar por nombre, licencia o seguro social..."
+                          data-action="filterOperadores"
+                        />
+                      </div>
+                    </div>
+                    <div class="col-md-3">
+                      <select
+                        class="form-select"
+                        id="filterEstadoOperadores"
+                        data-action="filterOperadores"
+                      >
+                        <option value="">Todos los estados</option>
+                        <option value="activo">Activo</option>
+                        <option value="vacaciones">En Vacaciones</option>
+                        <option value="incapacidad">En Incapacidad</option>
+                        <option value="suspendido">Suspendido</option>
+                        <option value="inactivo">Inactivo</option>
+                      </select>
+                    </div>
+                    <div class="col-md-3">
+                      <button
+                        type="button"
+                        class="btn btn-outline-danger w-100"
+                        data-action="showDeleteOperadorModal"
+                      >
+                        <i class="fas fa-trash"></i> Eliminar Operador
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Tabla de Operadores -->
+                  <div class="table-responsive">
+                    <table class="table table-striped table-hover" id="operadoresTable">
+                      <thead class="table-dark">
+                        <tr>
+                          <th>Nombre</th>
+                          <th>Licencia</th>
+                          <th>Seguro Social</th>
+                          <th>Tipo</th>
+                          <th>Estado</th>
+                          <th>Teléfono</th>
+                          <th>Fecha Ingreso</th>
+                          <th>Fecha Registro</th>
+                          <th>Acciones</th>
+                        </tr>
+                      </thead>
+                      <tbody id="operadoresTableBody">
+                        <tr>
+                          <td colspan="9" class="text-center text-muted">
+                            <i class="fas fa-info-circle"></i>
+                            Use "Actualizar" para cargar los operadores registrados
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+
+                  <!-- Información adicional -->
+                  <div class="mt-3">
+                    <small class="text-muted">
+                      <i class="fas fa-info-circle"></i>
+                      Total de operadores: <span id="totalOperadores">0</span> | Activos:
+                      <span id="activosOperadores">0</span> | En vacaciones:
+                      <span id="vacacionesOperadores">0</span>
+                    </small>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tab Clientes -->
+            <div class="tab-pane fade" id="clientes" role="tabpanel" aria-labelledby="clientes-tab">
+              <div class="card">
+                <div class="card-body">
+                  <form class="needs-validation" id="clienteForm" novalidate>
+                    <!-- Información del Cliente -->
+                    <div class="form-section">
+                      <h4 class="section-title">
+                        <i class="fas fa-building"></i>
+                        Información del Cliente
+                      </h4>
+                      <div class="row g-3">
+                        <div class="col-md-6">
+                          <label for="nombreCliente" class="form-label"
+                            >Nombre/Razón Social *</label
+                          >
+                          <input
+                            type="text"
+                            class="form-control"
+                            id="nombreCliente"
+                            placeholder="Nombre completo o razón social"
+                            required
+                          />
+                          <div class="invalid-feedback">
+                            Por favor ingrese el nombre o razón social
+                          </div>
+                        </div>
+                        <div class="col-md-6">
+                          <label for="rfcCliente" class="form-label">RFC *</label>
+                          <input
+                            type="text"
+                            class="form-control"
+                            id="rfcCliente"
+                            placeholder="RFC del cliente"
+                            required
+                          />
+                          <div class="invalid-feedback">Por favor ingrese el RFC</div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Datos de Contacto -->
+                    <div class="form-section">
+                      <h4 class="section-title">
+                        <i class="fas fa-address-book"></i>
+                        Datos de Contacto
+                      </h4>
+                      <div class="row g-3">
+                        <div class="col-md-6">
+                          <label for="contactoCliente" class="form-label"
+                            >Persona de Contacto *</label
+                          >
+                          <input
+                            type="text"
+                            class="form-control"
+                            id="contactoCliente"
+                            placeholder="Nombre del contacto principal"
+                            required
+                          />
+                          <div class="invalid-feedback">
+                            Por favor ingrese el nombre del contacto
+                          </div>
+                        </div>
+                        <div class="col-md-6">
+                          <label for="telefonoCliente" class="form-label">Teléfono *</label>
+                          <input
+                            type="tel"
+                            class="form-control"
+                            id="telefonoCliente"
+                            placeholder="(555) 123-4567"
+                            required
+                          />
+                          <div class="invalid-feedback">Por favor ingrese el teléfono</div>
+                        </div>
+                        <div class="col-md-6">
+                          <label for="emailCliente" class="form-label">Correo Electrónico</label>
+                          <input
+                            type="email"
+                            class="form-control"
+                            id="emailCliente"
+                            placeholder="correo@empresa.com"
+                          />
+                        </div>
+                        <div class="col-md-6">
+                          <label for="celularCliente" class="form-label">Celular</label>
+                          <input
+                            type="tel"
+                            class="form-control"
+                            id="celularCliente"
+                            placeholder="(555) 987-6543"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Dirección -->
+                    <div class="form-section">
+                      <h4 class="section-title">
+                        <i class="fas fa-map-marker-alt"></i>
+                        Dirección
+                      </h4>
+                      <div class="row g-3">
+                        <div class="col-md-8">
+                          <label for="direccionCliente" class="form-label">Dirección *</label>
+                          <input
+                            type="text"
+                            class="form-control"
+                            id="direccionCliente"
+                            placeholder="Calle, número, colonia"
+                            required
+                          />
+                          <div class="invalid-feedback">Por favor ingrese la dirección</div>
+                        </div>
+                        <div class="col-md-4">
+                          <label for="codigoPostalCliente" class="form-label">Código Postal</label>
+                          <input
+                            type="text"
+                            class="form-control"
+                            id="codigoPostalCliente"
+                            placeholder="12345"
+                          />
+                        </div>
+                        <div class="col-md-6">
+                          <label for="ciudadCliente" class="form-label">Ciudad *</label>
+                          <input
+                            type="text"
+                            class="form-control"
+                            id="ciudadCliente"
+                            placeholder="Ciudad"
+                            required
+                          />
+                          <div class="invalid-feedback">Por favor ingrese la ciudad</div>
+                        </div>
+                        <div class="col-md-6">
+                          <label for="estadoCliente" class="form-label">Estado *</label>
+                          <select id="estadoCliente" class="form-select" required>
+                            <option value="">Seleccione...</option>
+                            <option value="aguascalientes">Aguascalientes</option>
+                            <option value="baja-california">Baja California</option>
+                            <option value="baja-california-sur">Baja California Sur</option>
+                            <option value="campeche">Campeche</option>
+                            <option value="chiapas">Chiapas</option>
+                            <option value="chihuahua">Chihuahua</option>
+                            <option value="coahuila">Coahuila</option>
+                            <option value="colima">Colima</option>
+                            <option value="durango">Durango</option>
+                            <option value="guanajuato">Guanajuato</option>
+                            <option value="guerrero">Guerrero</option>
+                            <option value="hidalgo">Hidalgo</option>
+                            <option value="jalisco">Jalisco</option>
+                            <option value="mexico">México</option>
+                            <option value="michoacan">Michoacán</option>
+                            <option value="morelos">Morelos</option>
+                            <option value="nayarit">Nayarit</option>
+                            <option value="nuevo-leon">Nuevo León</option>
+                            <option value="oaxaca">Oaxaca</option>
+                            <option value="puebla">Puebla</option>
+                            <option value="queretaro">Querétaro</option>
+                            <option value="quintana-roo">Quintana Roo</option>
+                            <option value="san-luis-potosi">San Luis Potosí</option>
+                            <option value="sinaloa">Sinaloa</option>
+                            <option value="sonora">Sonora</option>
+                            <option value="tabasco">Tabasco</option>
+                            <option value="tamaulipas">Tamaulipas</option>
+                            <option value="tlaxcala">Tlaxcala</option>
+                            <option value="veracruz">Veracruz</option>
+                            <option value="yucatan">Yucatán</option>
+                            <option value="zacatecas">Zacatecas</option>
+                            <option value="cdmx">Ciudad de México</option>
+                            <option value="EUA">Estados Unidos</option>
+                          </select>
+                          <div class="invalid-feedback">Por favor seleccione el estado</div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Información Fiscal -->
+                    <div class="form-section">
+                      <h4 class="section-title">
+                        <i class="fas fa-file-invoice-dollar"></i>
+                        Información Fiscal
+                      </h4>
+                      <div class="row g-3">
+                        <div class="col-md-6">
+                          <label for="regimenFiscal" class="form-label">Régimen Fiscal *</label>
+                          <select id="regimenFiscal" class="form-select" required>
+                            <option value="">Seleccione...</option>
+                            <option value="601">601 - General de Ley Personas Morales</option>
+                            <option value="603">
+                              603 - Personas Morales con Fines no Lucrativos
+                            </option>
+                            <option value="605">
+                              605 - Sueldos y Salarios e Ingresos Asimilados a Salarios
+                            </option>
+                            <option value="606">606 - Arrendamiento</option>
+                            <option value="608">608 - Demás ingresos</option>
+                            <option value="610">
+                              610 - Residentes en el Extranjero sin Establecimiento Permanente en
+                              México
+                            </option>
+                            <option value="611">
+                              611 - Ingresos por Dividendos (socios y accionistas)
+                            </option>
+                            <option value="612">
+                              612 - Personas Físicas con Actividades Empresariales y Profesionales
+                            </option>
+                            <option value="614">614 - Ingresos por intereses</option>
+                            <option value="615">
+                              615 - Régimen de los ingresos por obtención de premios
+                            </option>
+                            <option value="616">616 - Sin obligaciones fiscales</option>
+                            <option value="620">
+                              620 - Sociedades Cooperativas de Producción que optan por diferir sus
+                              ingresos
+                            </option>
+                            <option value="621">621 - Incorporación Fiscal</option>
+                            <option value="622">
+                              622 - Actividades Agrícolas, Ganaderas, Silvícolas y Pesqueras
+                            </option>
+                            <option value="623">623 - Opcional para Grupos de Sociedades</option>
+                            <option value="624">624 - Coordinados</option>
+                            <option value="625">
+                              625 - Régimen de las Actividades Empresariales con ingresos a través
+                              de Plataformas Tecnológicas
+                            </option>
+                            <option value="626">626 - Régimen Simplificado de Confianza</option>
+                          </select>
+                          <div class="invalid-feedback">Por favor seleccione el régimen fiscal</div>
+                        </div>
+                        <div class="col-md-6">
+                          <label for="tipoCliente" class="form-label">Tipo de Cliente *</label>
+                          <select id="tipoCliente" class="form-select" required>
+                            <option value="">Seleccione...</option>
+                            <option value="empresa">Empresa</option>
+                            <option value="persona-fisica">Persona Física</option>
+                            <option value="gobierno">Gobierno</option>
+                            <option value="ong">ONG</option>
+                          </select>
+                          <div class="invalid-feedback">
+                            Por favor seleccione el tipo de cliente
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Información Comercial -->
+                    <div class="form-section">
+                      <h4 class="section-title">
+                        <i class="fas fa-handshake"></i>
+                        Información Comercial
+                      </h4>
+                      <div class="row g-3">
+                        <div class="col-md-6">
+                          <label for="limiteCredito" class="form-label">Límite de Crédito</label>
+                          <div class="input-group">
+                            <span class="input-group-text">$</span>
+                            <input
+                              type="number"
+                              class="form-control"
+                              id="limiteCredito"
+                              placeholder="0.00"
+                              step="0.01"
+                            />
+                          </div>
+                        </div>
+                        <div class="col-md-6">
+                          <label for="diasCredito" class="form-label">Días de Crédito</label>
+                          <input
+                            type="number"
+                            class="form-control"
+                            id="diasCredito"
+                            placeholder="30"
+                            min="0"
+                          />
+                        </div>
+                        <div class="col-md-6">
+                          <label for="descuentoCliente" class="form-label">Descuento (%)</label>
+                          <div class="input-group">
+                            <input
+                              type="number"
+                              class="form-control"
+                              id="descuentoCliente"
+                              placeholder="0"
+                              min="0"
+                              max="100"
+                              step="0.01"
+                            />
+                            <span class="input-group-text">%</span>
+                          </div>
+                        </div>
+                        <div class="col-md-6">
+                          <label for="estadoClienteComercial" class="form-label"
+                            >Estado Comercial *</label
+                          >
+                          <select id="estadoClienteComercial" class="form-select" required>
+                            <option value="">Seleccione...</option>
+                            <option value="activo">Activo</option>
+                            <option value="suspendido">Suspendido</option>
+                            <option value="moroso">Moroso</option>
+                            <option value="inactivo">Inactivo</option>
+                          </select>
+                          <div class="invalid-feedback">
+                            Por favor seleccione el estado comercial
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Observaciones -->
+                    <div class="form-section">
+                      <h4 class="section-title">
+                        <i class="fas fa-comments"></i>
+                        Observaciones
+                      </h4>
+                      <div class="row g-3">
+                        <div class="col-12">
+                          <label for="observacionesCliente" class="form-label">Observaciones</label>
+                          <textarea
+                            class="form-control"
+                            id="observacionesCliente"
+                            rows="3"
+                            placeholder="Observaciones adicionales sobre el cliente..."
+                          ></textarea>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Botones de Acción Cliente -->
+                    <div class="form-actions">
+                      <button
+                        type="button"
+                        class="btn btn-outline-secondary me-2"
+                        data-action="clearClienteForm"
+                      >
+                        <i class="fas fa-times"></i> Limpiar Formulario
+                      </button>
+                      <button
+                        type="button"
+                        class="btn btn-outline-info me-2"
+                        data-action="searchCliente"
+                      >
+                        <i class="fas fa-search"></i> Buscar Cliente
+                      </button>
+                      <button
+                        type="button"
+                        class="btn btn-outline-warning me-2"
+                        data-action="updateCliente"
+                      >
+                        <i class="fas fa-edit"></i> Actualizar
+                      </button>
+                      <button type="button" class="btn btn-primary" data-action="saveCliente">
+                        <i class="fas fa-save"></i> Guardar Cliente
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+
+              <!-- Panel de Gestión de Clientes -->
+              <div class="card mt-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                  <h5 class="mb-0">
+                    <i class="fas fa-list"></i>
+                    Clientes Registrados
+                  </h5>
+                  <div class="btn-group" role="group">
+                    <button
+                      type="button"
+                      class="btn btn-outline-primary"
+                      data-action="loadClientes"
+                    >
+                      <i class="fas fa-sync"></i> Actualizar
+                    </button>
+                    <button
+                      type="button"
+                      class="btn btn-outline-success"
+                      data-action="exportClientes"
+                    >
+                      <i class="fas fa-download"></i> Exportar
+                    </button>
+                    <button
+                      type="button"
+                      class="btn btn-outline-danger"
+                      data-action="limpiarTodosClientes"
+                    >
+                      <i class="fas fa-trash"></i> Limpiar Todo
+                    </button>
+                  </div>
+                </div>
+                <div class="card-body">
+                  <!-- Filtros -->
+                  <div class="row g-3 mb-3">
+                    <div class="col-md-4">
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="searchClientes"
+                        placeholder="Buscar cliente..."
+                        data-action="filterClientes"
+                      />
+                    </div>
+                    <div class="col-md-3">
+                      <select
+                        class="form-select"
+                        id="filterTipoClientes"
+                        data-action="filterClientes"
+                      >
+                        <option value="">Todos los tipos</option>
+                        <option value="empresa">Empresa</option>
+                        <option value="persona-fisica">Persona Física</option>
+                        <option value="gobierno">Gobierno</option>
+                        <option value="ong">ONG</option>
+                      </select>
+                    </div>
+                    <div class="col-md-3">
+                      <select
+                        class="form-select"
+                        id="filterEstadoClientes"
+                        data-action="filterClientes"
+                      >
+                        <option value="">Todos los estados</option>
+                        <option value="activo">Activo</option>
+                        <option value="suspendido">Suspendido</option>
+                        <option value="moroso">Moroso</option>
+                        <option value="inactivo">Inactivo</option>
+                      </select>
+                    </div>
+                    <div class="col-md-2">
+                      <button
+                        type="button"
+                        class="btn btn-outline-danger w-100"
+                        data-action="showDeleteClienteModal"
+                      >
+                        <i class="fas fa-trash"></i> Eliminar Cliente
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Tabla de Clientes -->
+                  <div class="table-responsive">
+                    <table class="table table-striped table-hover" id="clientesTable">
+                      <thead class="table-dark">
+                        <tr>
+                          <th>Nombre/Razón Social</th>
+                          <th>RFC</th>
+                          <th>Contacto</th>
+                          <th>Teléfono</th>
+                          <th>Email</th>
+                          <th>Tipo</th>
+                          <th>Estado</th>
+                          <th>Ciudad</th>
+                          <th>Fecha Registro</th>
+                          <th>Acciones</th>
+                        </tr>
+                      </thead>
+                      <tbody id="clientesTableBody">
+                        <tr>
+                          <td colspan="10" class="text-center text-muted">
+                            <i class="fas fa-info-circle"></i>
+                            Use "Actualizar" para cargar los clientes registrados
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+
+                  <!-- Información adicional -->
+                  <div class="mt-3">
+                    <small class="text-muted">
+                      <i class="fas fa-info-circle"></i>
+                      Total de clientes: <span id="totalClientes">0</span> | Activos:
+                      <span id="activosClientes">0</span> | Suspendidos:
+                      <span id="suspendidosClientes">0</span> | Morosos:
+                      <span id="morososClientes">0</span>
+                    </small>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tab Proveedores -->
+            <div
+              class="tab-pane fade"
+              id="proveedores"
+              role="tabpanel"
+              aria-labelledby="proveedores-tab"
+            >
+              <div class="card">
+                <div class="card-body">
+                  <form class="needs-validation" id="proveedorForm" novalidate>
+                    <!-- Información del Proveedor -->
+                    <div class="form-section">
+                      <h4 class="section-title">
+                        <i class="fas fa-truck"></i>
+                        Información del Proveedor
+                      </h4>
+                      <div class="row g-3">
+                        <div class="col-md-6">
+                          <label for="nombreProveedor" class="form-label"
+                            >Nombre/Razón Social *</label
+                          >
+                          <input
+                            type="text"
+                            class="form-control"
+                            id="nombreProveedor"
+                            name="nombreProveedor"
+                            required
+                          />
+                          <div class="invalid-feedback">
+                            Por favor ingrese el nombre o razón social del proveedor.
+                          </div>
+                        </div>
+                        <div class="col-md-6">
+                          <label for="rfcProveedor" class="form-label">RFC *</label>
+                          <input
+                            type="text"
+                            class="form-control"
+                            id="rfcProveedor"
+                            name="rfcProveedor"
+                            required
+                            pattern="[A-ZÑ&]{3,4}[0-9]{6}[A-Z0-9]{3}"
+                            maxlength="13"
+                          />
+                          <div class="invalid-feedback">Por favor ingrese un RFC válido.</div>
+                        </div>
+                        <div class="col-md-6">
+                          <label for="contactoProveedor" class="form-label"
+                            >Persona de Contacto</label
+                          >
+                          <input
+                            type="text"
+                            class="form-control"
+                            id="contactoProveedor"
+                            name="contactoProveedor"
+                          />
+                        </div>
+                        <div class="col-md-6">
+                          <label for="telefonoProveedor" class="form-label">Teléfono</label>
+                          <input
+                            type="tel"
+                            class="form-control"
+                            id="telefonoProveedor"
+                            name="telefonoProveedor"
+                          />
+                        </div>
+                        <div class="col-md-6">
+                          <label for="emailProveedor" class="form-label">Email</label>
+                          <input
+                            type="email"
+                            class="form-control"
+                            id="emailProveedor"
+                            name="emailProveedor"
+                          />
+                        </div>
+                        <div class="col-md-6">
+                          <label for="diasCreditoProveedor" class="form-label"
+                            >Días de Crédito</label
+                          >
+                          <input
+                            type="number"
+                            class="form-control"
+                            id="diasCreditoProveedor"
+                            name="diasCreditoProveedor"
+                            value="30"
+                            min="0"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Dirección -->
+                    <div class="form-section">
+                      <h4 class="section-title">
+                        <i class="fas fa-map-marker-alt"></i>
+                        Dirección
+                      </h4>
+                      <div class="row g-3">
+                        <div class="col-12">
+                          <label for="direccionProveedor" class="form-label"
+                            >Dirección Completa</label
+                          >
+                          <textarea
+                            class="form-control"
+                            id="direccionProveedor"
+                            name="direccionProveedor"
+                            rows="2"
+                          ></textarea>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Información Bancaria -->
+                    <div class="form-section">
+                      <h4 class="section-title">
+                        <i class="fas fa-university"></i>
+                        Información Bancaria
+                      </h4>
+                      <div class="row g-3">
+                        <div class="col-md-6">
+                          <label for="bancoProveedor" class="form-label">Banco</label>
+                          <input
+                            type="text"
+                            class="form-control"
+                            id="bancoProveedor"
+                            name="bancoProveedor"
+                          />
+                        </div>
+                        <div class="col-md-6">
+                          <label for="cuentaProveedor" class="form-label">Número de Cuenta</label>
+                          <input
+                            type="text"
+                            class="form-control"
+                            id="cuentaProveedor"
+                            name="cuentaProveedor"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Estado -->
+                    <div class="form-section">
+                      <h4 class="section-title">
+                        <i class="fas fa-cog"></i>
+                        Estado
+                      </h4>
+                      <div class="row g-3">
+                        <div class="col-md-6">
+                          <label for="estadoProveedor" class="form-label"
+                            >Estado del Proveedor</label
+                          >
+                          <select class="form-select" id="estadoProveedor" name="estadoProveedor">
+                            <option value="activo">Activo</option>
+                            <option value="inactivo">Inactivo</option>
+                            <option value="suspendido">Suspendido</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Botones de Acción -->
+                    <div class="form-actions">
+                      <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Guardar Proveedor
+                      </button>
+                      <button
+                        type="button"
+                        class="btn btn-secondary"
+                        data-action="limpiarFormularioProveedor"
+                      >
+                        <i class="fas fa-eraser"></i> Limpiar
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+
+              <!-- Panel de Gestión de Proveedores -->
+              <div class="card mt-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                  <h5 class="mb-0">
+                    <i class="fas fa-list"></i>
+                    Proveedores Registrados
+                  </h5>
+                  <div class="btn-group" role="group">
+                    <button
+                      type="button"
+                      class="btn btn-outline-primary"
+                      data-action="loadProveedores"
+                    >
+                      <i class="fas fa-sync"></i> Actualizar
+                    </button>
+                    <button
+                      type="button"
+                      class="btn btn-outline-success"
+                      data-action="exportProveedores"
+                    >
+                      <i class="fas fa-download"></i> Exportar
+                    </button>
+                    <button
+                      type="button"
+                      class="btn btn-outline-info"
+                      data-action="showProveedoresStats"
+                    >
+                      <i class="fas fa-chart-bar"></i> Estadísticas
+                    </button>
+                    <button
+                      type="button"
+                      class="btn btn-outline-danger"
+                      data-action="limpiarTodosProveedores"
+                    >
+                      <i class="fas fa-trash"></i> Limpiar Todo
+                    </button>
+                  </div>
+                </div>
+                <div class="card-body">
+                  <!-- Filtros -->
+                  <div class="row g-3 mb-3">
+                    <div class="col-md-4">
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="searchProveedores"
+                        placeholder="Buscar proveedor..."
+                        data-action="filterProveedores"
+                      />
+                    </div>
+                    <div class="col-md-3">
+                      <select
+                        class="form-select"
+                        id="filterEstadoProveedores"
+                        data-action="filterProveedores"
+                      >
+                        <option value="">Todos los estados</option>
+                        <option value="activo">Activo</option>
+                        <option value="inactivo">Inactivo</option>
+                        <option value="suspendido">Suspendido</option>
+                      </select>
+                    </div>
+                    <div class="col-md-3">
+                      <select
+                        class="form-select"
+                        id="filterTipoProveedores"
+                        data-action="filterProveedores"
+                      >
+                        <option value="">Todos los tipos</option>
+                        <option value="servicios">Servicios</option>
+                        <option value="suministros">Suministros</option>
+                        <option value="equipamiento">Equipamiento</option>
+                      </select>
+                    </div>
+                    <div class="col-md-2">
+                      <button
+                        class="btn btn-outline-secondary w-100"
+                        data-action="limpiarFiltrosProveedores"
+                      >
+                        <i class="fas fa-times"></i> Limpiar
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Tabla de Proveedores -->
+                  <div class="table-responsive">
+                    <table class="table table-striped table-hover" id="proveedoresTable">
+                      <thead class="table-dark">
+                        <tr>
+                          <th>Nombre</th>
+                          <th>RFC</th>
+                          <th>Contacto</th>
+                          <th>Teléfono</th>
+                          <th>Email</th>
+                          <th>Estado</th>
+                          <th>Días Crédito</th>
+                          <th>Acciones</th>
+                        </tr>
+                      </thead>
+                      <tbody id="proveedoresTableBody">
+                        <!-- Los datos se cargarán dinámicamente -->
+                      </tbody>
+                    </table>
+                  </div>
+
+                  <!-- Estadísticas -->
+                  <div class="mt-3">
+                    <small class="text-muted">
+                      <i class="fas fa-info-circle"></i>
+                      Total de proveedores: <span id="totalProveedores">0</span> | Activos:
+                      <span id="activosProveedores">0</span> | Inactivos:
+                      <span id="inactivosProveedores">0</span> | Suspendidos:
+                      <span id="suspendidosProveedores">0</span>
+                    </small>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tab Usuarios -->
+            <div class="tab-pane fade" id="usuarios" role="tabpanel" aria-labelledby="usuarios-tab">
+              <div class="card">
+                <div class="card-body">
+                  <form class="needs-validation" id="usuarioForm" novalidate>
+                    <div class="form-section">
+                      <h4 class="section-title"><i class="fa-solid fa-user-shield"></i> Usuario</h4>
+                      <div class="row g-3">
+                        <div class="col-md-4">
+                          <label for="usuarioNombre" class="form-label">Nombre *</label>
+                          <input
+                            type="text"
+                            class="form-control"
+                            id="usuarioNombre"
+                            required
+                            placeholder="Nombre visible"
+                          />
+                          <div class="invalid-feedback">Ingrese el nombre</div>
+                        </div>
+                        <div class="col-md-4">
+                          <label for="usuarioEmail" class="form-label">Email *</label>
+                          <input
+                            type="email"
+                            class="form-control"
+                            id="usuarioEmail"
+                            required
+                            placeholder="correo@empresa.com"
+                          />
+                          <div class="invalid-feedback">Ingrese un email válido</div>
+                        </div>
+                        <div class="col-md-4">
+                          <label for="usuarioPassword" class="form-label">Contraseña *</label>
+                          <div class="input-group">
+                            <input
+                              type="password"
+                              class="form-control"
+                              id="usuarioPassword"
+                              required
+                              placeholder="••••••"
+                              oninput="validarConfirmacionPassword()"
+                            />
+                            <button
+                              class="btn btn-outline-secondary"
+                              type="button"
+                              data-action="toggleUsuarioPassword"
+                              title="Mostrar/Ocultar"
+                            >
+                              <i id="iconUsuarioPassword" class="fa-solid fa-eye"></i>
+                            </button>
+                          </div>
+                          <div class="invalid-feedback">Ingrese una contraseña</div>
+                        </div>
+                        <div class="col-md-4">
+                          <label for="usuarioConfirmPassword" class="form-label"
+                            >Confirmar Contraseña *</label
+                          >
+                          <div class="input-group">
+                            <input
+                              type="password"
+                              class="form-control"
+                              id="usuarioConfirmPassword"
+                              required
+                              placeholder="••••••"
+                              oninput="validarConfirmacionPassword()"
+                            />
+                            <button
+                              class="btn btn-outline-secondary"
+                              type="button"
+                              data-action="toggleUsuarioConfirmPassword"
+                              title="Mostrar/Ocultar"
+                            >
+                              <i id="iconUsuarioConfirmPassword" class="fa-solid fa-eye"></i>
+                            </button>
+                          </div>
+                          <div class="invalid-feedback">Las contraseñas no coinciden</div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="form-section">
+                      <h4 class="section-title">
+                        <i class="fa-solid fa-lock"></i> Permisos por Módulo
+                      </h4>
+                      <div class="mb-2">
+                        <button
+                          type="button"
+                          class="btn btn-sm btn-outline-primary"
+                          data-action="selectAllPermisos"
+                        >
+                          <i class="fa-solid fa-check-double"></i> Seleccionar todos
+                        </button>
+                      </div>
+                      <div class="row g-3">
+                        <div class="col-12">
+                          <label class="form-label">Módulos habilitados (ver)</label>
+                          <div class="row row-cols-2" id="modulosVerContainer"></div>
+                        </div>
+                        <div class="col-12">
+                          <div class="form-check">
+                            <input
+                              class="form-check-input"
+                              type="checkbox"
+                              id="puedeAprobarSolicitudes"
+                              value="true"
+                            />
+                            <label class="form-check-label" for="puedeAprobarSolicitudes">
+                              <i class="fas fa-check-circle text-success"></i> Puede aprobar
+                              solicitudes de pago
+                            </label>
+                          </div>
+                          <div class="form-text">
+                            Solo usuarios con este permiso podrán aprobar solicitudes de pago en
+                            Cuentas por Pagar.
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Configuración de Contraseña de Aprobación -->
+                    <div class="form-section mt-4">
+                      <h4 class="section-title">
+                        <i class="fa-solid fa-lock"></i> Configuración de Contraseña de Aprobación
+                      </h4>
+                      <div class="row g-3">
+                        <div class="col-md-6">
+                          <label for="passwordAprobacion" class="form-label"
+                            >Contraseña de Aprobación de Solicitudes *</label
+                          >
+                          <div class="input-group">
+                            <input
+                              type="password"
+                              class="form-control"
+                              id="passwordAprobacion"
+                              required
+                              placeholder="Contraseña para aprobar solicitudes de pago"
+                            />
+                            <button
+                              class="btn btn-outline-secondary"
+                              type="button"
+                              data-action="togglePasswordVisibility"
+                              data-field-id="passwordAprobacion"
+                            >
+                              <i class="fas fa-eye" id="passwordAprobacion-icon"></i>
+                            </button>
+                          </div>
+                          <div class="form-text">
+                            Esta contraseña se usa para aprobar solicitudes de pago en Cuentas por
+                            Pagar.
+                          </div>
+                        </div>
+                        <div class="col-md-6">
+                          <label for="confirmPasswordAprobacion" class="form-label"
+                            >Confirmar Contraseña *</label
+                          >
+                          <div class="input-group">
+                            <input
+                              type="password"
+                              class="form-control"
+                              id="confirmPasswordAprobacion"
+                              required
+                              placeholder="Confirme la contraseña"
+                            />
+                            <button
+                              class="btn btn-outline-secondary"
+                              type="button"
+                              data-action="togglePasswordVisibility"
+                              data-field-id="confirmPasswordAprobacion"
+                            >
+                              <i class="fas fa-eye" id="confirmPasswordAprobacion-icon"></i>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="form-actions">
+                      <button
+                        type="button"
+                        class="btn btn-outline-secondary me-2"
+                        data-action="clearUsuarioForm"
+                      >
+                        <i class="fas fa-times"></i> Limpiar
+                      </button>
+                      <button type="button" class="btn btn-primary" data-action="saveUsuario">
+                        <i class="fas fa-save"></i> Guardar Usuario
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+
+              <div class="card mt-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                  <h5 class="mb-0"><i class="fas fa-list"></i> Usuarios Registrados</h5>
+                  <div class="btn-group" role="group">
+                    <button
+                      type="button"
+                      class="btn btn-outline-primary btn-sm"
+                      data-action="loadUsuariosTable"
+                    >
+                      <i class="fas fa-refresh"></i> Actualizar
+                    </button>
+                    <button
+                      type="button"
+                      class="btn btn-outline-success btn-sm"
+                      data-action="exportUsuarios"
+                    >
+                      <i class="fas fa-download"></i> Exportar
+                    </button>
+                  </div>
+                </div>
+                <div class="card-body">
+                  <div class="row mb-3">
+                    <div class="col-md-6">
+                      <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-search"></i></span>
+                        <input
+                          type="text"
+                          class="form-control"
+                          id="searchUsuarios"
+                          placeholder="Buscar por nombre o email..."
+                          data-action="filterUsuarios"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <div class="table-responsive">
+                    <table class="table table-striped table-hover" id="usuariosTable">
+                      <thead class="table-dark">
+                        <tr>
+                          <th>Nombre</th>
+                          <th>Email</th>
+                          <th>Puede Ver</th>
+                          <th>Puede Aprobar</th>
+                          <th>Acciones</th>
+                        </tr>
+                      </thead>
+                      <tbody id="usuariosTableBody">
+                        <tr>
+                          <td colspan="5" class="text-center text-muted">Sin registros</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tab Bancos -->
+            <div
+              class="tab-pane fade"
+              id="cuentas-bancarias"
+              role="tabpanel"
+              aria-labelledby="cuentas-bancarias-tab"
+            >
+              <div class="card">
+                <div class="card-body">
+                  <form class="needs-validation" id="cuentaBancariaForm" novalidate>
+                    <div class="form-section">
+                      <h4 class="section-title"><i class="fas fa-university"></i> Banco</h4>
+                      <div class="row g-3">
+                        <div class="col-md-6">
+                          <label for="bancoCuentaBancaria" class="form-label">Banco *</label>
+                          <input
+                            type="text"
+                            class="form-control"
+                            id="bancoCuentaBancaria"
+                            required
+                            placeholder="Ej: BBVA, Banamex, Santander"
+                          />
+                          <div class="invalid-feedback">Por favor ingrese el nombre del banco</div>
+                        </div>
+                        <div class="col-md-6">
+                          <label for="numeroCuentaBancaria" class="form-label"
+                            >Número de Cuenta *</label
+                          >
+                          <input
+                            type="text"
+                            class="form-control"
+                            id="numeroCuentaBancaria"
+                            required
+                            placeholder="Ej: 1234567890"
+                          />
+                          <div class="invalid-feedback">Por favor ingrese el número de cuenta</div>
+                        </div>
+                        <div class="col-md-6">
+                          <label for="clabeCuentaBancaria" class="form-label">CLABE</label>
+                          <input
+                            type="text"
+                            class="form-control"
+                            id="clabeCuentaBancaria"
+                            placeholder="18 dígitos"
+                            maxlength="18"
+                          />
+                        </div>
+                        <div class="col-md-6">
+                          <label for="tipoCuentaBancaria" class="form-label"
+                            >Tipo de Cuenta *</label
+                          >
+                          <select class="form-select" id="tipoCuentaBancaria" required>
+                            <option value="">Seleccione...</option>
+                            <option value="cheques">Cheques</option>
+                            <option value="ahorro">Ahorro</option>
+                            <option value="inversion">Inversión</option>
+                            <option value="nomina">Nómina</option>
+                          </select>
+                          <div class="invalid-feedback">Por favor seleccione el tipo de cuenta</div>
+                        </div>
+                        <div class="col-md-6">
+                          <label for="monedaCuentaBancaria" class="form-label">Moneda *</label>
+                          <select class="form-select" id="monedaCuentaBancaria" required>
+                            <option value="MXN">MXN (Pesos Mexicanos)</option>
+                            <option value="USD">USD (Dólares Americanos)</option>
+                          </select>
+                          <div class="invalid-feedback">Por favor seleccione la moneda</div>
+                        </div>
+                        <div class="col-md-6">
+                          <label for="saldoInicialCuentaBancaria" class="form-label"
+                            >Saldo Inicial</label
+                          >
+                          <input
+                            type="number"
+                            class="form-control"
+                            id="saldoInicialCuentaBancaria"
+                            step="0.01"
+                            min="0"
+                            placeholder="0.00"
+                            value="0.00"
+                          />
+                          <small class="form-text text-muted"
+                            >Saldo inicial de la cuenta para conciliación bancaria</small
+                          >
+                        </div>
+                        <div class="col-12">
+                          <label for="observacionesCuentaBancaria" class="form-label"
+                            >Observaciones</label
+                          >
+                          <textarea
+                            class="form-control"
+                            id="observacionesCuentaBancaria"
+                            rows="2"
+                            placeholder="Notas adicionales sobre la cuenta bancaria"
+                          ></textarea>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="form-actions">
+                      <button
+                        type="button"
+                        class="btn btn-outline-secondary me-2"
+                        data-action="clearCuentaBancariaForm"
+                      >
+                        <i class="fas fa-times"></i> Limpiar
+                      </button>
+                      <button
+                        type="button"
+                        class="btn btn-primary"
+                        data-action="saveCuentaBancaria"
+                      >
+                        <i class="fas fa-save"></i> Guardar Banco
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+
+              <div class="card mt-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                  <h5 class="mb-0"><i class="fas fa-list"></i> Bancos Registrados</h5>
+                  <div class="btn-group" role="group">
+                    <button
+                      type="button"
+                      class="btn btn-outline-primary btn-sm"
+                      data-action="loadCuentasBancariasTable"
+                    >
+                      <i class="fas fa-refresh"></i> Actualizar
+                    </button>
+                    <button
+                      type="button"
+                      class="btn btn-outline-success btn-sm"
+                      data-action="exportCuentasBancarias"
+                    >
+                      <i class="fas fa-download"></i> Exportar
+                    </button>
+                    <button
+                      type="button"
+                      class="btn btn-outline-danger btn-sm"
+                      data-action="limpiarTodasCuentasBancarias"
+                    >
+                      <i class="fas fa-trash"></i> Limpiar Todo
+                    </button>
+                  </div>
+                </div>
+                <div class="card-body">
+                  <div class="row mb-3">
+                    <div class="col-md-6">
+                      <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-search"></i></span>
+                        <input
+                          type="text"
+                          class="form-control"
+                          id="searchCuentasBancarias"
+                          placeholder="Buscar por banco o número de cuenta..."
+                          data-action="filterCuentasBancarias"
+                        />
+                      </div>
+                    </div>
+                    <div class="col-md-3">
+                      <select
+                        class="form-select"
+                        id="filterMonedaCuentasBancarias"
+                        data-action="filterCuentasBancarias"
+                      >
+                        <option value="">Todas las monedas</option>
+                        <option value="MXN">MXN</option>
+                        <option value="USD">USD</option>
+                      </select>
+                    </div>
+                    <div class="col-md-3">
+                      <select
+                        class="form-select"
+                        id="filterTipoCuentasBancarias"
+                        data-action="filterCuentasBancarias"
+                      >
+                        <option value="">Todos los tipos</option>
+                        <option value="cheques">Cheques</option>
+                        <option value="ahorro">Ahorro</option>
+                        <option value="inversion">Inversión</option>
+                        <option value="nomina">Nómina</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="table-responsive">
+                    <table class="table table-striped table-hover" id="cuentasBancariasTable">
+                      <thead class="table-dark">
+                        <tr>
+                          <th>Banco</th>
+                          <th>Número de Cuenta</th>
+                          <th>CLABE</th>
+                          <th>Tipo</th>
+                          <th>Moneda</th>
+                          <th>Saldo Inicial</th>
+                          <th>Observaciones</th>
+                          <th>Acciones</th>
+                        </tr>
+                      </thead>
+                      <tbody id="cuentasBancariasTableBody">
+                        <tr>
+                          <td colspan="8" class="text-center text-muted">Sin registros</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tab Estancias -->
+            <div
+              class="tab-pane fade"
+              id="estancias"
+              role="tabpanel"
+              aria-labelledby="estancias-tab"
+            >
+              <div class="card">
+                <div class="card-body">
+                  <form class="needs-validation" id="estanciaForm" novalidate>
+                    <div class="form-section">
+                      <h4 class="section-title"><i class="fa-solid fa-warehouse"></i> Estancia</h4>
+                      <div class="row g-3">
+                        <div class="col-md-6">
+                          <label for="nombreEstancia" class="form-label">Nombre *</label>
+                          <input
+                            type="text"
+                            class="form-control"
+                            id="nombreEstancia"
+                            required
+                            placeholder="Ej: Patio Pachuca"
+                          />
+                          <div class="invalid-feedback">Ingrese el nombre</div>
+                        </div>
+                        <div class="col-md-6">
+                          <label for="codigoEstancia" class="form-label">Código</label>
+                          <input
+                            type="text"
+                            class="form-control"
+                            id="codigoEstancia"
+                            placeholder="Opcional (único)"
+                          />
+                        </div>
+                        <div class="col-12">
+                          <label for="direccionEstancia" class="form-label"
+                            >Dirección completa *</label
+                          >
+                          <textarea
+                            id="direccionEstancia"
+                            class="form-control"
+                            rows="2"
+                            required
+                            placeholder="Calle, número, colonia, ciudad, estado, CP"
+                          ></textarea>
+                          <div class="invalid-feedback">Ingrese la dirección</div>
+                        </div>
+                        <div class="col-12">
+                          <label for="observacionesEstancia" class="form-label"
+                            >Observaciones</label
+                          >
+                          <textarea
+                            id="observacionesEstancia"
+                            class="form-control"
+                            rows="2"
+                            placeholder="Notas adicionales"
+                          ></textarea>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="form-actions">
+                      <button
+                        type="button"
+                        class="btn btn-outline-secondary me-2"
+                        data-action="clearEstanciaForm"
+                      >
+                        <i class="fas fa-times"></i> Limpiar
+                      </button>
+                      <button type="button" class="btn btn-primary" data-action="saveEstancia">
+                        <i class="fas fa-save"></i> Guardar Estancia
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+
+              <div class="card mt-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                  <h5 class="mb-0"><i class="fas fa-list"></i> Estancias Registradas</h5>
+                  <div class="btn-group" role="group">
+                    <button
+                      type="button"
+                      class="btn btn-outline-primary btn-sm"
+                      data-action="loadEstanciasTable"
+                    >
+                      <i class="fas fa-refresh"></i> Actualizar
+                    </button>
+                    <button
+                      type="button"
+                      class="btn btn-outline-success btn-sm"
+                      data-action="exportEstancias"
+                    >
+                      <i class="fas fa-download"></i> Exportar
+                    </button>
+                    <button
+                      type="button"
+                      class="btn btn-outline-danger btn-sm"
+                      data-action="limpiarTodasEstancias"
+                    >
+                      <i class="fas fa-trash"></i> Limpiar Todo
+                    </button>
+                  </div>
+                </div>
+                <div class="card-body">
+                  <div class="row mb-3">
+                    <div class="col-md-6">
+                      <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-search"></i></span>
+                        <input
+                          type="text"
+                          class="form-control"
+                          id="searchEstancias"
+                          placeholder="Buscar por nombre o código..."
+                          data-action="filterEstancias"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <div class="table-responsive">
+                    <table class="table table-striped table-hover" id="estanciasTable">
+                      <thead class="table-dark">
+                        <tr>
+                          <th>Nombre</th>
+                          <th>Código</th>
+                          <th>Dirección</th>
+                          <th>Observaciones</th>
+                          <th>Acciones</th>
+                        </tr>
+                      </thead>
+                      <tbody id="estanciasTableBody">
+                        <tr>
+                          <td colspan="5" class="text-center text-muted">Sin registros</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tab Almacenes -->
+            <div
+              class="tab-pane fade"
+              id="almacenes"
+              role="tabpanel"
+              aria-labelledby="almacenes-tab"
+            >
+              <div class="card">
+                <div class="card-body">
+                  <form class="needs-validation" id="almacenForm" novalidate>
+                    <div class="form-section">
+                      <h4 class="section-title">
+                        <i class="fa-solid fa-boxes-stacked"></i> Almacén
+                      </h4>
+                      <div class="row g-3">
+                        <div class="col-md-6">
+                          <label for="nombreAlmacen" class="form-label">Nombre *</label>
+                          <input
+                            type="text"
+                            class="form-control"
+                            id="nombreAlmacen"
+                            required
+                            placeholder="Ej: Almacén de Líquidos"
+                          />
+                          <div class="invalid-feedback">Ingrese el nombre</div>
+                        </div>
+                        <div class="col-md-6">
+                          <label for="codigoAlmacen" class="form-label">Código</label>
+                          <input
+                            type="text"
+                            class="form-control"
+                            id="codigoAlmacen"
+                            placeholder="Opcional (único)"
+                          />
+                        </div>
+                        <div class="col-12">
+                          <label for="direccionAlmacen" class="form-label"
+                            >Ubicación/Dirección</label
+                          >
+                          <textarea
+                            id="direccionAlmacen"
+                            class="form-control"
+                            rows="2"
+                            placeholder="Dirección o referencia"
+                          ></textarea>
+                        </div>
+                        <div class="col-12">
+                          <label for="observacionesAlmacen" class="form-label">Observaciones</label>
+                          <textarea
+                            id="observacionesAlmacen"
+                            class="form-control"
+                            rows="2"
+                            placeholder="Notas adicionales"
+                          ></textarea>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="form-actions">
+                      <button
+                        type="button"
+                        class="btn btn-outline-secondary me-2"
+                        data-action="clearAlmacenForm"
+                      >
+                        <i class="fas fa-times"></i> Limpiar
+                      </button>
+                      <button type="button" class="btn btn-primary" data-action="saveAlmacen">
+                        <i class="fas fa-save"></i> Guardar Almacén
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+
+              <div class="card mt-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                  <h5 class="mb-0"><i class="fas fa-list"></i> Almacenes Registrados</h5>
+                  <div class="btn-group" role="group">
+                    <button
+                      type="button"
+                      class="btn btn-outline-primary btn-sm"
+                      data-action="loadAlmacenesTable"
+                    >
+                      <i class="fas fa-refresh"></i> Actualizar
+                    </button>
+                    <button
+                      type="button"
+                      class="btn btn-outline-success btn-sm"
+                      data-action="exportAlmacenes"
+                    >
+                      <i class="fas fa-download"></i> Exportar
+                    </button>
+                    <button
+                      type="button"
+                      class="btn btn-outline-danger btn-sm"
+                      data-action="limpiarTodosAlmacenes"
+                    >
+                      <i class="fas fa-trash"></i> Limpiar Todo
+                    </button>
+                  </div>
+                </div>
+                <div class="card-body">
+                  <div class="row mb-3">
+                    <div class="col-md-6">
+                      <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-search"></i></span>
+                        <input
+                          type="text"
+                          class="form-control"
+                          id="searchAlmacenes"
+                          placeholder="Buscar por nombre o código..."
+                          data-action="filterAlmacenes"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <div class="table-responsive">
+                    <table class="table table-striped table-hover" id="almacenesTable">
+                      <thead class="table-dark">
+                        <tr>
+                          <th>Nombre</th>
+                          <th>Código</th>
+                          <th>Ubicación</th>
+                          <th>Observaciones</th>
+                          <th>Acciones</th>
+                        </tr>
+                      </thead>
+                      <tbody id="almacenesTableBody">
+                        <tr>
+                          <td colspan="5" class="text-center text-muted">Sin registros</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal para eliminar Económico -->
+    <div
+      class="modal fade"
+      id="deleteEconomicoModal"
+      tabindex="-1"
+      aria-labelledby="deleteEconomicoModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="deleteEconomicoModalLabel">
+              <i class="fas fa-exclamation-triangle text-warning"></i>
+              Eliminar Económico
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3">
+              <label for="economicoToDelete" class="form-label"
+                >Seleccione el económico a eliminar:</label
+              >
+              <select class="form-select" id="economicoToDelete" required>
+                <option value="">Seleccione un económico...</option>
+              </select>
+            </div>
+            <div class="alert alert-warning">
+              <i class="fas fa-exclamation-triangle"></i>
+              <strong>Advertencia:</strong> Esta acción no se puede deshacer. Se eliminarán todos
+              los datos del económico seleccionado.
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+              Cancelar
+            </button>
+            <button type="button" class="btn btn-danger" data-action="confirmDeleteEconomico">
+              <i class="fas fa-trash"></i> Eliminar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal para eliminar Operador -->
+    <div
+      class="modal fade"
+      id="deleteOperadorModal"
+      tabindex="-1"
+      aria-labelledby="deleteOperadorModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="deleteOperadorModalLabel">
+              <i class="fas fa-exclamation-triangle text-warning"></i>
+              Eliminar Operador
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3">
+              <label for="operadorToDelete" class="form-label"
+                >Seleccione el operador a eliminar:</label
+              >
+              <select class="form-select" id="operadorToDelete" required>
+                <option value="">Seleccione un operador...</option>
+              </select>
+            </div>
+            <div class="alert alert-warning">
+              <i class="fas fa-exclamation-triangle"></i>
+              <strong>Advertencia:</strong> Esta acción no se puede deshacer. Se eliminarán todos
+              los datos del operador seleccionado.
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+              Cancelar
+            </button>
+            <button type="button" class="btn btn-danger" data-action="confirmDeleteOperador">
+              <i class="fas fa-trash"></i> Eliminar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal para eliminar Cliente -->
+    <div
+      class="modal fade"
+      id="deleteClienteModal"
+      tabindex="-1"
+      aria-labelledby="deleteClienteModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="deleteClienteModalLabel">
+              <i class="fas fa-exclamation-triangle text-warning"></i>
+              Eliminar Cliente
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3">
+              <label for="clienteToDelete" class="form-label"
+                >Seleccione el cliente a eliminar:</label
+              >
+              <select class="form-select" id="clienteToDelete" required>
+                <option value="">Seleccione un cliente...</option>
+              </select>
+            </div>
+            <div class="alert alert-warning">
+              <i class="fas fa-exclamation-triangle"></i>
+              <strong>Advertencia:</strong> Esta acción no se puede deshacer. Se eliminarán todos
+              los datos del cliente seleccionado.
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+              Cancelar
+            </button>
+            <button type="button" class="btn btn-danger" data-action="confirmDeleteCliente">
+              <i class="fas fa-trash"></i> Eliminar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== SCRIPTS COMUNES Y MÓDULOS (Carga automática) ===== -->
+    <script src="../assets/scripts/performance/common-head-loader.js"></script>
+    <script src="../assets/scripts/performance/common-scripts-loader.js"></script>
+    <script src="../assets/scripts/performance/page-modules-config.js"></script>
+    <script src="../assets/scripts/performance/page-modules-loader.js"></script>
+    <script type="module" src="../assets/scripts/firebase-init.js"></script>
+
+    <!-- Modal para Editar Económico -->
+    <div
+      class="modal fade"
+      id="editEconomicoModal"
+      tabindex="-1"
+      aria-labelledby="editEconomicoModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="editEconomicoModalLabel">
+              <i class="fas fa-edit"></i> Editar Económico
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <form id="editEconomicoForm">
+              <!-- Información del Económico -->
+              <div class="form-section mb-4">
+                <h6 class="section-title">
+                  <i class="fas fa-truck"></i>
+                  Información del Económico
+                </h6>
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <label for="editNumeroEconomico" class="form-label"
+                      >Número de Económico *</label
+                    >
+                    <input type="text" class="form-control" id="editNumeroEconomico" required />
+                  </div>
+                  <div class="col-md-6">
+                    <label for="editTipoVehiculo" class="form-label">Tipo de Vehículo *</label>
+                    <select id="editTipoVehiculo" class="form-select" required>
+                      <option value="">Seleccione...</option>
+                      <option value="tractocamion">Tractocamión</option>
+                      <option value="camion">Camión</option>
+                      <option value="remolque">Remolque</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Placas y Estado -->
+              <div class="form-section mb-4">
+                <h6 class="section-title">
+                  <i class="fas fa-id-card"></i>
+                  Placas y Estado
+                </h6>
+                <div class="row g-3">
+                  <div class="col-md-4">
+                    <label for="editPlacaTracto" class="form-label">Placa del Tracto *</label>
+                    <input type="text" class="form-control" id="editPlacaTracto" required />
+                  </div>
+                  <div class="col-md-4">
+                    <label for="editPlacaRemolque" class="form-label">Placa del Remolque</label>
+                    <input type="text" class="form-control" id="editPlacaRemolque" />
+                  </div>
+                  <div class="col-md-4">
+                    <label for="editEstadoPlacas" class="form-label">Estado de Placas *</label>
+                    <select id="editEstadoPlacas" class="form-select" required>
+                      <option value="">Seleccione...</option>
+                      <option value="activas">Activas</option>
+                      <option value="vencidas">Vencidas</option>
+                      <option value="en_tramite">En Trámite</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Especificaciones Técnicas -->
+              <div class="form-section mb-4">
+                <h6 class="section-title">
+                  <i class="fas fa-cogs"></i>
+                  Especificaciones Técnicas
+                </h6>
+                <div class="row g-3">
+                  <div class="col-md-3">
+                    <label for="editMarca" class="form-label">Marca *</label>
+                    <input type="text" class="form-control" id="editMarca" required />
+                  </div>
+                  <div class="col-md-3">
+                    <label for="editModelo" class="form-label">Modelo *</label>
+                    <input type="text" class="form-control" id="editModelo" required />
+                  </div>
+                  <div class="col-md-3">
+                    <label for="editAño" class="form-label">Año *</label>
+                    <input
+                      type="number"
+                      class="form-control"
+                      id="editAño"
+                      min="1990"
+                      max="2030"
+                      required
+                    />
+                  </div>
+                  <div class="col-md-3">
+                    <label for="editEstadoVehiculo" class="form-label">Estado del Vehículo *</label>
+                    <select id="editEstadoVehiculo" class="form-select" required>
+                      <option value="">Seleccione...</option>
+                      <option value="activo">Activo</option>
+                      <option value="mantenimiento">En Mantenimiento</option>
+                      <option value="reparacion">En Reparación</option>
+                      <option value="inactivo">Inactivo</option>
+                      <option value="retirado">Retirado</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Observaciones -->
+              <div class="form-section">
+                <h6 class="section-title">
+                  <i class="fas fa-comment"></i>
+                  Observaciones
+                </h6>
+                <div class="row g-3">
+                  <div class="col-12">
+                    <label for="editObservaciones" class="form-label">Observaciones</label>
+                    <textarea
+                      class="form-control"
+                      id="editObservaciones"
+                      rows="3"
+                      placeholder="Observaciones adicionales..."
+                    ></textarea>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+              <i class="fas fa-times"></i> Cancelar
+            </button>
+            <button type="button" class="btn btn-primary" data-action="saveEditedEconomico">
+              <i class="fas fa-save"></i> Guardar Cambios
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal para Editar Operador -->
+    <div
+      class="modal fade"
+      id="editOperadorModal"
+      tabindex="-1"
+      aria-labelledby="editOperadorModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="editOperadorModalLabel">
+              <i class="fas fa-edit"></i> Editar Operador
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <form id="editOperadorForm">
+              <input type="hidden" id="editOperadorRfcOriginal" />
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label for="editOperadorNombre" class="form-label">Nombre Completo *</label>
+                  <input type="text" class="form-control" id="editOperadorNombre" required />
+                </div>
+                <div class="col-md-6">
+                  <label for="editOperadorLicencia" class="form-label">Número de Licencia *</label>
+                  <input type="text" class="form-control" id="editOperadorLicencia" required />
+                </div>
+                <div class="col-md-6">
+                  <label for="editOperadorRfc" class="form-label">RFC</label>
+                  <input type="text" class="form-control" id="editOperadorRfc" />
+                </div>
+                <div class="col-md-6">
+                  <label for="editOperadorSeguroSocial" class="form-label">Seguro Social *</label>
+                  <input type="text" class="form-control" id="editOperadorSeguroSocial" required />
+                </div>
+                <div class="col-md-6">
+                  <label for="editOperadorTelefono" class="form-label">Teléfono</label>
+                  <input type="tel" class="form-control" id="editOperadorTelefono" />
+                </div>
+                <div class="col-md-6">
+                  <label for="editOperadorEmail" class="form-label">Email</label>
+                  <input type="email" class="form-control" id="editOperadorEmail" />
+                </div>
+                <div class="col-md-6">
+                  <label for="editOperadorTipo" class="form-label">Tipo de Operador *</label>
+                  <select id="editOperadorTipo" class="form-select" required>
+                    <option value="">Seleccione...</option>
+                    <option value="principal">Operador Principal</option>
+                    <option value="secundario">Operador Secundario</option>
+                    <option value="relevo">Operador de Relevo</option>
+                    <option value="temporal">Operador Temporal</option>
+                  </select>
+                </div>
+                <div class="col-md-6">
+                  <label for="editOperadorEstado" class="form-label">Estado *</label>
+                  <select id="editOperadorEstado" class="form-select" required>
+                    <option value="">Seleccione...</option>
+                    <option value="activo">Activo</option>
+                    <option value="vacaciones">En Vacaciones</option>
+                    <option value="incapacidad">En Incapacidad</option>
+                    <option value="suspendido">Suspendido</option>
+                    <option value="inactivo">Inactivo</option>
+                  </select>
+                </div>
+                <div class="col-md-6">
+                  <label for="editOperadorFechaIngreso" class="form-label"
+                    >Fecha de Ingreso *</label
+                  >
+                  <input type="date" class="form-control" id="editOperadorFechaIngreso" required />
+                </div>
+                <div class="col-md-6">
+                  <label for="editOperadorFechaNacimiento" class="form-label"
+                    >Fecha de Nacimiento</label
+                  >
+                  <input type="date" class="form-control" id="editOperadorFechaNacimiento" />
+                </div>
+                <div class="col-md-6">
+                  <label for="editOperadorDireccion" class="form-label">Dirección</label>
+                  <input type="text" class="form-control" id="editOperadorDireccion" />
+                </div>
+                <div class="col-md-6">
+                  <label for="editOperadorSalario" class="form-label">Salario Base</label>
+                  <div class="input-group">
+                    <span class="input-group-text">$</span>
+                    <input
+                      type="number"
+                      class="form-control"
+                      id="editOperadorSalario"
+                      step="0.01"
+                    />
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <label for="editOperadorVencimientoLicencia" class="form-label"
+                    >Vencimiento de Licencia *</label
+                  >
+                  <input
+                    type="date"
+                    class="form-control"
+                    id="editOperadorVencimientoLicencia"
+                    required
+                  />
+                </div>
+                <div class="col-md-6">
+                  <label for="editOperadorCertificadoMedico" class="form-label"
+                    >Certificado Médico</label
+                  >
+                  <input type="text" class="form-control" id="editOperadorCertificadoMedico" />
+                </div>
+                <div class="col-md-6">
+                  <label for="editOperadorVencimientoCertificado" class="form-label"
+                    >Vencimiento Certificado Médico</label
+                  >
+                  <input type="date" class="form-control" id="editOperadorVencimientoCertificado" />
+                </div>
+                <div class="col-12">
+                  <label for="editOperadorObservaciones" class="form-label">Observaciones</label>
+                  <textarea class="form-control" id="editOperadorObservaciones" rows="3"></textarea>
+                </div>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+              <i class="fas fa-times"></i> Cancelar
+            </button>
+            <button type="button" class="btn btn-primary" data-action="saveEditedOperador">
+              <i class="fas fa-save"></i> Guardar Cambios
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal para Editar Cliente -->
+    <div
+      class="modal fade"
+      id="editClienteModal"
+      tabindex="-1"
+      aria-labelledby="editClienteModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="editClienteModalLabel">
+              <i class="fas fa-edit"></i> Editar Cliente
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <form id="editClienteForm">
+              <input type="hidden" id="editClienteRfcOriginal" />
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label for="editClienteRfc" class="form-label">RFC *</label>
+                  <input type="text" class="form-control" id="editClienteRfc" required />
+                </div>
+                <div class="col-md-6">
+                  <label for="editClienteNombre" class="form-label">Nombre *</label>
+                  <input type="text" class="form-control" id="editClienteNombre" required />
+                </div>
+                <div class="col-md-6">
+                  <label for="editClienteTelefono" class="form-label">Teléfono</label>
+                  <input type="tel" class="form-control" id="editClienteTelefono" />
+                </div>
+                <div class="col-md-6">
+                  <label for="editClienteEmail" class="form-label">Email</label>
+                  <input type="email" class="form-control" id="editClienteEmail" />
+                </div>
+                <div class="col-md-6">
+                  <label for="editClienteContacto" class="form-label">Contacto</label>
+                  <input type="text" class="form-control" id="editClienteContacto" />
+                </div>
+                <div class="col-md-6">
+                  <label for="editClienteTipo" class="form-label">Tipo de Cliente</label>
+                  <select id="editClienteTipo" class="form-select">
+                    <option value="">Seleccione...</option>
+                    <option value="empresa">Empresa</option>
+                    <option value="individual">Individual</option>
+                  </select>
+                </div>
+                <div class="col-md-6">
+                  <label for="editClienteEstado" class="form-label">Estado Comercial</label>
+                  <select id="editClienteEstado" class="form-select">
+                    <option value="">Seleccione...</option>
+                    <option value="Activo">Activo</option>
+                    <option value="Inactivo">Inactivo</option>
+                  </select>
+                </div>
+                <div class="col-md-6">
+                  <label for="editClienteCiudad" class="form-label">Ciudad</label>
+                  <input type="text" class="form-control" id="editClienteCiudad" />
+                </div>
+                <div class="col-md-6">
+                  <label for="editClienteLimiteCredito" class="form-label">Límite de Crédito</label>
+                  <div class="input-group">
+                    <span class="input-group-text">$</span>
+                    <input
+                      type="number"
+                      class="form-control"
+                      id="editClienteLimiteCredito"
+                      step="0.01"
+                    />
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <label for="editClienteDiasCredito" class="form-label">Días de Crédito</label>
+                  <input type="number" class="form-control" id="editClienteDiasCredito" min="0" />
+                </div>
+                <div class="col-12">
+                  <label for="editClienteDireccion" class="form-label">Dirección</label>
+                  <textarea class="form-control" id="editClienteDireccion" rows="2"></textarea>
+                </div>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+              <i class="fas fa-times"></i> Cancelar
+            </button>
+            <button type="button" class="btn btn-primary" data-action="saveEditedCliente">
+              <i class="fas fa-save"></i> Guardar Cambios
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal para Editar Proveedor -->
+    <div
+      class="modal fade"
+      id="editProveedorModal"
+      tabindex="-1"
+      aria-labelledby="editProveedorModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="editProveedorModalLabel">
+              <i class="fas fa-edit"></i> Editar Proveedor
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <form id="editProveedorForm">
+              <input type="hidden" id="editProveedorRfcOriginal" />
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label for="editProveedorRfc" class="form-label">RFC *</label>
+                  <input type="text" class="form-control" id="editProveedorRfc" required />
+                </div>
+                <div class="col-md-6">
+                  <label for="editProveedorNombre" class="form-label">Nombre *</label>
+                  <input type="text" class="form-control" id="editProveedorNombre" required />
+                </div>
+                <div class="col-md-6">
+                  <label for="editProveedorContacto" class="form-label">Contacto</label>
+                  <input type="text" class="form-control" id="editProveedorContacto" />
+                </div>
+                <div class="col-md-6">
+                  <label for="editProveedorTelefono" class="form-label">Teléfono</label>
+                  <input type="tel" class="form-control" id="editProveedorTelefono" />
+                </div>
+                <div class="col-md-6">
+                  <label for="editProveedorEmail" class="form-label">Email</label>
+                  <input type="email" class="form-control" id="editProveedorEmail" />
+                </div>
+                <div class="col-md-6">
+                  <label for="editProveedorEstado" class="form-label">Estado</label>
+                  <select id="editProveedorEstado" class="form-select">
+                    <option value="">Seleccione...</option>
+                    <option value="Activo">Activo</option>
+                    <option value="Inactivo">Inactivo</option>
+                  </select>
+                </div>
+                <div class="col-md-6">
+                  <label for="editProveedorDiasCredito" class="form-label">Días de Crédito</label>
+                  <input
+                    type="number"
+                    class="form-control"
+                    id="editProveedorDiasCredito"
+                    min="0"
+                    value="30"
+                  />
+                </div>
+                <div class="col-12">
+                  <label for="editProveedorDireccion" class="form-label">Dirección</label>
+                  <textarea class="form-control" id="editProveedorDireccion" rows="2"></textarea>
+                </div>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+              <i class="fas fa-times"></i> Cancelar
+            </button>
+            <button type="button" class="btn btn-primary" data-action="saveEditedProveedor">
+              <i class="fas fa-save"></i> Guardar Cambios
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal para Editar Estancia -->
+    <div
+      class="modal fade"
+      id="editEstanciaModal"
+      tabindex="-1"
+      aria-labelledby="editEstanciaModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="editEstanciaModalLabel">
+              <i class="fas fa-edit"></i> Editar Estancia
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <form id="editEstanciaForm">
+              <input type="hidden" id="editEstanciaIdOriginal" />
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label for="editEstanciaNombre" class="form-label">Nombre *</label>
+                  <input type="text" class="form-control" id="editEstanciaNombre" required />
+                </div>
+                <div class="col-md-6">
+                  <label for="editEstanciaCodigo" class="form-label">Código</label>
+                  <input type="text" class="form-control" id="editEstanciaCodigo" />
+                </div>
+                <div class="col-12">
+                  <label for="editEstanciaDireccion" class="form-label">Dirección</label>
+                  <textarea class="form-control" id="editEstanciaDireccion" rows="2"></textarea>
+                </div>
+                <div class="col-12">
+                  <label for="editEstanciaObservaciones" class="form-label">Observaciones</label>
+                  <textarea class="form-control" id="editEstanciaObservaciones" rows="3"></textarea>
+                </div>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+              <i class="fas fa-times"></i> Cancelar
+            </button>
+            <button type="button" class="btn btn-primary" data-action="saveEditedEstancia">
+              <i class="fas fa-save"></i> Guardar Cambios
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal para Editar Almacén -->
+    <div
+      class="modal fade"
+      id="editAlmacenModal"
+      tabindex="-1"
+      aria-labelledby="editAlmacenModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="editAlmacenModalLabel">
+              <i class="fas fa-edit"></i> Editar Almacén
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <form id="editAlmacenForm">
+              <input type="hidden" id="editAlmacenIdOriginal" />
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label for="editAlmacenNombre" class="form-label">Nombre *</label>
+                  <input type="text" class="form-control" id="editAlmacenNombre" required />
+                </div>
+                <div class="col-md-6">
+                  <label for="editAlmacenCodigo" class="form-label">Código</label>
+                  <input type="text" class="form-control" id="editAlmacenCodigo" />
+                </div>
+                <div class="col-12">
+                  <label for="editAlmacenDireccion" class="form-label">Dirección</label>
+                  <textarea class="form-control" id="editAlmacenDireccion" rows="2"></textarea>
+                </div>
+                <div class="col-12">
+                  <label for="editAlmacenObservaciones" class="form-label">Observaciones</label>
+                  <textarea class="form-control" id="editAlmacenObservaciones" rows="3"></textarea>
+                </div>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+              <i class="fas fa-times"></i> Cancelar
+            </button>
+            <button type="button" class="btn btn-primary" data-action="saveEditedAlmacen">
+              <i class="fas fa-save"></i> Guardar Cambios
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Script de respaldo para saveEditedCuentaBancaria movido a assets/scripts/configuracion-cuentas-bancarias-fallback.js -->
+
+    <!-- Modal para Editar Cuenta Bancaria -->
+    <div
+      class="modal fade"
+      id="editCuentaBancariaModal"
+      tabindex="-1"
+      aria-labelledby="editCuentaBancariaModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="editCuentaBancariaModalLabel">
+              <i class="fas fa-edit"></i> Editar Cuenta Bancaria
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <form id="editCuentaBancariaForm">
+              <input type="hidden" id="editCuentaBancariaNumeroOriginal" />
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label for="editCuentaBancariaBanco" class="form-label">Banco *</label>
+                  <input type="text" class="form-control" id="editCuentaBancariaBanco" required />
+                </div>
+                <div class="col-md-6">
+                  <label for="editCuentaBancariaNumero" class="form-label"
+                    >Número de Cuenta *</label
+                  >
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="editCuentaBancariaNumero"
+                    required
+                    readonly
+                  />
+                </div>
+                <div class="col-md-6">
+                  <label for="editCuentaBancariaClabe" class="form-label">CLABE</label>
+                  <input type="text" class="form-control" id="editCuentaBancariaClabe" />
+                </div>
+                <div class="col-md-6">
+                  <label for="editCuentaBancariaTipo" class="form-label">Tipo de Cuenta *</label>
+                  <select id="editCuentaBancariaTipo" class="form-select" required>
+                    <option value="">Seleccione...</option>
+                    <option value="cheques">Cheques</option>
+                    <option value="ahorro">Ahorro</option>
+                    <option value="inversion">Inversión</option>
+                  </select>
+                </div>
+                <div class="col-md-6">
+                  <label for="editCuentaBancariaMoneda" class="form-label">Moneda *</label>
+                  <select id="editCuentaBancariaMoneda" class="form-select" required>
+                    <option value="">Seleccione...</option>
+                    <option value="MXN">MXN (Pesos Mexicanos)</option>
+                    <option value="USD">USD (Dólares)</option>
+                  </select>
+                </div>
+                <div class="col-md-6">
+                  <label for="editCuentaBancariaSaldoInicial" class="form-label"
+                    >Saldo Inicial</label
+                  >
+                  <input
+                    type="number"
+                    class="form-control"
+                    id="editCuentaBancariaSaldoInicial"
+                    step="0.01"
+                    min="0"
+                    placeholder="0.00"
+                  />
+                  <small class="form-text text-muted"
+                    >Saldo inicial de la cuenta para conciliación bancaria</small
+                  >
+                </div>
+                <div class="col-12">
+                  <label for="editCuentaBancariaObservaciones" class="form-label"
+                    >Observaciones</label
+                  >
+                  <textarea
+                    class="form-control"
+                    id="editCuentaBancariaObservaciones"
+                    rows="3"
+                  ></textarea>
+                </div>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+              <i class="fas fa-times"></i> Cancelar
+            </button>
+            <button type="button" class="btn btn-primary" data-action="saveEditedCuentaBancaria">
+              <i class="fas fa-save"></i> Guardar Cambios
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal para Editar Usuario -->
+    <div
+      class="modal fade"
+      id="editUsuarioModal"
+      tabindex="-1"
+      aria-labelledby="editUsuarioModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="editUsuarioModalLabel">
+              <i class="fas fa-edit"></i> Editar Usuario
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <form id="editUsuarioForm">
+              <input type="hidden" id="editUsuarioIdOriginal" />
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label for="editUsuarioNombre" class="form-label">Nombre *</label>
+                  <input type="text" class="form-control" id="editUsuarioNombre" required />
+                </div>
+                <div class="col-md-6">
+                  <label for="editUsuarioEmail" class="form-label">Email *</label>
+                  <input type="email" class="form-control" id="editUsuarioEmail" required />
+                </div>
+                <div class="col-md-6">
+                  <label for="editUsuarioPassword" class="form-label"
+                    >Contraseña (dejar vacío para mantener la actual)</label
+                  >
+                  <input type="password" class="form-control" id="editUsuarioPassword" />
+                </div>
+                <div class="col-md-6">
+                  <label for="editUsuarioConfirmPassword" class="form-label"
+                    >Confirmar Contraseña</label
+                  >
+                  <input type="password" class="form-control" id="editUsuarioConfirmPassword" />
+                </div>
+                <div class="col-md-12">
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="editUsuarioPuedeAprobar" />
+                    <label class="form-check-label" for="editUsuarioPuedeAprobar">
+                      Puede aprobar solicitudes
+                    </label>
+                  </div>
+                </div>
+                <div class="col-12">
+                  <label class="form-label">Módulos que puede ver:</label>
+                  <div
+                    id="editUsuarioModulosContainer"
+                    class="border p-3 rounded scrollable-container"
+                  >
+                    <!-- Los checkboxes se generarán dinámicamente -->
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+              <i class="fas fa-times"></i> Cancelar
+            </button>
+            <button type="button" class="btn btn-primary" data-action="saveEditedUsuario">
+              <i class="fas fa-save"></i> Guardar Cambios
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Scripts movidos a carga bajo demanda arriba -->
+    <!-- Script para indicador de carga del backend (compartido) -->
+    <script src="../assets/scripts/backend-ready-indicator.js"></script>
+
+    <!-- Incluir modales y funciones de licencia -->
+    <div id="licenseUI"></div>
+    <script>
+      // Cargar license-ui.html dinámicamente
+      fetch('../assets/scripts/license-ui.html')
+        .then(response => response.text())
+        .then(html => {
+          document.getElementById('licenseUI').innerHTML = html;
+          // Ejecutar scripts dentro del HTML cargado
+          const scripts = document.getElementById('licenseUI').querySelectorAll('script');
+          scripts.forEach(oldScript => {
+            const newScript = document.createElement('script');
+            Array.from(oldScript.attributes).forEach(attr => {
+              newScript.setAttribute(attr.name, attr.value);
+            });
+            newScript.appendChild(document.createTextNode(oldScript.innerHTML));
+            oldScript.parentNode.replaceChild(newScript, oldScript);
+          });
+        })
+        .catch(error => {
+          console.warn(
+            'No se pudo cargar license-ui.html, las funciones estarán disponibles si se cargó en otra página:',
+            error
+          );
+        });
+    </script>
+  </body>
+</html>

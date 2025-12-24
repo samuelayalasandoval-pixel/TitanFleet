@@ -1,0 +1,97 @@
+/**
+ * Backend Ready Indicator Styles
+ * Estilos para el indicador visual del estado de carga del backend
+ * 
+ * Uso:
+ * - Incluir este archivo CSS en cualquier página que use el indicador
+ * - Agregar los elementos HTML con IDs: 'backendReadyIndicator' y 'backendReadyBadge'
+ * 
+ * @author TitanFleet ERP
+ * @version 1.0.0
+ */
+
+/* Contenedor del indicador (similar a current-period) */
+.backend-status-container {
+  margin-top: 0.5rem;
+  margin-bottom: 0.25rem;
+}
+
+/* Estilos para el indicador de carga del backend */
+.backend-loading-indicator,
+.backend-ready-badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.875rem;
+  font-weight: 500;
+  padding: 0.375rem 0.75rem;
+  border-radius: 0.5rem;
+  transition: all 0.3s ease;
+}
+
+/* Si está dentro del título (inline) */
+.page-title .backend-loading-indicator,
+.page-title .backend-ready-badge {
+  margin-left: 1rem;
+  vertical-align: middle;
+}
+
+/* Si está en contenedor separado (como en operadores) */
+.backend-status-container .backend-loading-indicator,
+.backend-status-container .backend-ready-badge {
+  margin-left: 0;
+}
+
+.backend-loading-indicator {
+  color: #f59e0b;
+  background-color: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  display: none; /* Oculto por defecto, se mostrará cuando sea necesario */
+}
+
+.backend-loading-indicator .spinner-border-sm {
+  width: 1rem;
+  height: 1rem;
+  border-width: 0.15em;
+}
+
+.backend-ready-badge {
+  color: #10b981;
+  background-color: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  animation: fadeInScale 0.5s ease;
+  display: none; /* Oculto por defecto, se mostrará cuando sea necesario */
+}
+
+.backend-ready-badge i,
+.backend-ready-badge i.fa-check-circle,
+.backend-ready-badge .fa-check-circle {
+  color: #10b981 !important;
+}
+
+/* Asegurar que el icono sea verde incluso dentro del page-title */
+.page-title .backend-ready-badge i,
+.page-title .backend-ready-badge i.fa-check-circle,
+.page-title .backend-ready-badge .fa-check-circle {
+  color: #10b981 !important;
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@media (max-width: 768px) {
+  .backend-loading-indicator,
+  .backend-ready-badge {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    margin-left: 0.5rem;
+  }
+}
+

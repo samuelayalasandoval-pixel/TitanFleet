@@ -1,0 +1,154 @@
+name: CI - Tests y Despliegue
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  # Job de tests unitarios
+  test-unit:
+    name: Tests Unitarios
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v4
+      
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+      
+      - name: Instalar dependencias
+        run: npm ci
+      
+      - name: Ejecutar tests unitarios
+        run: npm run test
+      
+      - name: Generar reporte de cobertura
+        run: npm run test:coverage
+      
+      - name: Subir cobertura a Codecov (opcional)
+        uses: codecov/codecov-action@v3
+        with:
+          files: ./coverage/lcov.info
+          fail_ci_if_error: false
+
+  # Job de tests E2E
+  test-e2e:
+    name: Tests E2E
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v4
+      
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+      
+      - name: Instalar dependencias
+        run: npm ci
+      
+      - name: Instalar dependencias de Playwright
+        run: npx playwright install --with-deps
+      
+      - name: Ejecutar tests E2E
+        run: npm run test:e2e
+        env:
+          BASE_URL: http://localhost:3000
+      
+      - name: Subir artefactos de tests
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 30
+
+  # Job de linting
+  lint:
+    name: Linting
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v4
+      
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+      
+      - name: Instalar dependencias
+        run: npm ci
+      
+      - name: Ejecutar linting CSS
+        run: npm run lint:css
+
+  # Job de build
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    needs: [test-unit, lint]
+    
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v4
+      
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+      
+      - name: Instalar dependencias
+        run: npm ci
+      
+      - name: Build del proyecto
+        run: npm run build
+      
+      - name: Subir artefactos de build
+        uses: actions/upload-artifact@v3
+        with:
+          name: build-artifacts
+          path: |
+            styles/
+            assets/
+
+  # Job de despliegue (solo en main)
+  deploy:
+    name: Despliegue a Firebase
+    runs-on: ubuntu-latest
+    needs: [test-unit, test-e2e, build]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v4
+      
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+      
+      - name: Instalar dependencias
+        run: npm ci
+      
+      - name: Build del proyecto
+        run: npm run build
+      
+      - name: Desplegar a Firebase
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: '${{ secrets.GITHUB_TOKEN }}'
+          firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}'
+          channelId: live
+          projectId: titanfleet-60931

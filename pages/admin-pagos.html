@@ -1,0 +1,619 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Administración de Pagos - TitanFleet ERP</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link rel="stylesheet" href="../styles/styles.css" />
+    <style>
+      .payment-card {
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        transition: box-shadow 0.3s;
+      }
+      .payment-card:hover {
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+      .payment-transferencia {
+        border-left: 4px solid #f59e0b;
+      }
+      .payment-tarjeta {
+        border-left: 4px solid #10b981;
+      }
+      .payment-pendiente {
+        border-left: 4px solid #ef4444;
+      }
+      .payment-validado {
+        border-left: 4px solid #10b981;
+      }
+      .stats-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+      }
+      .badge-custom {
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        font-weight: 600;
+      }
+      .receipt-preview {
+        max-width: 200px;
+        max-height: 200px;
+        border-radius: 8px;
+        cursor: pointer;
+        border: 2px solid #e5e7eb;
+      }
+      .receipt-preview:hover {
+        border-color: #667eea;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container-fluid py-4">
+      <div class="row mb-4">
+        <div class="col-12">
+          <h1 class="display-5"><i class="fas fa-credit-card"></i> Administración de Pagos</h1>
+          <p class="text-muted">
+            Gestiona y verifica los pagos recibidos por transferencia y tarjeta
+          </p>
+        </div>
+      </div>
+
+      <!-- Estadísticas -->
+      <div class="row mb-4">
+        <div class="col-md-3">
+          <div class="stats-card">
+            <h6 class="mb-2">Total Solicitudes</h6>
+            <h2 id="totalSolicitudes">0</h2>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div
+            class="stats-card"
+            style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%)"
+          >
+            <h6 class="mb-2">Transferencias</h6>
+            <h2 id="totalTransferencias">0</h2>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div
+            class="stats-card"
+            style="background: linear-gradient(135deg, #10b981 0%, #059669 100%)"
+          >
+            <h6 class="mb-2">Pagos Tarjeta</h6>
+            <h2 id="totalTarjetas">0</h2>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div
+            class="stats-card"
+            style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%)"
+          >
+            <h6 class="mb-2">Pendientes</h6>
+            <h2 id="totalPendientes">0</h2>
+          </div>
+        </div>
+      </div>
+
+      <!-- Filtros -->
+      <div class="row mb-4">
+        <div class="col-12">
+          <div class="card">
+            <div class="card-body">
+              <div class="row">
+                <div class="col-md-3">
+                  <label for="filterTipo" class="form-label">Tipo de Pago</label>
+                  <select class="form-select" id="filterTipo" onchange="filtrarPagos()">
+                    <option value="">Todos</option>
+                    <option value="transferencia">Transferencia</option>
+                    <option value="tarjeta">Tarjeta</option>
+                  </select>
+                </div>
+                <div class="col-md-3">
+                  <label for="filterEstado" class="form-label">Estado</label>
+                  <select class="form-select" id="filterEstado" onchange="filtrarPagos()">
+                    <option value="">Todos</option>
+                    <option value="pendiente">Pendiente</option>
+                    <option value="validado">Validado</option>
+                    <option value="completado">Completado</option>
+                  </select>
+                </div>
+                <div class="col-md-3">
+                  <label for="filterFecha" class="form-label">Buscar por Fecha</label>
+                  <input
+                    type="date"
+                    class="form-control"
+                    id="filterFecha"
+                    onchange="filtrarPagos()"
+                  />
+                </div>
+                <div class="col-md-3">
+                  <label for="filterBuscar" class="form-label">Buscar</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="filterBuscar"
+                    placeholder="Nombre, email, ID..."
+                    onkeyup="filtrarPagos()"
+                  />
+                </div>
+              </div>
+              <div class="row mt-3">
+                <div class="col-12">
+                  <button class="btn btn-primary" onclick="cargarPagos()">
+                    <i class="fas fa-sync-alt me-2"></i>Actualizar
+                  </button>
+                  <button class="btn btn-success" onclick="exportarPagos()">
+                    <i class="fas fa-download me-2"></i>Exportar CSV
+                  </button>
+                  <button class="btn btn-danger" onclick="limpiarPagosCompletados()">
+                    <i class="fas fa-trash me-2"></i>Limpiar Completados
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Lista de Pagos -->
+      <div class="row">
+        <div class="col-12">
+          <div id="pagosContainer">
+            <div class="text-center py-5">
+              <i class="fas fa-spinner fa-spin fa-3x text-muted"></i>
+              <p class="mt-3 text-muted">Cargando pagos...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal para Ver Detalles -->
+    <div class="modal fade" id="detalleModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Detalles del Pago</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body" id="detalleModalBody">
+            <!-- Se llena dinámicamente -->
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            <button
+              type="button"
+              class="btn btn-success"
+              id="btnValidarPago"
+              onclick="validarPago()"
+            >
+              <i class="fas fa-check me-2"></i>Validar Pago
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal para Ver Comprobante -->
+    <div class="modal fade" id="comprobanteModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Comprobante de Pago</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body text-center">
+            <img
+              id="comprobanteImage"
+              src=""
+              alt="Comprobante"
+              class="img-fluid"
+              style="max-height: 70vh"
+            />
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            <a id="downloadComprobante" href="#" download class="btn btn-primary">
+              <i class="fas fa-download me-2"></i>Descargar
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      let allPagos = [];
+      let currentPaymentId = null;
+
+      // Cargar pagos al iniciar
+      document.addEventListener('DOMContentLoaded', function () {
+        cargarPagos();
+      });
+
+      function cargarPagos() {
+        // Cargar solicitudes de transferencia
+        const solicitudes = JSON.parse(localStorage.getItem('titanfleet_solicitudes') || '[]');
+
+        // Cargar pagos con tarjeta
+        const pagosTarjeta = JSON.parse(localStorage.getItem('titanfleet_pagos') || '[]');
+
+        // Combinar y formatear
+        allPagos = [
+          ...solicitudes.map(s => ({
+            ...s,
+            tipo: 'transferencia',
+            estado: s.estado || 'pendiente',
+            fechaPago: s.fecha
+          })),
+          ...pagosTarjeta.map(p => ({
+            ...p,
+            tipo: 'tarjeta',
+            estado: p.estado || 'completado',
+            fechaPago: p.fecha
+          }))
+        ].sort((a, b) => new Date(b.fechaPago) - new Date(a.fechaPago));
+
+        actualizarEstadisticas();
+        filtrarPagos();
+      }
+
+      function actualizarEstadisticas() {
+        const total = allPagos.length;
+        const transferencias = allPagos.filter(p => p.tipo === 'transferencia').length;
+        const tarjetas = allPagos.filter(p => p.tipo === 'tarjeta').length;
+        const pendientes = allPagos.filter(p => p.estado === 'pendiente').length;
+
+        document.getElementById('totalSolicitudes').textContent = total;
+        document.getElementById('totalTransferencias').textContent = transferencias;
+        document.getElementById('totalTarjetas').textContent = tarjetas;
+        document.getElementById('totalPendientes').textContent = pendientes;
+      }
+
+      function filtrarPagos() {
+        const tipo = document.getElementById('filterTipo').value;
+        const estado = document.getElementById('filterEstado').value;
+        const fecha = document.getElementById('filterFecha').value;
+        const buscar = document.getElementById('filterBuscar').value.toLowerCase();
+
+        let filtrados = allPagos.filter(pago => {
+          if (tipo && pago.tipo !== tipo) return false;
+          if (estado && pago.estado !== estado) return false;
+          if (fecha) {
+            const pagoFecha = new Date(pago.fechaPago).toISOString().split('T')[0];
+            if (pagoFecha !== fecha) return false;
+          }
+          if (buscar) {
+            const texto =
+              `${pago.id} ${pago.cliente?.nombre || ''} ${pago.cliente?.email || ''} ${pago.plan || ''}`.toLowerCase();
+            if (!texto.includes(buscar)) return false;
+          }
+          return true;
+        });
+
+        renderizarPagos(filtrados);
+      }
+
+      function renderizarPagos(pagos) {
+        const container = document.getElementById('pagosContainer');
+
+        if (pagos.length === 0) {
+          container.innerHTML = `
+          <div class="text-center py-5">
+            <i class="fas fa-inbox fa-3x text-muted"></i>
+            <p class="mt-3 text-muted">No se encontraron pagos</p>
+          </div>
+        `;
+          return;
+        }
+
+        container.innerHTML = pagos
+          .map(pago => {
+            const fecha = new Date(pago.fechaPago).toLocaleString('es-MX');
+            const precio = new Intl.NumberFormat('es-MX', {
+              style: 'currency',
+              currency: 'MXN'
+            }).format(pago.precio || 0);
+
+            const tipoClass =
+              pago.tipo === 'transferencia' ? 'payment-transferencia' : 'payment-tarjeta';
+            const estadoClass =
+              pago.estado === 'pendiente' ? 'payment-pendiente' : 'payment-validado';
+
+            const tipoBadge =
+              pago.tipo === 'transferencia'
+                ? '<span class="badge bg-warning">Transferencia</span>'
+                : '<span class="badge bg-success">Tarjeta</span>';
+
+            const estadoBadge =
+              pago.estado === 'pendiente'
+                ? '<span class="badge bg-danger">Pendiente</span>'
+                : pago.estado === 'validado'
+                  ? '<span class="badge bg-success">Validado</span>'
+                  : '<span class="badge bg-primary">Completado</span>';
+
+            // Verificar si hay comprobante (en el pago o en localStorage)
+            const tieneComprobante =
+              pago.comprobante || localStorage.getItem(`titanfleet_comprobante_${pago.id}`);
+            const comprobanteBtn = tieneComprobante
+              ? `<button class="btn btn-sm btn-info" onclick="verComprobante('${pago.id}')">
+               <i class="fas fa-file-image me-1"></i>Ver Comprobante
+             </button>`
+              : '<span class="badge bg-secondary">Sin comprobante</span>';
+
+            return `
+          <div class="payment-card ${tipoClass} ${estadoClass}">
+            <div class="row">
+              <div class="col-md-8">
+                <h5>${pago.cliente?.nombre || 'Sin nombre'}</h5>
+                <p class="mb-1"><strong>Plan:</strong> ${pago.plan || 'N/A'}</p>
+                <p class="mb-1"><strong>Periodo:</strong> ${pago.periodoPago || pago.periodo || 'N/A'}</p>
+                <p class="mb-1"><strong>Precio:</strong> ${precio}</p>
+                <p class="mb-1"><strong>Email:</strong> ${pago.cliente?.email || 'N/A'}</p>
+                <p class="mb-1"><strong>Teléfono:</strong> ${pago.cliente?.telefono || 'N/A'}</p>
+                <p class="mb-0"><strong>Fecha:</strong> ${fecha}</p>
+              </div>
+              <div class="col-md-4 text-end">
+                <div class="mb-2">${tipoBadge} ${estadoBadge}</div>
+                <div class="mb-2">${comprobanteBtn}</div>
+                <button class="btn btn-sm btn-primary" onclick="verDetalle('${pago.id}')">
+                  <i class="fas fa-eye me-1"></i>Ver Detalles
+                </button>
+                ${
+                  pago.estado === 'pendiente'
+                    ? `
+                  <button class="btn btn-sm btn-success" onclick="validarPagoDesdeLista('${pago.id}')">
+                    <i class="fas fa-check me-1"></i>Validar
+                  </button>
+                `
+                    : ''
+                }
+              </div>
+            </div>
+            <div class="row mt-2">
+              <div class="col-12">
+                <small class="text-muted">ID: ${pago.id}</small>
+              </div>
+            </div>
+          </div>
+        `;
+          })
+          .join('');
+      }
+
+      function verDetalle(pagoId) {
+        const pago = allPagos.find(p => p.id === pagoId);
+        if (!pago) return;
+
+        currentPaymentId = pagoId;
+        const precio = new Intl.NumberFormat('es-MX', {
+          style: 'currency',
+          currency: 'MXN'
+        }).format(pago.precio || 0);
+
+        const fecha = new Date(pago.fechaPago).toLocaleString('es-MX');
+
+        let html = `
+        <div class="row">
+          <div class="col-md-6">
+            <h6>Información del Cliente</h6>
+            <table class="table table-sm">
+              <tr><td><strong>Nombre:</strong></td><td>${pago.cliente?.nombre || 'N/A'}</td></tr>
+              <tr><td><strong>Email:</strong></td><td>${pago.cliente?.email || 'N/A'}</td></tr>
+              <tr><td><strong>Teléfono:</strong></td><td>${pago.cliente?.telefono || 'N/A'}</td></tr>
+              <tr><td><strong>Empresa:</strong></td><td>${pago.cliente?.empresa || 'N/A'}</td></tr>
+            </table>
+          </div>
+          <div class="col-md-6">
+            <h6>Detalles del Pago</h6>
+            <table class="table table-sm">
+              <tr><td><strong>Plan:</strong></td><td>${pago.plan || 'N/A'}</td></tr>
+              <tr><td><strong>Periodo:</strong></td><td>${pago.periodoPago || pago.periodo || 'N/A'}</td></tr>
+              <tr><td><strong>Precio:</strong></td><td>${precio}</td></tr>
+              <tr><td><strong>Tipo:</strong></td><td>${pago.tipo === 'transferencia' ? 'Transferencia Bancaria' : 'Tarjeta'}</td></tr>
+              <tr><td><strong>Estado:</strong></td><td>${pago.estado || 'Pendiente'}</td></tr>
+              <tr><td><strong>Fecha:</strong></td><td>${fecha}</td></tr>
+            </table>
+          </div>
+        </div>
+      `;
+
+        if (pago.mensaje) {
+          html += `
+          <div class="mt-3">
+            <h6>Mensaje del Cliente</h6>
+            <p class="bg-light p-3 rounded">${pago.mensaje}</p>
+          </div>
+        `;
+        }
+
+        if (pago.tipo === 'tarjeta' && pago.ultimos4) {
+          html += `
+          <div class="mt-3">
+            <h6>Información de Tarjeta</h6>
+            <p><strong>Últimos 4 dígitos:</strong> ****${pago.ultimos4}</p>
+          </div>
+        `;
+        }
+
+        // Verificar si hay comprobante (en el pago o en localStorage)
+        const tieneComprobante =
+          pago.comprobante || localStorage.getItem(`titanfleet_comprobante_${pago.id}`);
+        if (tieneComprobante) {
+          html += `
+          <div class="mt-3">
+            <h6>Comprobante</h6>
+            <button class="btn btn-info" onclick="verComprobante('${pago.id}')">
+              <i class="fas fa-file-image me-2"></i>Ver Comprobante
+            </button>
+          </div>
+        `;
+        }
+
+        document.getElementById('detalleModalBody').innerHTML = html;
+        document.getElementById('btnValidarPago').style.display =
+          pago.estado === 'pendiente' ? 'inline-block' : 'none';
+
+        const modal = new bootstrap.Modal(document.getElementById('detalleModal'));
+        modal.show();
+      }
+
+      function verComprobante(pagoId) {
+        const pago = allPagos.find(p => p.id === pagoId);
+        if (!pago) {
+          alert('Pago no encontrado');
+          return;
+        }
+
+        // Buscar comprobante en el pago o en localStorage
+        let comprobante = pago.comprobante;
+
+        if (!comprobante) {
+          // Intentar cargar desde localStorage
+          const comprobanteData = localStorage.getItem(`titanfleet_comprobante_${pagoId}`);
+          if (comprobanteData) {
+            try {
+              comprobante = JSON.parse(comprobanteData);
+            } catch (e) {
+              console.error('Error parseando comprobante:', e);
+            }
+          }
+        }
+
+        if (!comprobante || !comprobante.base64) {
+          alert('No hay comprobante disponible para este pago');
+          return;
+        }
+
+        const img = document.getElementById('comprobanteImage');
+        const downloadLink = document.getElementById('downloadComprobante');
+
+        img.src = comprobante.base64;
+        downloadLink.href = comprobante.base64;
+        downloadLink.download = comprobante.nombre || 'comprobante.png';
+
+        const modal = new bootstrap.Modal(document.getElementById('comprobanteModal'));
+        modal.show();
+      }
+
+      function validarPago() {
+        if (!currentPaymentId) return;
+        validarPagoDesdeLista(currentPaymentId);
+      }
+
+      function validarPagoDesdeLista(pagoId) {
+        if (!confirm('¿Estás seguro de validar este pago? Esto marcará el pago como validado.')) {
+          return;
+        }
+
+        // Actualizar estado en localStorage
+        const solicitudes = JSON.parse(localStorage.getItem('titanfleet_solicitudes') || '[]');
+        const pagos = JSON.parse(localStorage.getItem('titanfleet_pagos') || '[]');
+
+        // Buscar y actualizar
+        const solicitudIndex = solicitudes.findIndex(s => s.id === pagoId);
+        if (solicitudIndex !== -1) {
+          solicitudes[solicitudIndex].estado = 'validado';
+          solicitudes[solicitudIndex].fechaValidacion = new Date().toISOString();
+          localStorage.setItem('titanfleet_solicitudes', JSON.stringify(solicitudes));
+        }
+
+        const pagoIndex = pagos.findIndex(p => p.id === pagoId);
+        if (pagoIndex !== -1) {
+          pagos[pagoIndex].estado = 'validado';
+          pagos[pagoIndex].fechaValidacion = new Date().toISOString();
+          localStorage.setItem('titanfleet_pagos', JSON.stringify(pagos));
+        }
+
+        // Recargar
+        cargarPagos();
+
+        // Cerrar modal si está abierto
+        const modal = bootstrap.Modal.getInstance(document.getElementById('detalleModal'));
+        if (modal) modal.hide();
+
+        alert('Pago validado correctamente');
+      }
+
+      function exportarPagos() {
+        const csv = [
+          [
+            'ID',
+            'Fecha',
+            'Tipo',
+            'Estado',
+            'Cliente',
+            'Email',
+            'Teléfono',
+            'Plan',
+            'Periodo',
+            'Precio',
+            'Empresa'
+          ].join(','),
+          ...allPagos.map(p =>
+            [
+              p.id,
+              new Date(p.fechaPago).toLocaleString('es-MX'),
+              p.tipo,
+              p.estado,
+              `"${p.cliente?.nombre || ''}"`,
+              p.cliente?.email || '',
+              p.cliente?.telefono || '',
+              `"${p.plan || ''}"`,
+              p.periodoPago || p.periodo || '',
+              p.precio || 0,
+              `"${p.cliente?.empresa || ''}"`
+            ].join(',')
+          )
+        ].join('\n');
+
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `pagos_titanfleet_${new Date().toISOString().split('T')[0]}.csv`;
+        link.click();
+      }
+
+      function limpiarPagosCompletados() {
+        if (
+          !confirm(
+            '¿Estás seguro de eliminar todos los pagos completados? Esta acción no se puede deshacer.'
+          )
+        ) {
+          return;
+        }
+
+        const solicitudes = JSON.parse(localStorage.getItem('titanfleet_solicitudes') || '[]');
+        const pagos = JSON.parse(localStorage.getItem('titanfleet_pagos') || '[]');
+
+        const solicitudesFiltradas = solicitudes.filter(
+          s => s.estado !== 'validado' && s.estado !== 'completado'
+        );
+        const pagosFiltrados = pagos.filter(
+          p => p.estado !== 'validado' && p.estado !== 'completado'
+        );
+
+        localStorage.setItem('titanfleet_solicitudes', JSON.stringify(solicitudesFiltradas));
+        localStorage.setItem('titanfleet_pagos', JSON.stringify(pagosFiltrados));
+
+        cargarPagos();
+        alert('Pagos completados eliminados');
+      }
+    </script>
+  </body>
+</html>
+

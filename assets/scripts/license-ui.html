@@ -1,0 +1,1866 @@
+<!-- Modal de Activación de Licencia -->
+<div class="modal fade" id="licenseModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-key"></i> Activar Licencia
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i>
+                    Ingresa tu clave de licencia para activar el sistema.
+                    <br><small>Formato: TF2512A-XXXXXXXX-XXXXXXXX</small>
+                </div>
+                
+                <form id="licenseForm">
+                    <div class="mb-3">
+                        <label for="licenseKey" class="form-label">Clave de Licencia</label>
+                        <input 
+                            type="text" 
+                            class="form-control" 
+                            id="licenseKey" 
+                            placeholder="TF2512A-XXXXXXXX-XXXXXXXX"
+                            pattern="TF\d{2}\d{2}[AMT]-[A-Z0-9]{8}-[A-Z0-9]{8}"
+                            required
+                        >
+                        <div class="form-text">
+                            Formato: TF2512A-XXXXXXXX-XXXXXXXX (A=Anual, M=Mensual, T=Trimestral)
+                        </div>
+                    </div>
+                    
+                    <div id="licenseInfo" class="mt-3" style="display: none;">
+                        <div class="card">
+                            <div class="card-body">
+                                <h6 class="card-title">Información de Licencia</h6>
+                                <p class="mb-1"><strong>Tipo:</strong> <span id="licenseType"></span></p>
+                                <p class="mb-1"><strong>Tenant ID:</strong> <span id="licenseTenantId"></span></p>
+                                <p class="mb-0" id="licenseExpires" style="display: none;">
+                                    <strong>Expira:</strong> <span id="licenseExpiresDate"></span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" onclick="handleLicenseActivation()">
+                    <i class="fas fa-check"></i> Activar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Actualización de Plan -->
+<div class="modal fade" id="updatePlanModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-warning text-dark">
+                <h5 class="modal-title">
+                    <i class="fas fa-sync-alt"></i> Actualizar Plan
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i>
+                    <strong>Actualizar tu plan mantendrá tu tenantId y todos tus datos.</strong>
+                    <br><small>Selecciona el nuevo plan y completa el pago. El sistema actualizará automáticamente tu plan sin necesidad de ingresar una clave.</small>
+                </div>
+                
+                <div id="currentPlanInfo" class="mb-3 p-2 bg-light rounded">
+                    <small><strong>Plan actual:</strong> <span id="currentPlanType"></span></small>
+                </div>
+                
+                <!-- Selección de Plan por Nivel -->
+                <div class="mb-4">
+                    <label class="form-label fw-bold">Selecciona el nuevo plan:</label>
+                    <div id="plansSelection">
+                        <!-- Plan Básico -->
+                        <div class="card plan-card mb-3" data-plan-level="basico" onclick="selectPlanForUpdate('basico')" style="cursor: pointer; border: 2px solid #e0e0e0;">
+                            <div class="card-body">
+                                <div class="row align-items-center">
+                                    <div class="col-md-3 text-center">
+                                        <i class="fas fa-layer-group text-primary" style="font-size: 2.5rem;"></i>
+                                        <h5 class="card-title mt-2 mb-0">Plan Básico</h5>
+                                        <div class="plan-badge bg-primary text-white p-2 rounded mt-2">
+                                            <strong>Básico</strong>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-9">
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <small class="text-muted d-block"><strong>Precio Mensual:</strong></small>
+                                                <strong class="text-primary">$1,999 MXN/mes</strong>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <small class="text-muted d-block"><strong>Precio Anual:</strong></small>
+                                                <strong class="text-primary">$21,989 MXN/año</strong>
+                                                <small class="text-success d-block">(1 mes gratis)</small>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <small class="text-muted d-block"><strong>Características:</strong></small>
+                                                <small class="d-block">• Hasta 100 registros/mes</small>
+                                                <small class="d-block">• 10 GB almacenamiento</small>
+                                                <small class="d-block">• Soporte por email</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Plan Estándar -->
+                        <div class="card plan-card mb-3" data-plan-level="estandar" onclick="selectPlanForUpdate('estandar')" style="cursor: pointer; border: 2px solid #e0e0e0;">
+                            <div class="card-body">
+                                <div class="row align-items-center">
+                                    <div class="col-md-3 text-center">
+                                        <i class="fas fa-star text-success" style="font-size: 2.5rem;"></i>
+                                        <h5 class="card-title mt-2 mb-0">Plan Estándar</h5>
+                                        <span class="badge bg-success mt-1">⭐ Recomendado</span>
+                                        <div class="plan-badge bg-success text-white p-2 rounded mt-2">
+                                            <strong>Estándar</strong>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-9">
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <small class="text-muted d-block"><strong>Precio Mensual:</strong></small>
+                                                <strong class="text-success">$4,999 MXN/mes</strong>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <small class="text-muted d-block"><strong>Precio Anual:</strong></small>
+                                                <strong class="text-success">$54,989 MXN/año</strong>
+                                                <small class="text-success d-block">(1 mes gratis)</small>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <small class="text-muted d-block"><strong>Características:</strong></small>
+                                                <small class="d-block">• Hasta 500 registros/mes</small>
+                                                <small class="d-block">• 25 GB almacenamiento</small>
+                                                <small class="d-block">• Soporte prioritario</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Plan Premium -->
+                        <div class="card plan-card mb-3" data-plan-level="premium" onclick="selectPlanForUpdate('premium')" style="cursor: pointer; border: 2px solid #e0e0e0;">
+                            <div class="card-body">
+                                <div class="row align-items-center">
+                                    <div class="col-md-3 text-center">
+                                        <i class="fas fa-crown text-warning" style="font-size: 2.5rem;"></i>
+                                        <h5 class="card-title mt-2 mb-0">Plan Premium</h5>
+                                        <div class="plan-badge bg-warning text-dark p-2 rounded mt-2">
+                                            <strong>Premium</strong>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-9">
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <small class="text-muted d-block"><strong>Precio Mensual:</strong></small>
+                                                <strong class="text-warning">$8,999 MXN/mes</strong>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <small class="text-muted d-block"><strong>Precio Anual:</strong></small>
+                                                <strong class="text-warning">$98,989 MXN/año</strong>
+                                                <small class="text-success d-block">(1 mes gratis)</small>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <small class="text-muted d-block"><strong>Características:</strong></small>
+                                                <small class="d-block">• Hasta 2,000 registros/mes</small>
+                                                <small class="d-block">• 100 GB almacenamiento</small>
+                                                <small class="d-block">• Soporte 24/7 + SLA</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Plan Enterprise -->
+                        <div class="card plan-card mb-3" data-plan-level="enterprise" onclick="selectPlanForUpdate('enterprise')" style="cursor: pointer; border: 2px solid #e0e0e0;">
+                            <div class="card-body">
+                                <div class="row align-items-center">
+                                    <div class="col-md-3 text-center">
+                                        <i class="fas fa-building text-danger" style="font-size: 2.5rem;"></i>
+                                        <h5 class="card-title mt-2 mb-0">Plan Enterprise</h5>
+                                        <div class="plan-badge bg-danger text-white p-2 rounded mt-2">
+                                            <strong>Enterprise</strong>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-9">
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <small class="text-muted d-block"><strong>Precio Mensual:</strong></small>
+                                                <strong class="text-danger">$14,999 MXN/mes</strong>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <small class="text-muted d-block"><strong>Precio Anual:</strong></small>
+                                                <strong class="text-danger">$164,989 MXN/año</strong>
+                                                <small class="text-success d-block">(1 mes gratis)</small>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <small class="text-muted d-block"><strong>Características:</strong></small>
+                                                <small class="d-block">• Registros ilimitados</small>
+                                                <small class="d-block">• Almacenamiento ilimitado</small>
+                                                <small class="d-block">• Soporte dedicado</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Selección de Período de Pago (se muestra después de seleccionar plan) -->
+                <div id="paymentPeriodSection" style="display: none;">
+                    <hr class="my-4">
+                    <h6 class="fw-bold mb-3">Selecciona el período de pago para <span id="selectedPlanNameDisplay"></span>:</h6>
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <div class="card payment-period-card" data-period="mensual" onclick="selectPaymentPeriod('mensual')" style="cursor: pointer; border: 2px solid #e0e0e0;">
+                                <div class="card-body text-center">
+                                    <h6 class="card-title">
+                                        <i class="fas fa-calendar-alt text-primary"></i><br>
+                                        Pago Mensual
+                                    </h6>
+                                    <div class="mt-2">
+                                        <strong class="text-primary" id="monthlyPrice">-</strong>
+                                        <small class="text-muted d-block">Facturación mensual</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card payment-period-card" data-period="anual" onclick="selectPaymentPeriod('anual')" style="cursor: pointer; border: 2px solid #e0e0e0;">
+                                <div class="card-body text-center">
+                                    <h6 class="card-title">
+                                        <i class="fas fa-calendar-check text-success"></i><br>
+                                        Pago Anual
+                                    </h6>
+                                    <div class="mt-2">
+                                        <strong class="text-success" id="annualPrice">-</strong>
+                                        <small class="text-success d-block">Ahorra 1 mes gratis</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Opciones de Pago (se muestra después de seleccionar plan) -->
+                <div id="paymentOptionsSection" style="display: none;">
+                    <hr class="my-4">
+                    <h6 class="fw-bold mb-3">Método de Pago:</h6>
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <button type="button" class="btn btn-outline-primary w-100" onclick="processPlanUpdatePayment('stripe')">
+                                <i class="fas fa-credit-card me-2"></i>
+                                Pagar con Tarjeta
+                            </button>
+                        </div>
+                        <div class="col-md-6">
+                            <button type="button" class="btn btn-outline-success w-100" onclick="processPlanUpdatePayment('transfer')">
+                                <i class="fas fa-university me-2"></i>
+                                Transferencia Bancaria
+                            </button>
+                        </div>
+                    </div>
+                    <div class="alert alert-warning">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Importante:</strong> Una vez completado el pago, tu plan se actualizará automáticamente manteniendo tu tenantId y todos tus datos.
+                    </div>
+                </div>
+                
+                <!-- Opción alternativa: Si ya tienen la clave (para casos especiales) -->
+                <div id="manualLicenseSection" style="display: none;" class="mt-3">
+                    <hr class="my-3">
+                    <div class="alert alert-secondary">
+                        <i class="fas fa-key me-2"></i>
+                        <strong>¿Ya tienes una clave de licencia?</strong>
+                        <button type="button" class="btn btn-sm btn-outline-secondary ms-2" onclick="showManualLicenseInput()">
+                            Ingresar Clave Manualmente
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Campo manual para clave (solo si el usuario lo solicita) -->
+                <form id="updatePlanForm" style="display: none;">
+                    <div class="mb-3">
+                        <label for="updatePlanLicenseKey" class="form-label fw-bold">
+                            Clave de Licencia para Plan <span id="selectedPlanName"></span>
+                        </label>
+                        <input 
+                            type="text" 
+                            class="form-control" 
+                            id="updatePlanLicenseKey" 
+                            placeholder="TF2512A-XXXXXXXX-XXXXXXXX"
+                            pattern="TF\d{2}\d{2}[AMT]-[A-Z0-9]{8}-[A-Z0-9]{8}"
+                            required
+                        >
+                        <div class="form-text">
+                            <span id="licenseFormatHint"></span>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-warning" id="btnUpdatePlan" onclick="handlePlanUpdate()" style="display: none;">
+                    <i class="fas fa-sync-alt"></i> Actualizar Plan (Manual)
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Renovación de Licencia -->
+<div class="modal fade" id="renewLicenseModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-redo"></i> Renovar Licencia
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i>
+                    <strong>Renovar tu licencia extenderá la fecha de expiración manteniendo tu tenantId y todos tus datos.</strong>
+                    <br><small>Completa el pago para renovar automáticamente tu licencia sin necesidad de ingresar una clave.</small>
+                </div>
+                
+                <div id="renewLicenseInfo" class="mb-3 p-2 bg-light rounded">
+                    <small>
+                        <strong>Plan actual:</strong> <span id="renewPlanType"></span><br>
+                        <strong>Expira:</strong> <span id="renewExpiresDate"></span>
+                    </small>
+                </div>
+                
+                <!-- Opciones de Pago -->
+                <div id="renewPaymentOptionsSection">
+                    <h6 class="fw-bold mb-3">Método de Pago para Renovar:</h6>
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <button type="button" class="btn btn-outline-primary w-100" onclick="processRenewalPayment('stripe')">
+                                <i class="fas fa-credit-card me-2"></i>
+                                Pagar con Tarjeta
+                            </button>
+                        </div>
+                        <div class="col-md-6">
+                            <button type="button" class="btn btn-outline-success w-100" onclick="processRenewalPayment('transfer')">
+                                <i class="fas fa-university me-2"></i>
+                                Transferencia Bancaria
+                            </button>
+                        </div>
+                    </div>
+                    <div class="alert alert-warning">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Importante:</strong> Una vez completado el pago, tu licencia se renovará automáticamente extendiendo la fecha de expiración y manteniendo tu tenantId y todos tus datos.
+                    </div>
+                </div>
+                
+                <!-- Opción alternativa: Si ya tienen la clave (para casos especiales) -->
+                <div id="renewManualLicenseSection" class="mt-3">
+                    <hr class="my-3">
+                    <div class="alert alert-secondary">
+                        <i class="fas fa-key me-2"></i>
+                        <strong>¿Ya tienes una clave de licencia?</strong>
+                        <button type="button" class="btn btn-sm btn-outline-secondary ms-2" onclick="showRenewalManualLicenseInput()">
+                            Ingresar Clave Manualmente
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Campo manual para clave (solo si el usuario lo solicita) -->
+                <form id="renewLicenseForm" style="display: none;">
+                    <div class="mb-3">
+                        <label for="renewLicenseKey" class="form-label">Clave de Licencia (opcional)</label>
+                        <input 
+                            type="text" 
+                            class="form-control" 
+                            id="renewLicenseKey" 
+                            placeholder="Dejar vacío para usar la misma clave"
+                            pattern="TF\d{2}\d{2}[AMT]-[A-Z0-9]{8}-[A-Z0-9]{8}"
+                        >
+                        <div class="form-text">
+                            Si dejas vacío, se renovará con la misma clave. Si ingresas una nueva, se actualizará el plan.
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-success" id="btnRenewLicense" onclick="handleLicenseRenewal()" style="display: none;">
+                    <i class="fas fa-redo"></i> Renovar (Manual)
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Estilos para las tarjetas de planes -->
+<style>
+.plan-card {
+    transition: all 0.3s ease;
+    border-radius: 8px;
+}
+
+.plan-card:hover:not([style*="opacity: 0.5"]) {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.plan-card.selected {
+    border: 3px solid #ffc107 !important;
+    background-color: #fff9e6 !important;
+}
+
+.plan-badge {
+    font-size: 0.9rem;
+}
+
+.payment-period-card {
+    transition: all 0.3s ease;
+    border-radius: 8px;
+}
+
+.payment-period-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.payment-period-card.selected {
+    border: 3px solid #28a745 !important;
+    background-color: #f0fff4 !important;
+}
+</style>
+
+<!-- Modal de Transferencia Bancaria -->
+<div class="modal fade" id="transferModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-university me-2"></i>
+                    Transferencia Bancaria
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <strong>Instrucciones:</strong> Realiza la transferencia bancaria y envía el comprobante al correo indicado.
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6 class="fw-bold mb-3"><i class="fas fa-receipt me-2"></i>Datos Bancarios:</h6>
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <p class="mb-2"><strong>Banco:</strong> <span id="transferBank">Banco de México</span></p>
+                                <p class="mb-2"><strong>CLABE:</strong> <span id="transferClabe">012345678901234567</span></p>
+                                <p class="mb-2"><strong>Cuenta:</strong> <span id="transferAccount">1234567890</span></p>
+                                <p class="mb-2"><strong>Beneficiario:</strong> <span id="transferBeneficiary">TitanFleet ERP</span></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="fw-bold mb-3"><i class="fas fa-dollar-sign me-2"></i>Monto a Transferir:</h6>
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <p class="mb-2" id="transferAmountInfo"></p>
+                                <p class="mb-0"><strong>TenantId:</strong> <span id="transferTenantId" class="text-primary"></span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <hr class="my-4">
+                
+                <h6 class="fw-bold mb-3"><i class="fas fa-envelope me-2"></i>Envía tu Comprobante:</h6>
+                <div class="card bg-light">
+                    <div class="card-body">
+                        <p class="mb-2"><strong>Correo para comprobante:</strong></p>
+                        <div class="input-group mb-3">
+                            <input type="email" class="form-control" id="transferEmail" value="samuelayalasandoval@gmail.com" readonly>
+                            <button class="btn btn-outline-secondary" type="button" onclick="copyTransferEmail()">
+                                <i class="fas fa-copy"></i> Copiar
+                            </button>
+                        </div>
+                        <p class="mb-2"><strong>Asunto sugerido:</strong></p>
+                        <div class="input-group mb-3">
+                            <input type="text" class="form-control" id="transferSubject" readonly>
+                            <button class="btn btn-outline-secondary" type="button" onclick="copyTransferSubject()">
+                                <i class="fas fa-copy"></i> Copiar
+                            </button>
+                        </div>
+                        <button class="btn btn-success w-100" onclick="openTransferEmail()">
+                            <i class="fas fa-envelope me-2"></i>
+                            Abrir Cliente de Correo
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="alert alert-warning mt-3">
+                    <i class="fas fa-clock me-2"></i>
+                    <strong>Importante:</strong> Una vez verificado el pago, tu plan se actualizará automáticamente manteniendo tu tenantId y todos tus datos.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Indicador de Licencia en la Barra Superior -->
+<div id="licenseIndicator" class="position-fixed top-0 end-0 m-3" style="z-index: 1050; display: none;">
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="fas fa-check-circle"></i>
+        <strong>Licencia Activa</strong>
+        <span id="licenseStatusText"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        <div class="mt-2">
+            <button type="button" class="btn btn-sm btn-warning me-1" onclick="showUpdatePlanModal()" title="Actualizar Plan">
+                <i class="fas fa-sync-alt"></i> Actualizar Plan
+            </button>
+            <button type="button" class="btn btn-sm btn-success" onclick="showRenewLicenseModal()" title="Renovar Licencia">
+                <i class="fas fa-redo"></i> Renovar
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+// Función para manejar la activación de licencia (global)
+window.handleLicenseActivation = async function() {
+    const licenseKey = document.getElementById('licenseKey').value.trim().toUpperCase();
+    
+    if (!licenseKey) {
+        alert('Por favor ingresa una clave de licencia');
+        return;
+    }
+
+    // Validar formato básico (nuevo formato TF)
+    const licensePattern = /^TF\d{2}\d{2}[AMT]-[A-Z0-9]{8}-[A-Z0-9]{8}$/;
+    if (!licensePattern.test(licenseKey)) {
+        alert('Formato de licencia inválido. Debe ser: TF2512A-XXXXXXXX-XXXXXXXX');
+        return;
+    }
+
+    // Activar licencia
+    const result = await window.activateLicense(licenseKey);
+    
+    if (result.success) {
+        // Cerrar modal
+        const modal = bootstrap.Modal.getInstance(document.getElementById('licenseModal'));
+        if (modal) {
+            modal.hide();
+        }
+        
+        // Recargar página para aplicar cambios
+        setTimeout(() => {
+            window.location.reload();
+        }, 1000);
+    }
+}
+
+// Variable global para el plan seleccionado
+let selectedPlanType = null;
+
+// Función para mostrar modal de actualización de plan
+function showUpdatePlanModal() {
+    const licenseInfo = window.licenseManager?.getLicenseInfo();
+    if (licenseInfo) {
+        const planNames = {
+            'anual': 'Anual',
+            'mensual': 'Mensual',
+            'trimestral': 'Trimestral'
+        };
+        const currentPlanEl = document.getElementById('currentPlanType');
+        if (currentPlanEl) {
+            currentPlanEl.textContent = planNames[licenseInfo.type] || licenseInfo.type;
+        }
+        
+        // Deshabilitar el plan actual en la selección
+        const currentPlanCard = document.querySelector(`.plan-card[data-plan-type="${licenseInfo.type}"]`);
+        if (currentPlanCard) {
+            currentPlanCard.style.opacity = '0.5';
+            currentPlanCard.style.cursor = 'not-allowed';
+            currentPlanCard.onclick = null;
+            const badge = currentPlanCard.querySelector('.plan-badge');
+            if (badge) {
+                badge.innerHTML = '<strong>Plan Actual</strong>';
+            }
+        }
+    }
+    
+    // Resetear selección
+    selectedPlanType = null;
+    selectedPaymentPeriod = null;
+    const paymentPeriodSection = document.getElementById('paymentPeriodSection');
+    const paymentOptionsSection = document.getElementById('paymentOptionsSection');
+    const manualLicenseSection = document.getElementById('manualLicenseSection');
+    const updatePlanForm = document.getElementById('updatePlanForm');
+    const btnUpdatePlan = document.getElementById('btnUpdatePlan');
+    
+    if (paymentPeriodSection) paymentPeriodSection.style.display = 'none';
+    if (paymentOptionsSection) paymentOptionsSection.style.display = 'none';
+    if (manualLicenseSection) manualLicenseSection.style.display = 'none';
+    if (updatePlanForm) updatePlanForm.style.display = 'none';
+    if (btnUpdatePlan) btnUpdatePlan.style.display = 'none';
+    
+    // Remover selección visual de todas las tarjetas
+    document.querySelectorAll('.plan-card').forEach(card => {
+        card.style.border = '2px solid #e0e0e0';
+        card.style.backgroundColor = '';
+    });
+    document.querySelectorAll('.payment-period-card').forEach(card => {
+        card.style.border = '2px solid #e0e0e0';
+        card.style.backgroundColor = '';
+    });
+    
+    const modal = new bootstrap.Modal(document.getElementById('updatePlanModal'));
+    modal.show();
+}
+
+// Función para seleccionar un plan
+function selectPlan(planType) {
+    // Verificar si es el plan actual
+    const licenseInfo = window.licenseManager?.getLicenseInfo();
+    if (licenseInfo && licenseInfo.type === planType) {
+        alert('Este es tu plan actual. Selecciona un plan diferente para actualizar.');
+        return;
+    }
+    
+    selectedPlanType = planType;
+    
+    // Remover selección visual de todas las tarjetas
+    document.querySelectorAll('.plan-card').forEach(card => {
+        card.style.border = '2px solid #e0e0e0';
+        card.style.backgroundColor = '';
+    });
+    
+    // Resaltar la tarjeta seleccionada
+    const selectedCard = document.querySelector(`.plan-card[data-plan-type="${planType}"]`);
+    if (selectedCard) {
+        selectedCard.style.border = '3px solid #ffc107';
+        selectedCard.style.backgroundColor = '#fff9e6';
+    }
+    
+    // Mostrar formulario de clave de licencia
+    const updatePlanForm = document.getElementById('updatePlanForm');
+    const btnUpdatePlan = document.getElementById('btnUpdatePlan');
+    const selectedPlanName = document.getElementById('selectedPlanName');
+    const licenseFormatHint = document.getElementById('licenseFormatHint');
+    const licenseKeyInput = document.getElementById('updatePlanLicenseKey');
+    
+    if (updatePlanForm) updatePlanForm.style.display = 'block';
+    if (btnUpdatePlan) btnUpdatePlan.disabled = false;
+    
+    const planNames = {
+        'anual': 'Anual',
+        'mensual': 'Mensual',
+        'trimestral': 'Trimestral'
+    };
+    
+    const planCodes = {
+        'anual': 'A',
+        'mensual': 'M',
+        'trimestral': 'T'
+    };
+    
+    if (selectedPlanName) {
+        selectedPlanName.textContent = planNames[planType] || planType;
+    }
+    
+    if (licenseFormatHint) {
+        licenseFormatHint.textContent = `Formato: TF2512${planCodes[planType]}-XXXXXXXX-XXXXXXXX (${planCodes[planType]}=${planNames[planType]})`;
+    }
+    
+    if (licenseKeyInput) {
+        licenseKeyInput.value = '';
+        licenseKeyInput.focus();
+    }
+}
+
+// Función para manejar la actualización de plan (global)
+window.handlePlanUpdate = async function() {
+    if (!selectedPlanType) {
+        alert('Por favor selecciona un plan primero');
+        return;
+    }
+    
+    const licenseKey = document.getElementById('updatePlanLicenseKey').value.trim().toUpperCase();
+    
+    if (!licenseKey) {
+        alert('Por favor ingresa una clave de licencia');
+        return;
+    }
+
+    // Validar formato general
+    const licensePattern = /^TF\d{2}\d{2}[AMT]-[A-Z0-9]{8}-[A-Z0-9]{8}$/;
+    if (!licensePattern.test(licenseKey)) {
+        alert('Formato de licencia inválido. Debe ser: TF2512A-XXXXXXXX-XXXXXXXX');
+        return;
+    }
+    
+    // Validar que la clave corresponda al plan seleccionado
+    const planCodes = {
+        'anual': 'A',
+        'mensual': 'M',
+        'trimestral': 'T'
+    };
+    
+    const expectedCode = planCodes[selectedPlanType];
+    const actualCode = licenseKey.match(/^TF\d{2}\d{2}([AMT])-/)?.[1];
+    
+    if (actualCode !== expectedCode) {
+        const planNames = {
+            'anual': 'Anual',
+            'mensual': 'Mensual',
+            'trimestral': 'Trimestral'
+        };
+        alert(`La clave de licencia no corresponde al plan seleccionado.\n\n` +
+              `Plan seleccionado: ${planNames[selectedPlanType]}\n` +
+              `Código esperado: ${expectedCode}\n` +
+              `Código en la clave: ${actualCode || 'No encontrado'}\n\n` +
+              `Por favor verifica que la clave sea para el plan ${planNames[selectedPlanType]}.`);
+        return;
+    }
+
+    // Actualizar plan
+    const result = await window.updateLicensePlan(licenseKey);
+    
+    if (result.success) {
+        // Cerrar modal
+        const modal = bootstrap.Modal.getInstance(document.getElementById('updatePlanModal'));
+        if (modal) {
+            modal.hide();
+        }
+        
+        // Recargar página para aplicar cambios
+        setTimeout(() => {
+            window.location.reload();
+        }, 1000);
+    }
+}
+
+// Esta función ya está definida más arriba como window.showRenewLicenseModal
+
+// Función para validar datos antes de renovar licencia
+function validateLicenseRenewalBeforeSave(tenantId) {
+    // Validar tenantId
+    if (!tenantId || typeof tenantId !== 'string' || tenantId.trim() === '') {
+        return { valid: false, error: 'TenantId no válido o vacío' };
+    }
+    
+    // Verificar que el tenantId coincida con el actual
+    const currentLicenseInfo = window.licenseManager?.getLicenseInfo();
+    if (currentLicenseInfo && currentLicenseInfo.tenantId !== tenantId) {
+        return { valid: false, error: 'El TenantId no coincide con la licencia actual' };
+    }
+    
+    // Verificar que la licencia actual tenga fecha de expiración
+    if (currentLicenseInfo && !currentLicenseInfo.expiresAt) {
+        return { valid: false, error: 'La licencia actual no tiene fecha de expiración' };
+    }
+    
+    return { valid: true };
+}
+
+// Función para procesar el pago de renovación (global)
+window.processRenewalPayment = async function(paymentMethod) {
+    const licenseInfo = window.licenseManager?.getLicenseInfo();
+    if (!licenseInfo || !licenseInfo.tenantId) {
+        alert('Error: No se pudo obtener tu información de licencia. Por favor contacta al soporte.');
+        return;
+    }
+    
+    if (!licenseInfo.expiresAt) {
+        alert('Tu licencia no tiene fecha de expiración. No es necesario renovarla.');
+        return;
+    }
+    
+    const planNames = {
+        'anual': 'Anual',
+        'mensual': 'Mensual',
+        'trimestral': 'Trimestral'
+    };
+    
+    const planPrices = {
+        'mensual': { min: 1999, max: 14999 },
+        'trimestral': { min: 5997, max: 44997 },
+        'anual': { min: 21989, max: 164989 }
+    };
+    
+    const planName = planNames[licenseInfo.type] || licenseInfo.type;
+    const prices = planPrices[licenseInfo.type] || { min: 0, max: 0 };
+    
+    // Calcular nueva fecha de expiración
+    const currentExpires = new Date(licenseInfo.expiresAt);
+    const now = new Date();
+    let newExpiresDate = new Date(currentExpires);
+    
+    if (licenseInfo.type === 'mensual') {
+        newExpiresDate.setMonth(newExpiresDate.getMonth() + 1);
+    } else if (licenseInfo.type === 'trimestral') {
+        newExpiresDate.setMonth(newExpiresDate.getMonth() + 3);
+    } else if (licenseInfo.type === 'anual') {
+        newExpiresDate.setMonth(newExpiresDate.getMonth() + 12);
+    }
+    
+    if (paymentMethod === 'stripe') {
+        // Validar datos antes de proceder
+        const validation = validateLicenseRenewalBeforeSave(licenseInfo.tenantId);
+        if (!validation.valid) {
+            console.error('❌ Validación fallida:', validation.error);
+            alert('❌ Error de validación: ' + validation.error + '\n\nPor favor, contacta al soporte.');
+            return;
+        }
+        
+        // Redirigir a página de pago con tarjeta
+        // Guardar información para renovar después del pago
+        const renewalData = {
+            planType: licenseInfo.type,
+            tenantId: licenseInfo.tenantId,
+            licenseKey: licenseInfo.licenseKey,
+            paymentMethod: 'stripe',
+            newExpiresDate: newExpiresDate.toISOString(),
+            isRenewal: true,
+            timestamp: new Date().toISOString() // Agregar timestamp para validación
+        };
+        
+        // Validar nuevamente antes de guardar
+        const finalValidation = validateLicenseRenewalBeforeSave(renewalData.tenantId);
+        if (!finalValidation.valid) {
+            console.error('❌ Validación final fallida:', finalValidation.error);
+            alert('❌ Error de validación: ' + finalValidation.error);
+            return;
+        }
+        
+        sessionStorage.setItem('pendingLicenseRenewal', JSON.stringify(renewalData));
+        
+        // Calcular precio según el tipo de plan
+        const planPrices = {
+            'mensual': { basico: 1999, estandar: 4999, premium: 8999, enterprise: 14999 },
+            'anual': { basico: 21989, estandar: 54989, premium: 98989, enterprise: 164989 }
+        };
+        
+        const currentPlanLevel = licenseInfo.planLevel || 'basico';
+        const paymentPeriod = licenseInfo.paymentPeriod || licenseInfo.type;
+        const price = planPrices[paymentPeriod]?.[currentPlanLevel] || prices.min;
+        
+        // Guardar datos para la página de pago
+        sessionStorage.setItem('titanfleet_payment_data', JSON.stringify({
+            plan: `Plan ${planName}`,
+            periodo: paymentPeriod === 'mensual' ? 'Mensual' : paymentPeriod === 'anual' ? 'Anual' : 'Trimestral',
+            precio: price,
+            cliente: {
+                nombre: licenseInfo.tenantId || 'Cliente',
+                email: '',
+                telefono: '',
+                empresa: ''
+            },
+            solicitudId: `RENEWAL-${Date.now()}`,
+            isRenewal: true,
+            tenantId: licenseInfo.tenantId
+        }));
+        
+        // Redirigir a página de pago
+        window.location.href = '../pages/pago.html';
+        
+    } else if (paymentMethod === 'transfer') {
+        // Mostrar modal con datos de transferencia
+        const planPrices = {
+            'mensual': { basico: 1999, estandar: 4999, premium: 8999, enterprise: 14999 },
+            'anual': { basico: 21989, estandar: 54989, premium: 98989, enterprise: 164989 }
+        };
+        
+        const currentPlanLevel = licenseInfo.planLevel || 'basico';
+        const paymentPeriod = licenseInfo.paymentPeriod || licenseInfo.type;
+        const prices = {
+            mensual: planPrices.mensual?.[currentPlanLevel] || 1999,
+            anual: planPrices.anual?.[currentPlanLevel] || 21989
+        };
+        
+        showTransferModal(planName, prices, paymentPeriod, licenseInfo.tenantId, 'renewal', newExpiresDate);
+    }
+};
+
+// Función para completar la renovación después del pago exitoso (global)
+window.completeLicenseRenewal = async function(paymentId, paymentMethod) {
+    const pendingRenewal = sessionStorage.getItem('pendingLicenseRenewal');
+    if (!pendingRenewal) {
+        console.warn('❌ No hay renovación de licencia pendiente');
+        alert('❌ Error: No se encontraron datos de renovación pendiente. Por favor, contacta al soporte.');
+        return;
+    }
+    
+    let renewalData;
+    try {
+        renewalData = JSON.parse(pendingRenewal);
+    } catch (error) {
+        console.error('❌ Error parseando datos de renovación:', error);
+        alert('❌ Error: Los datos de renovación están corruptos. Por favor, contacta al soporte.');
+        return;
+    }
+    
+    // Validar datos antes de renovar
+    const validation = validateLicenseRenewalBeforeSave(renewalData.tenantId);
+    if (!validation.valid) {
+        console.error('❌ Validación fallida antes de renovar:', validation.error);
+        alert('❌ Error de validación: ' + validation.error + '\n\nPor favor, contacta al soporte.');
+        sessionStorage.removeItem('pendingLicenseRenewal');
+        return;
+    }
+    
+    // Verificar que el tenantId coincida con el actual
+    const currentLicenseInfo = window.licenseManager?.getLicenseInfo();
+    if (currentLicenseInfo && currentLicenseInfo.tenantId !== renewalData.tenantId) {
+        console.error('❌ TenantId no coincide:', {
+            expected: renewalData.tenantId,
+            actual: currentLicenseInfo.tenantId
+        });
+        alert('❌ Error de seguridad: El TenantId no coincide. Por favor, contacta al soporte.');
+        sessionStorage.removeItem('pendingLicenseRenewal');
+        return;
+    }
+    
+    console.log('✅ Validaciones pasadas. Renovando licencia...', renewalData);
+    
+    // Renovar la licencia sin necesidad de clave (solo extender fecha)
+    let result;
+    try {
+        result = await window.renewLicense(null);
+    } catch (error) {
+        console.error('❌ Error crítico en renewLicense:', error);
+        
+        // Notificar al administrador
+        window.notifyAdministrator('RENOVACIÓN DE LICENCIA', {
+            tenantId: renewalData.tenantId,
+            plan: renewalData.planType,
+            paymentId: paymentId,
+            paymentMethod: paymentMethod,
+            newExpiresDate: renewalData.newExpiresDate,
+            errorMessage: error.message || 'Error desconocido al renovar la licencia',
+            stackTrace: error.stack || 'No disponible',
+            renewalData: renewalData
+        });
+        
+        alert('❌ Error crítico al renovar la licencia. El administrador ha sido notificado.\n\n' +
+              'Por favor, contacta al soporte con tu TenantId: ' + renewalData.tenantId + '\n\n' +
+              'Error: ' + (error.message || 'Error desconocido'));
+        
+        // NO limpiar sessionStorage para que se pueda reintentar
+        return;
+    }
+    
+    if (result && result.success) {
+        // Limpiar datos pendientes
+        sessionStorage.removeItem('pendingLicenseRenewal');
+        
+        // Guardar información del pago (opcional)
+        console.log('✅ Licencia renovada después del pago:', {
+            planType: renewalData.planType,
+            tenantId: renewalData.tenantId,
+            paymentId: paymentId,
+            paymentMethod: paymentMethod,
+            newExpiresDate: renewalData.newExpiresDate
+        });
+        
+        alert('✅ Licencia renovada exitosamente. Tu tenantId se mantiene y todos tus datos están seguros.');
+        
+        // Cerrar modal
+        const modal = bootstrap.Modal.getInstance(document.getElementById('renewLicenseModal'));
+        if (modal) {
+            modal.hide();
+        }
+        
+        // Recargar página
+        setTimeout(() => {
+            window.location.reload();
+        }, 1000);
+    } else {
+        // Error en la renovación (result.success === false)
+        const errorMessage = result?.message || 'Error desconocido al renovar la licencia';
+        console.error('❌ Error en renewLicense:', errorMessage);
+        
+        // Notificar al administrador
+        window.notifyAdministrator('RENOVACIÓN DE LICENCIA FALLIDA', {
+            tenantId: renewalData.tenantId,
+            plan: renewalData.planType,
+            paymentId: paymentId,
+            paymentMethod: paymentMethod,
+            newExpiresDate: renewalData.newExpiresDate,
+            errorMessage: errorMessage,
+            stackTrace: 'Error retornado por renewLicense',
+            renewalData: renewalData,
+            result: result
+        });
+        
+        alert('❌ Error al renovar la licencia: ' + errorMessage + '\n\n' +
+              'El administrador ha sido notificado. Por favor, contacta al soporte con tu TenantId: ' + renewalData.tenantId);
+        
+        // NO limpiar sessionStorage para que se pueda reintentar
+    }
+};
+
+// Función para mostrar input manual de clave (solo para casos especiales)
+window.showRenewalManualLicenseInput = function() {
+    const renewLicenseForm = document.getElementById('renewLicenseForm');
+    const btnRenewLicense = document.getElementById('btnRenewLicense');
+    
+    if (renewLicenseForm) renewLicenseForm.style.display = 'block';
+    if (btnRenewLicense) btnRenewLicense.style.display = 'block';
+    
+    const licenseKeyInput = document.getElementById('renewLicenseKey');
+    if (licenseKeyInput) {
+        licenseKeyInput.value = '';
+        licenseKeyInput.focus();
+    }
+};
+
+// Función para manejar la renovación de licencia manual (global)
+window.handleLicenseRenewal = async function() {
+    const licenseKey = document.getElementById('renewLicenseKey')?.value.trim().toUpperCase() || '';
+    
+    // Si hay una clave, validarla
+    if (licenseKey) {
+        const licensePattern = /^TF\d{2}\d{2}[AMT]-[A-Z0-9]{8}-[A-Z0-9]{8}$/;
+        if (!licensePattern.test(licenseKey)) {
+            alert('Formato de licencia inválido. Debe ser: TF2512A-XXXXXXXX-XXXXXXXX');
+            return;
+        }
+    }
+
+    // Renovar licencia (puede ser null si no se ingresó nueva clave)
+    const result = await window.renewLicense(licenseKey || null);
+    
+    if (result.success) {
+        // Cerrar modal
+        const modal = bootstrap.Modal.getInstance(document.getElementById('renewLicenseModal'));
+        if (modal) {
+            modal.hide();
+        }
+        
+        // Recargar página para aplicar cambios
+        setTimeout(() => {
+            window.location.reload();
+        }, 1000);
+    }
+}
+
+// Mostrar información de licencia actual (global)
+window.showLicenseInfo = function() {
+    const licenseInfo = window.licenseManager?.getLicenseInfo();
+    
+    if (licenseInfo && window.licenseManager.isLicenseActive()) {
+        // Mostrar indicador
+        document.getElementById('licenseIndicator').style.display = 'block';
+        
+        const planNames = {
+            'anual': 'Anual',
+            'mensual': 'Mensual',
+            'trimestral': 'Trimestral'
+        };
+        
+        let statusText = ` - Plan ${planNames[licenseInfo.type] || licenseInfo.type}`;
+        
+        // Mostrar días restantes para licencias temporales
+        const tiposTemporales = ['mensual', 'trimestral'];
+        if (tiposTemporales.includes(licenseInfo.type)) {
+            const daysRemaining = window.licenseManager.getDaysRemaining();
+            if (daysRemaining !== null) {
+                statusText += ` (${daysRemaining} días restantes)`;
+            }
+        }
+        
+        document.getElementById('licenseStatusText').textContent = statusText;
+    } else {
+        // Mostrar modal de activación si no hay licencia
+        const modal = new bootstrap.Modal(document.getElementById('licenseModal'));
+        modal.show();
+    }
+}
+
+// Variable global para el período de pago seleccionado
+let selectedPaymentPeriod = null;
+
+// Función para seleccionar un plan para actualización (global)
+window.selectPlanForUpdate = function(planLevel) {
+    // Verificar si es el plan actual (solo el nivel, no el período)
+    // Permitir cambiar el período del mismo plan (ej: mensual a anual)
+    const licenseInfo = window.licenseManager?.getLicenseInfo();
+    const currentPlanLevel = licenseInfo?.planLevel || licenseInfo?.type; // Compatibilidad con sistema antiguo
+    
+    // Solo validar si es el mismo plan Y el mismo período
+    // Si el usuario quiere cambiar solo el período, debe poder hacerlo
+    // La validación completa se hará cuando seleccione el período de pago
+    // Por ahora, solo permitimos seleccionar cualquier plan
+    // (La validación final se hace en selectPaymentPeriod)
+    
+    selectedPlanType = planLevel;
+    selectedPaymentPeriod = null; // Resetear período de pago
+    
+    // Remover selección visual de todas las tarjetas de planes
+    document.querySelectorAll('.plan-card').forEach(card => {
+        card.style.border = '2px solid #e0e0e0';
+        card.style.backgroundColor = '';
+    });
+    
+    // Resaltar la tarjeta seleccionada
+    const selectedCard = document.querySelector(`.plan-card[data-plan-level="${planLevel}"]`);
+    if (selectedCard) {
+        selectedCard.style.border = '3px solid #ffc107';
+        selectedCard.style.backgroundColor = '#fff9e6';
+    }
+    
+    // Mostrar selección de período de pago
+    const paymentPeriodSection = document.getElementById('paymentPeriodSection');
+    const paymentOptionsSection = document.getElementById('paymentOptionsSection');
+    const manualLicenseSection = document.getElementById('manualLicenseSection');
+    const btnUpdatePlan = document.getElementById('btnUpdatePlan');
+    const selectedPlanNameDisplay = document.getElementById('selectedPlanNameDisplay');
+    
+    const planNames = {
+        'basico': 'Plan Básico',
+        'estandar': 'Plan Estándar',
+        'premium': 'Plan Premium',
+        'enterprise': 'Plan Enterprise'
+    };
+    
+    const planPrices = {
+        'basico': { mensual: 1999, anual: 21989 },
+        'estandar': { mensual: 4999, anual: 54989 },
+        'premium': { mensual: 8999, anual: 98989 },
+        'enterprise': { mensual: 14999, anual: 164989 }
+    };
+    
+    if (paymentPeriodSection) {
+        paymentPeriodSection.style.display = 'block';
+        
+        // Actualizar precios (mostrar con descuento de primera compra si aplica)
+        const prices = planPrices[planLevel];
+        const monthlyPriceEl = document.getElementById('monthlyPrice');
+        const annualPriceEl = document.getElementById('annualPrice');
+        
+        // Verificar si es primera compra (el backend lo verificará, pero mostramos el descuento potencial)
+        // Por ahora, asumimos que puede ser primera compra y mostramos el descuento
+        const isFirstPurchase = true; // El backend verificará realmente
+        const discountPercent = isFirstPurchase ? 20 : 0;
+        
+        if (monthlyPriceEl && prices) {
+            const originalPrice = prices.mensual;
+            const discount = originalPrice * (discountPercent / 100);
+            const finalPrice = originalPrice - discount;
+            
+            if (isFirstPurchase && discountPercent > 0) {
+                monthlyPriceEl.innerHTML = `
+                    <span class="text-decoration-line-through text-muted me-2">$${originalPrice.toLocaleString('es-MX')}</span>
+                    <span class="text-success fw-bold">$${finalPrice.toLocaleString('es-MX')} MXN/mes</span>
+                    <br><small class="text-success"><i class="fas fa-gift"></i> ${discountPercent}% descuento primera compra</small>
+                `;
+            } else {
+                monthlyPriceEl.textContent = `$${originalPrice.toLocaleString('es-MX')} MXN/mes`;
+            }
+        }
+        if (annualPriceEl && prices) {
+            const originalPrice = prices.anual;
+            const discount = originalPrice * (discountPercent / 100);
+            const finalPrice = originalPrice - discount;
+            
+            if (isFirstPurchase && discountPercent > 0) {
+                annualPriceEl.innerHTML = `
+                    <span class="text-decoration-line-through text-muted me-2">$${originalPrice.toLocaleString('es-MX')}</span>
+                    <span class="text-success fw-bold">$${finalPrice.toLocaleString('es-MX')} MXN/año</span>
+                    <br><small class="text-success"><i class="fas fa-gift"></i> ${discountPercent}% descuento primera compra</small>
+                `;
+            } else {
+                annualPriceEl.textContent = `$${originalPrice.toLocaleString('es-MX')} MXN/año`;
+            }
+        }
+        
+        if (selectedPlanNameDisplay) {
+            selectedPlanNameDisplay.textContent = planNames[planLevel] || planLevel;
+        }
+    }
+    
+    // Ocultar opciones de pago hasta que se seleccione el período
+    if (paymentOptionsSection) paymentOptionsSection.style.display = 'none';
+    if (manualLicenseSection) manualLicenseSection.style.display = 'none';
+    if (btnUpdatePlan) btnUpdatePlan.style.display = 'none';
+    
+    // Resetear selección de períodos
+    document.querySelectorAll('.payment-period-card').forEach(card => {
+        card.style.border = '2px solid #e0e0e0';
+        card.style.backgroundColor = '';
+    });
+};
+
+// Función para seleccionar período de pago (mensual o anual)
+window.selectPaymentPeriod = function(period) {
+    if (!selectedPlanType) {
+        alert('Por favor selecciona un plan primero');
+        return;
+    }
+    
+    // Verificar si es el mismo plan Y el mismo período (no permitir)
+    const licenseInfo = window.licenseManager?.getLicenseInfo();
+    if (licenseInfo) {
+        // planLevel = nivel del plan (basico, estandar, premium, enterprise)
+        // type = período de pago (mensual, anual, trimestral) en sistema nuevo
+        // type = nivel del plan (mensual, trimestral, anual) en sistema antiguo
+        const currentPlanLevel = licenseInfo?.planLevel;
+        const currentType = licenseInfo?.type;
+        
+        // Determinar el período actual
+        let currentPeriod = null;
+        let actualPlanLevel = currentPlanLevel;
+        
+        if (currentPlanLevel) {
+            // Sistema nuevo: planLevel existe, type es el período
+            currentPeriod = currentType; // mensual, anual, trimestral
+            actualPlanLevel = currentPlanLevel; // basico, estandar, premium, enterprise
+        } else if (currentType) {
+            // Sistema antiguo: solo type existe, puede ser 'mensual', 'trimestral', 'anual'
+            // En este caso, type es el período, y no hay planLevel (se asume 'basico')
+            if (['mensual', 'trimestral', 'anual'].includes(currentType.toLowerCase())) {
+                currentPeriod = currentType.toLowerCase();
+                actualPlanLevel = 'basico'; // Por defecto en sistema antiguo
+            } else {
+                // Si type no es un período, entonces es el planLevel (compatibilidad)
+                actualPlanLevel = currentType.toLowerCase();
+                currentPeriod = null; // No sabemos el período en sistema antiguo
+            }
+        }
+        
+        // Verificar si es el mismo plan nivel
+        const isSamePlanLevel = actualPlanLevel && 
+                                actualPlanLevel.toLowerCase() === selectedPlanType.toLowerCase();
+        
+        // Verificar si es el mismo período (solo si sabemos el período actual)
+        const isSamePeriod = currentPeriod && currentPeriod.toLowerCase() === period.toLowerCase();
+        
+        // Si es el mismo plan Y el mismo período, no permitir
+        if (isSamePlanLevel && isSamePeriod) {
+            alert('Este es tu plan actual. Selecciona un plan diferente o un período diferente para actualizar.');
+            return;
+        }
+        
+        // Si es el mismo plan pero diferente período, permitir (es una actualización válida)
+        if (isSamePlanLevel && !isSamePeriod && currentPeriod) {
+            console.log(`✅ Actualización permitida: Cambiando período de ${currentPeriod} a ${period} en el plan ${actualPlanLevel}`);
+        }
+    }
+    
+    selectedPaymentPeriod = period;
+    
+    // Remover selección visual de todas las tarjetas de períodos
+    document.querySelectorAll('.payment-period-card').forEach(card => {
+        card.style.border = '2px solid #e0e0e0';
+        card.style.backgroundColor = '';
+    });
+    
+    // Resaltar la tarjeta seleccionada
+    const selectedCard = document.querySelector(`.payment-period-card[data-period="${period}"]`);
+    if (selectedCard) {
+        selectedCard.style.border = '3px solid #28a745';
+        selectedCard.style.backgroundColor = '#f0fff4';
+    }
+    
+    // Mostrar opciones de pago
+    const paymentOptionsSection = document.getElementById('paymentOptionsSection');
+    const manualLicenseSection = document.getElementById('manualLicenseSection');
+    
+    if (paymentOptionsSection) paymentOptionsSection.style.display = 'block';
+    if (manualLicenseSection) manualLicenseSection.style.display = 'block';
+};
+
+// Función para notificar al administrador sobre errores
+window.notifyAdministrator = function(errorType, errorDetails) {
+    const adminEmail = 'samuelayalasandoval@gmail.com';
+    const timestamp = new Date().toISOString();
+    
+    // Preparar información del error
+    const errorInfo = {
+        tipo: errorType,
+        timestamp: timestamp,
+        detalles: errorDetails,
+        userAgent: navigator.userAgent,
+        url: window.location.href,
+        tenantId: errorDetails.tenantId || 'N/A',
+        plan: errorDetails.plan || 'N/A',
+        paymentId: errorDetails.paymentId || 'N/A',
+        errorMessage: errorDetails.errorMessage || 'N/A',
+        stackTrace: errorDetails.stackTrace || 'N/A'
+    };
+    
+    // Guardar error en localStorage para registro
+    try {
+        const errorLog = JSON.parse(localStorage.getItem('titanfleet_error_log') || '[]');
+        errorLog.push(errorInfo);
+        // Mantener solo los últimos 50 errores
+        if (errorLog.length > 50) {
+            errorLog.shift();
+        }
+        localStorage.setItem('titanfleet_error_log', JSON.stringify(errorLog));
+        console.log('📝 Error registrado en localStorage');
+    } catch (e) {
+        console.error('❌ Error guardando en localStorage:', e);
+    }
+    
+    // Intentar guardar en Firebase si está disponible
+    if (typeof firebase !== 'undefined' && firebase.firestore) {
+        try {
+            const db = firebase.firestore();
+            db.collection('errores_sistema').add({
+                ...errorInfo,
+                fecha: firebase.firestore.FieldValue.serverTimestamp()
+            }).then(() => {
+                console.log('✅ Error guardado en Firebase');
+            }).catch(firebaseError => {
+                console.warn('⚠️ No se pudo guardar en Firebase:', firebaseError);
+            });
+        } catch (e) {
+            console.warn('⚠️ Error guardando en Firebase:', e);
+        }
+    }
+    
+    // Preparar correo para el administrador
+    const subject = encodeURIComponent(`[TitanFleet ERP] Error ${errorType} - ${errorDetails.tenantId || 'N/A'}`);
+    
+    let emailBody = `ERROR EN SISTEMA DE PAGOS - TITANFLEET ERP
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+TIPO DE ERROR: ${errorType}
+FECHA Y HORA: ${new Date(timestamp).toLocaleString('es-MX', { timeZone: 'America/Mexico_City' })}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+INFORMACIÓN DEL CLIENTE:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+- TenantId: ${errorDetails.tenantId || 'N/A'}
+- Plan: ${errorDetails.plan || 'N/A'}
+- Período: ${errorDetails.paymentPeriod || 'N/A'}
+- ID de Pago: ${errorDetails.paymentId || 'N/A'}
+- Método de Pago: ${errorDetails.paymentMethod || 'N/A'}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+DETALLES DEL ERROR:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+${errorDetails.errorMessage || 'Error desconocido'}
+
+${errorDetails.stackTrace ? `STACK TRACE:\n${errorDetails.stackTrace}` : ''}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+INFORMACIÓN TÉCNICA:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+- URL: ${window.location.href}
+- User Agent: ${navigator.userAgent}
+- Timestamp: ${timestamp}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+ACCIÓN REQUERIDA:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Por favor, revisa el error y actualiza manualmente el plan del cliente si es necesario.
+
+TenantId: ${errorDetails.tenantId || 'N/A'}
+Plan solicitado: ${errorDetails.plan || 'N/A'}
+Período: ${errorDetails.paymentPeriod || 'N/A'}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`;
+    
+    const body = encodeURIComponent(emailBody);
+    
+    // Abrir cliente de correo
+    try {
+        window.location.href = `mailto:${adminEmail}?subject=${subject}&body=${body}`;
+        console.log('📧 Correo preparado para el administrador');
+    } catch (e) {
+        console.error('❌ Error abriendo cliente de correo:', e);
+        // Mostrar información en consola como fallback
+        console.error('📧 INFORMACIÓN DEL ERROR PARA ADMINISTRADOR:');
+        console.error('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+        console.error(emailBody);
+        console.error('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    }
+    
+    // También intentar enviar por API si está disponible (para producción)
+    if (typeof fetch !== 'undefined') {
+        try {
+            fetch('/api/notify-admin-error', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(errorInfo)
+            }).catch(apiError => {
+                console.warn('⚠️ No se pudo enviar notificación por API:', apiError);
+            });
+        } catch (e) {
+            console.warn('⚠️ Error enviando notificación por API:', e);
+        }
+    }
+};
+
+// Función para validar datos antes de guardar actualización de plan
+function validatePlanUpdateBeforeSave(planLevel, paymentPeriod, tenantId) {
+    // Validar planLevel
+    const validPlanLevels = ['basico', 'estandar', 'premium', 'enterprise'];
+    if (!planLevel || !validPlanLevels.includes(planLevel.toLowerCase())) {
+        return { valid: false, error: 'Nivel de plan no válido: ' + planLevel };
+    }
+    
+    // Validar paymentPeriod
+    const validPaymentPeriods = ['mensual', 'anual'];
+    if (!paymentPeriod || !validPaymentPeriods.includes(paymentPeriod.toLowerCase())) {
+        return { valid: false, error: 'Período de pago no válido: ' + paymentPeriod };
+    }
+    
+    // Validar tenantId
+    if (!tenantId || typeof tenantId !== 'string' || tenantId.trim() === '') {
+        return { valid: false, error: 'TenantId no válido o vacío' };
+    }
+    
+    // Verificar que el tenantId coincida con el actual
+    const currentLicenseInfo = window.licenseManager?.getLicenseInfo();
+    if (currentLicenseInfo && currentLicenseInfo.tenantId !== tenantId) {
+        return { valid: false, error: 'El TenantId no coincide con la licencia actual' };
+    }
+    
+    return { valid: true };
+}
+
+// Función para procesar el pago de actualización de plan (global)
+window.processPlanUpdatePayment = async function(paymentMethod) {
+    if (!selectedPlanType) {
+        alert('Por favor selecciona un plan primero');
+        return;
+    }
+    
+    const licenseInfo = window.licenseManager?.getLicenseInfo();
+    if (!licenseInfo || !licenseInfo.tenantId) {
+        alert('Error: No se pudo obtener tu tenantId. Por favor contacta al soporte.');
+        return;
+    }
+    
+    const planNames = {
+        'basico': 'Básico',
+        'estandar': 'Estándar',
+        'premium': 'Premium',
+        'enterprise': 'Enterprise'
+    };
+    
+    const planPrices = {
+        'basico': { mensual: 1999, anual: 21989 },
+        'estandar': { mensual: 4999, anual: 54989 },
+        'premium': { mensual: 8999, anual: 98989 },
+        'enterprise': { mensual: 14999, anual: 164989 }
+    };
+    
+    const planName = planNames[selectedPlanType];
+    const prices = planPrices[selectedPlanType];
+    
+    if (!prices) {
+        alert('Error: Plan no reconocido. Por favor selecciona un plan válido.');
+        return;
+    }
+    
+    if (!selectedPaymentPeriod) {
+        alert('Por favor selecciona un período de pago (mensual o anual)');
+        return;
+    }
+    
+    const paymentPeriod = selectedPaymentPeriod;
+    const price = prices[paymentPeriod];
+    const periodText = paymentPeriod === 'mensual' ? 'mensual' : 'anual';
+    
+    // Validar datos antes de proceder
+    const validation = validatePlanUpdateBeforeSave(selectedPlanType, paymentPeriod, licenseInfo.tenantId);
+    if (!validation.valid) {
+        console.error('❌ Validación fallida:', validation.error);
+        alert('❌ Error de validación: ' + validation.error + '\n\nPor favor, contacta al soporte.');
+        return;
+    }
+    
+    if (paymentMethod === 'stripe') {
+        // Redirigir a página de pago con tarjeta
+        // Guardar información para actualizar después del pago (sin generar nuevo tenantId)
+        const updateData = {
+            planLevel: selectedPlanType,
+            paymentPeriod: paymentPeriod,
+            tenantId: licenseInfo.tenantId,
+            paymentMethod: 'stripe',
+            isUpdate: true, // Marcar que es una actualización, no una nueva activación
+            type: paymentPeriod,
+            timestamp: new Date().toISOString() // Agregar timestamp para validación
+        };
+        
+        // Validar nuevamente antes de guardar
+        const finalValidation = validatePlanUpdateBeforeSave(updateData.planLevel, updateData.paymentPeriod, updateData.tenantId);
+        if (!finalValidation.valid) {
+            console.error('❌ Validación final fallida:', finalValidation.error);
+            alert('❌ Error de validación: ' + finalValidation.error);
+            return;
+        }
+        
+        sessionStorage.setItem('pendingPlanUpdate', JSON.stringify(updateData));
+        
+        // Guardar datos para la página de pago
+        sessionStorage.setItem('titanfleet_payment_data', JSON.stringify({
+            plan: `Plan ${planName}`,
+            periodo: periodText === 'mensual' ? 'Mensual' : 'Anual',
+            precio: price,
+            cliente: {
+                nombre: licenseInfo.tenantId || 'Cliente',
+                email: '',
+                telefono: '',
+                empresa: ''
+            },
+            solicitudId: `UPDATE-${Date.now()}`,
+            isPlanUpdate: true,
+            tenantId: licenseInfo.tenantId
+        }));
+        
+        // Redirigir a página de pago
+        window.location.href = '../pages/pago.html';
+        
+    } else if (paymentMethod === 'transfer') {
+        // Mostrar modal con datos de transferencia
+        showTransferModal(planName, prices, paymentPeriod, licenseInfo.tenantId, 'update');
+    }
+};
+
+// Función para actualizar plan después de pago exitoso (llamada desde callback de pago)
+window.completePlanUpdate = async function(paymentId, paymentMethod) {
+    const pendingUpdate = sessionStorage.getItem('pendingPlanUpdate');
+    if (!pendingUpdate) {
+        console.warn('❌ No hay actualización de plan pendiente');
+        alert('❌ Error: No se encontraron datos de actualización pendiente. Por favor, contacta al soporte.');
+        return;
+    }
+    
+    let updateData;
+    try {
+        updateData = JSON.parse(pendingUpdate);
+    } catch (error) {
+        console.error('❌ Error parseando datos de actualización:', error);
+        alert('❌ Error: Los datos de actualización están corruptos. Por favor, contacta al soporte.');
+        return;
+    }
+    
+    // Validar datos antes de actualizar
+    const validation = validatePlanUpdateBeforeSave(
+        updateData.planLevel || updateData.planType,
+        updateData.paymentPeriod,
+        updateData.tenantId
+    );
+    
+    if (!validation.valid) {
+        console.error('❌ Validación fallida antes de actualizar:', validation.error);
+        alert('❌ Error de validación: ' + validation.error + '\n\nPor favor, contacta al soporte.');
+        sessionStorage.removeItem('pendingPlanUpdate');
+        return;
+    }
+    
+    // Verificar que el tenantId coincida con el actual
+    const currentLicenseInfo = window.licenseManager?.getLicenseInfo();
+    if (currentLicenseInfo && currentLicenseInfo.tenantId !== updateData.tenantId) {
+        console.error('❌ TenantId no coincide:', {
+            expected: updateData.tenantId,
+            actual: currentLicenseInfo.tenantId
+        });
+        alert('❌ Error de seguridad: El TenantId no coincide. Por favor, contacta al soporte.');
+        sessionStorage.removeItem('pendingPlanUpdate');
+        return;
+    }
+    
+    console.log('✅ Validaciones pasadas. Actualizando plan...', updateData);
+    
+    // Actualizar el plan manteniendo el tenantId (sin necesidad de clave)
+    // Usar planLevel en lugar de planType
+    let result;
+    try {
+        result = await window.updateLicensePlan(null, updateData.planLevel || updateData.planType, updateData.paymentPeriod);
+    } catch (error) {
+        console.error('❌ Error crítico en updateLicensePlan:', error);
+        
+        // Notificar al administrador
+        window.notifyAdministrator('ACTUALIZACIÓN DE PLAN', {
+            tenantId: updateData.tenantId,
+            plan: updateData.planLevel || updateData.planType,
+            paymentPeriod: updateData.paymentPeriod,
+            paymentId: paymentId,
+            paymentMethod: paymentMethod,
+            errorMessage: error.message || 'Error desconocido al actualizar el plan',
+            stackTrace: error.stack || 'No disponible',
+            updateData: updateData
+        });
+        
+        alert('❌ Error crítico al actualizar el plan. El administrador ha sido notificado.\n\n' +
+              'Por favor, contacta al soporte con tu TenantId: ' + updateData.tenantId + '\n\n' +
+              'Error: ' + (error.message || 'Error desconocido'));
+        
+        // NO limpiar sessionStorage para que se pueda reintentar
+        return;
+    }
+    
+    if (result && result.success) {
+        // Limpiar datos pendientes
+        sessionStorage.removeItem('pendingPlanUpdate');
+        
+        // Guardar información del pago (opcional)
+        console.log('✅ Plan actualizado después del pago:', {
+            planLevel: updateData.planLevel || updateData.planType,
+            paymentPeriod: updateData.paymentPeriod,
+            tenantId: updateData.tenantId,
+            paymentId: paymentId,
+            paymentMethod: paymentMethod
+        });
+        
+        alert('✅ Plan actualizado exitosamente. Tu tenantId se mantiene y todos tus datos están seguros.');
+        
+        // Cerrar modal
+        const modal = bootstrap.Modal.getInstance(document.getElementById('updatePlanModal'));
+        if (modal) {
+            modal.hide();
+        }
+        
+        // Recargar página
+        setTimeout(() => {
+            window.location.reload();
+        }, 1000);
+    } else {
+        // Error en la actualización (result.success === false)
+        const errorMessage = result?.message || 'Error desconocido al actualizar el plan';
+        console.error('❌ Error en updateLicensePlan:', errorMessage);
+        
+        // Notificar al administrador
+        window.notifyAdministrator('ACTUALIZACIÓN DE PLAN FALLIDA', {
+            tenantId: updateData.tenantId,
+            plan: updateData.planLevel || updateData.planType,
+            paymentPeriod: updateData.paymentPeriod,
+            paymentId: paymentId,
+            paymentMethod: paymentMethod,
+            errorMessage: errorMessage,
+            stackTrace: 'Error retornado por updateLicensePlan',
+            updateData: updateData,
+            result: result
+        });
+        
+        alert('❌ Error al actualizar el plan: ' + errorMessage + '\n\n' +
+              'El administrador ha sido notificado. Por favor, contacta al soporte con tu TenantId: ' + updateData.tenantId);
+        
+        // NO limpiar sessionStorage para que se pueda reintentar
+    }
+};
+
+// Función para mostrar input manual de clave (solo para casos especiales)
+window.showManualLicenseInput = function() {
+    if (!selectedPlanType) {
+        alert('Por favor selecciona un plan primero');
+        return;
+    }
+    
+    const updatePlanForm = document.getElementById('updatePlanForm');
+    const selectedPlanName = document.getElementById('selectedPlanName');
+    const licenseFormatHint = document.getElementById('licenseFormatHint');
+    const licenseKeyInput = document.getElementById('updatePlanLicenseKey');
+    const btnUpdatePlan = document.getElementById('btnUpdatePlan');
+    
+    if (updatePlanForm) updatePlanForm.style.display = 'block';
+    if (btnUpdatePlan) btnUpdatePlan.style.display = 'block';
+    
+    const planNames = {
+        'anual': 'Anual',
+        'mensual': 'Mensual',
+        'trimestral': 'Trimestral'
+    };
+    
+    const planCodes = {
+        'anual': 'A',
+        'mensual': 'M',
+        'trimestral': 'T'
+    };
+    
+    if (selectedPlanName) {
+        selectedPlanName.textContent = planNames[selectedPlanType] || selectedPlanType;
+    }
+    
+    if (licenseFormatHint) {
+        licenseFormatHint.textContent = `Formato: TF2512${planCodes[selectedPlanType]}-XXXXXXXX-XXXXXXXX (${planCodes[selectedPlanType]}=${planNames[selectedPlanType]})`;
+    }
+    
+    if (licenseKeyInput) {
+        licenseKeyInput.value = '';
+        licenseKeyInput.focus();
+    }
+};
+
+// Función para mostrar modal de transferencia bancaria
+window.showTransferModal = function(planName, prices, paymentPeriod, tenantId, action = 'update', newExpiresDate = null) {
+    const modal = new bootstrap.Modal(document.getElementById('transferModal'));
+    
+    // Actualizar información del monto
+    const amountInfo = document.getElementById('transferAmountInfo');
+    if (amountInfo) {
+        if (action === 'update') {
+            amountInfo.innerHTML = `
+                <strong>Mensual:</strong> $${prices.mensual.toLocaleString('es-MX')} MXN<br>
+                <strong>Anual:</strong> $${prices.anual.toLocaleString('es-MX')} MXN<br>
+                <small class="text-muted">Selecciona el monto según el período que elegiste</small>
+            `;
+        } else {
+            const price = paymentPeriod === 'mensual' ? prices.mensual : prices.anual;
+            amountInfo.innerHTML = `
+                <strong>Monto:</strong> $${price.toLocaleString('es-MX')} MXN<br>
+                <small class="text-muted">${paymentPeriod === 'mensual' ? 'Mensual' : 'Anual'}</small>
+            `;
+        }
+    }
+    
+    // Actualizar tenantId
+    const tenantIdEl = document.getElementById('transferTenantId');
+    if (tenantIdEl) {
+        tenantIdEl.textContent = tenantId;
+    }
+    
+    // Actualizar asunto del correo
+    const subjectEl = document.getElementById('transferSubject');
+    if (subjectEl) {
+        const actionText = action === 'update' ? 'Actualización de Plan' : 'Renovación de Licencia';
+        const subject = `${actionText} - ${planName} - TenantId: ${tenantId}`;
+        subjectEl.value = subject;
+    }
+    
+    // Guardar datos para el correo
+    window.transferData = {
+        planName: planName,
+        prices: prices,
+        paymentPeriod: paymentPeriod,
+        tenantId: tenantId,
+        action: action,
+        newExpiresDate: newExpiresDate
+    };
+    
+    modal.show();
+};
+
+// Función para copiar correo de transferencia
+window.copyTransferEmail = function() {
+    const email = document.getElementById('transferEmail').value;
+    navigator.clipboard.writeText(email).then(() => {
+        alert('Correo copiado al portapapeles');
+    }).catch(() => {
+        alert('No se pudo copiar. El correo es: ' + email);
+    });
+};
+
+// Función para copiar asunto
+window.copyTransferSubject = function() {
+    const subject = document.getElementById('transferSubject').value;
+    navigator.clipboard.writeText(subject).then(() => {
+        alert('Asunto copiado al portapapeles');
+    }).catch(() => {
+        alert('No se pudo copiar. El asunto es: ' + subject);
+    });
+};
+
+// Función para abrir cliente de correo
+window.openTransferEmail = function() {
+    const email = document.getElementById('transferEmail').value;
+    const subject = encodeURIComponent(document.getElementById('transferSubject').value);
+    const tenantId = window.transferData?.tenantId || '';
+    const planName = window.transferData?.planName || '';
+    const action = window.transferData?.action || 'update';
+    
+    let body = '';
+    if (action === 'update') {
+        body = encodeURIComponent(`Hola,
+
+Adjunto el comprobante de transferencia para la actualización de mi plan.
+
+Datos de la transferencia:
+- Plan: ${planName}
+- TenantId: ${tenantId}
+- Monto transferido: [Indicar monto]
+
+Por favor, confírmenme cuando se haya verificado el pago para que mi plan se actualice.
+
+Gracias.`);
+    } else {
+        body = encodeURIComponent(`Hola,
+
+Adjunto el comprobante de transferencia para la renovación de mi licencia.
+
+Datos de la transferencia:
+- Plan: ${planName}
+- TenantId: ${tenantId}
+- Monto transferido: [Indicar monto]
+
+Por favor, confírmenme cuando se haya verificado el pago para que mi licencia se renueve.
+
+Gracias.`);
+    }
+    
+    window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
+};
+
+// Verificar licencia al cargar la página
+document.addEventListener('DOMContentLoaded', function() {
+    if (window.licenseManager) {
+        if (!window.licenseManager.isLicenseActive()) {
+            // Si no hay licencia activa, mostrar modal después de 2 segundos
+            setTimeout(() => {
+                showLicenseInfo();
+            }, 2000);
+        } else {
+            showLicenseInfo();
+        }
+        
+        // Verificar si hay una actualización de plan pendiente (después de pago)
+        const pendingUpdate = sessionStorage.getItem('pendingPlanUpdate');
+        if (pendingUpdate) {
+            try {
+                const updateData = JSON.parse(pendingUpdate);
+                // Simular callback de pago exitoso (en producción esto vendría del sistema de pagos)
+                // Por ahora, solo mostrar mensaje informativo
+                console.log('📋 Actualización de plan pendiente detectada:', updateData);
+            } catch (error) {
+                console.error('Error procesando actualización pendiente:', error);
+            }
+        }
+        
+        // Verificar si hay una renovación de licencia pendiente (después de pago)
+        const pendingRenewal = sessionStorage.getItem('pendingLicenseRenewal');
+        if (pendingRenewal) {
+            try {
+                const renewalData = JSON.parse(pendingRenewal);
+                // Simular callback de pago exitoso (en producción esto vendría del sistema de pagos)
+                // Por ahora, solo mostrar mensaje informativo
+                console.log('📋 Renovación de licencia pendiente detectada:', renewalData);
+            } catch (error) {
+                console.error('Error procesando renovación pendiente:', error);
+            }
+        }
+    }
+});
+</script>
+
+
+
+
+
+
+

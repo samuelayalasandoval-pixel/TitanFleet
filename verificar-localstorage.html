@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verificar localStorage</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .section h2 {
+            margin-top: 0;
+            color: #333;
+        }
+        .data-item {
+            margin: 10px 0;
+            padding: 10px;
+            background: #f5f5f5;
+            border-radius: 3px;
+        }
+        .has-tenant {
+            color: green;
+        }
+        .no-tenant {
+            color: orange;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin: 20px 0;
+        }
+        .stat-box {
+            padding: 15px;
+            background: #e3f2fd;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .stat-box h3 {
+            margin: 0 0 10px 0;
+            font-size: 14px;
+            color: #666;
+        }
+        .stat-box .number {
+            font-size: 24px;
+            font-weight: bold;
+            color: #1976d2;
+        }
+        button {
+            padding: 10px 20px;
+            background: #1976d2;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #1565c0;
+        }
+        button.danger {
+            background: #d32f2f;
+        }
+        button.danger:hover {
+            background: #c62828;
+        }
+        pre {
+            background: #f5f5f5;
+            padding: 10px;
+            border-radius: 3px;
+            overflow-x: auto;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 Verificador de localStorage</h1>
+    
+    <div class="stats" id="stats"></div>
+    
+    <div class="section">
+        <h2>📊 Resumen de Datos</h2>
+        <div id="summary"></div>
+    </div>
+    
+    <div class="section">
+        <h2>🔑 Claves en localStorage</h2>
+        <div id="keys"></div>
+    </div>
+    
+    <div class="section">
+        <h2>📋 Datos Detallados</h2>
+        <div id="details"></div>
+    </div>
+    
+    <div class="section">
+        <h2>🛠️ Acciones</h2>
+        <button onclick="exportarDatos()">📥 Exportar Datos</button>
+        <button onclick="limpiarDatosSinTenant()" class="danger">🗑️ Limpiar Datos sin tenantId</button>
+        <button onclick="asignarTenantId()">🏷️ Asignar tenantId a Datos sin ID</button>
+    </div>
+
+    <script>
+        const currentTenantId = localStorage.getItem('tenantId') || 
+                               (window.firebaseAuth?.currentUser?.uid) || 
+                               'demo_tenant';
+
+        function analizarLocalStorage() {
+            const keys = Object.keys(localStorage);
+            const erpKeys = keys.filter(k => k.startsWith('erp_'));
+            
+            const stats = {
+                total: keys.length,
+                erpKeys: erpKeys.length,
+                withTenant: 0,
+                withoutTenant: 0,
+                totalRecords: 0
+            };
+            
+            const summary = [];
+            const details = [];
+            
+            // Analizar erp_shared_data
+            const sharedData = localStorage.getItem('erp_shared_data');
+            if (sharedData) {
+                try {
+                    const data = JSON.parse(sharedData);
+                    const sections = ['registros', 'facturas', 'facturacion', 'trafico', 'diesel', 'mantenimiento', 'tesoreria', 'cxc', 'cxp', 'inventario'];
+                    
+                    sections.forEach(section => {
+                        if (data[section] && typeof data[section] === 'object') {
+                            const items = Object.values(data[section]);
+                            stats.totalRecords += items.length;
+                            
+                            const withTenant = items.filter(item => item.tenantId === currentTenantId || item.userId === window.firebaseAuth?.currentUser?.uid).length;
+                            const withoutTenant = items.filter(item => !item.tenantId && !item.userId).length;
+                            const otherTenant = items.length - withTenant - withoutTenant;
+                            
+                            stats.withTenant += withTenant;
+                            stats.withoutTenant += withoutTenant;
+                            
+                            summary.push({
+                                seccion: section,
+                                total: items.length,
+                                conTenant: withTenant,
+                                sinTenant: withoutTenant,
+                                otroTenant: otherTenant
+                            });
+                            
+                            if (items.length > 0) {
+                                details.push({
+                                    seccion: `erp_shared_data.${section}`,
+                                    items: items.slice(0, 5), // Mostrar solo los primeros 5
+                                    total: items.length
+                                });
+                            }
+                        }
+                    });
+                } catch (e) {
+                    console.error('Error parseando erp_shared_data:', e);
+                }
+            }
+            
+            // Analizar otras claves
+            const otherKeys = ['erp_logistica', 'erp_facturacion', 'erp_trafico', 'erp_diesel_movimientos', 
+                              'erp_operadores_gastos', 'erp_mantenimientos', 'erp_tesoreria_movimientos'];
+            
+            otherKeys.forEach(key => {
+                const data = localStorage.getItem(key);
+                if (data) {
+                    try {
+                        const parsed = JSON.parse(data);
+                        const items = Array.isArray(parsed) ? parsed : Object.values(parsed);
+                        stats.totalRecords += items.length;
+                        
+                        const withTenant = items.filter(item => item.tenantId === currentTenantId || item.userId === window.firebaseAuth?.currentUser?.uid).length;
+                        const withoutTenant = items.filter(item => !item.tenantId && !item.userId).length;
+                        const otherTenant = items.length - withTenant - withoutTenant;
+                        
+                        stats.withTenant += withTenant;
+                        stats.withoutTenant += withoutTenant;
+                        
+                        summary.push({
+                            seccion: key,
+                            total: items.length,
+                            conTenant: withTenant,
+                            sinTenant: withoutTenant,
+                            otroTenant: otherTenant
+                        });
+                        
+                        if (items.length > 0) {
+                            details.push({
+                                seccion: key,
+                                items: items.slice(0, 5),
+                                total: items.length
+                            });
+                        }
+                    } catch (e) {
+                        console.error(`Error parseando ${key}:`, e);
+                    }
+                }
+            });
+            
+            return { stats, summary, details, keys: erpKeys };
+        }
+        
+        function mostrarResultados() {
+            const { stats, summary, details, keys } = analizarLocalStorage();
+            
+            // Mostrar estadísticas
+            document.getElementById('stats').innerHTML = `
+                <div class="stat-box">
+                    <h3>Total Claves ERP</h3>
+                    <div class="number">${stats.erpKeys}</div>
+                </div>
+                <div class="stat-box">
+                    <h3>Total Registros</h3>
+                    <div class="number">${stats.totalRecords}</div>
+                </div>
+                <div class="stat-box">
+                    <h3>Con tenantId</h3>
+                    <div class="number has-tenant">${stats.withTenant}</div>
+                </div>
+                <div class="stat-box">
+                    <h3>Sin tenantId</h3>
+                    <div class="number no-tenant">${stats.withoutTenant}</div>
+                </div>
+                <div class="stat-box">
+                    <h3>TenantId Actual</h3>
+                    <div class="number" style="font-size: 12px;">${currentTenantId}</div>
+                </div>
+            `;
+            
+            // Mostrar resumen
+            let summaryHTML = '<table style="width: 100%; border-collapse: collapse;">';
+            summaryHTML += '<tr><th>Sección</th><th>Total</th><th>Con tenantId</th><th>Sin tenantId</th><th>Otro tenant</th></tr>';
+            summary.forEach(s => {
+                summaryHTML += `<tr>
+                    <td><strong>${s.seccion}</strong></td>
+                    <td>${s.total}</td>
+                    <td class="has-tenant">${s.conTenant}</td>
+                    <td class="no-tenant">${s.sinTenant}</td>
+                    <td>${s.otroTenant}</td>
+                </tr>`;
+            });
+            summaryHTML += '</table>';
+            document.getElementById('summary').innerHTML = summaryHTML;
+            
+            // Mostrar claves
+            document.getElementById('keys').innerHTML = keys.map(k => 
+                `<div class="data-item">${k} (${localStorage.getItem(k)?.length || 0} caracteres)</div>`
+            ).join('');
+            
+            // Mostrar detalles
+            let detailsHTML = '';
+            details.forEach(d => {
+                detailsHTML += `<h3>${d.seccion} (${d.total} registros totales, mostrando primeros 5)</h3>`;
+                d.items.forEach((item, idx) => {
+                    const hasTenant = item.tenantId === currentTenantId;
+                    const hasUserId = item.userId === window.firebaseAuth?.currentUser?.uid;
+                    const className = (hasTenant || hasUserId) ? 'has-tenant' : 'no-tenant';
+                    detailsHTML += `<div class="data-item ${className}">
+                        <strong>Registro ${idx + 1}:</strong><br>
+                        tenantId: ${item.tenantId || '❌ NO TIENE'}<br>
+                        userId: ${item.userId || '❌ NO TIENE'}<br>
+                        ID: ${item.numeroRegistro || item.id || item.registroId || 'N/A'}<br>
+                        <pre>${JSON.stringify(item, null, 2).substring(0, 200)}...</pre>
+                    </div>`;
+                });
+            });
+            document.getElementById('details').innerHTML = detailsHTML || '<p>No hay datos para mostrar</p>';
+        }
+        
+        function exportarDatos() {
+            const data = {};
+            Object.keys(localStorage).forEach(key => {
+                if (key.startsWith('erp_')) {
+                    try {
+                        data[key] = JSON.parse(localStorage.getItem(key));
+                    } catch (e) {
+                        data[key] = localStorage.getItem(key);
+                    }
+                }
+            });
+            
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `localStorage-backup-${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+        
+        function limpiarDatosSinTenant() {
+            if (!confirm('¿Estás seguro de eliminar todos los registros sin tenantId? Esta acción no se puede deshacer.')) {
+                return;
+            }
+            
+            let eliminados = 0;
+            
+            // Limpiar erp_shared_data
+            const sharedData = JSON.parse(localStorage.getItem('erp_shared_data') || '{}');
+            const sections = ['registros', 'facturas', 'facturacion', 'trafico', 'diesel', 'mantenimiento', 'tesoreria', 'cxc', 'cxp', 'inventario'];
+            
+            sections.forEach(section => {
+                if (sharedData[section] && typeof sharedData[section] === 'object') {
+                    const original = Object.keys(sharedData[section]).length;
+                    Object.keys(sharedData[section]).forEach(key => {
+                        const item = sharedData[section][key];
+                        if (!item.tenantId && !item.userId) {
+                            delete sharedData[section][key];
+                            eliminados++;
+                        }
+                    });
+                }
+            });
+            
+            localStorage.setItem('erp_shared_data', JSON.stringify(sharedData));
+            
+            // Limpiar otras claves
+            const otherKeys = ['erp_logistica', 'erp_facturacion', 'erp_trafico', 'erp_diesel_movimientos', 
+                              'erp_operadores_gastos', 'erp_mantenimientos', 'erp_tesoreria_movimientos'];
+            
+            otherKeys.forEach(key => {
+                const data = localStorage.getItem(key);
+                if (data) {
+                    try {
+                        const parsed = JSON.parse(data);
+                        const items = Array.isArray(parsed) ? parsed : Object.values(parsed);
+                        const filtered = items.filter(item => item.tenantId || item.userId);
+                        
+                        if (filtered.length !== items.length) {
+                            eliminados += items.length - filtered.length;
+                            localStorage.setItem(key, JSON.stringify(Array.isArray(parsed) ? filtered : 
+                                filtered.reduce((acc, item) => {
+                                    acc[item.id || item.numeroRegistro || item.registroId] = item;
+                                    return acc;
+                                }, {}))));
+                        }
+                    } catch (e) {
+                        console.error(`Error procesando ${key}:`, e);
+                    }
+                }
+            });
+            
+            alert(`✅ Se eliminaron ${eliminados} registros sin tenantId`);
+            mostrarResultados();
+        }
+        
+        function asignarTenantId() {
+            if (!confirm(`¿Asignar tenantId "${currentTenantId}" a todos los registros que no lo tengan?`)) {
+                return;
+            }
+            
+            let asignados = 0;
+            
+            // Asignar en erp_shared_data
+            const sharedData = JSON.parse(localStorage.getItem('erp_shared_data') || '{}');
+            const sections = ['registros', 'facturas', 'facturacion', 'trafico', 'diesel', 'mantenimiento', 'tesoreria', 'cxc', 'cxp', 'inventario'];
+            
+            sections.forEach(section => {
+                if (sharedData[section] && typeof sharedData[section] === 'object') {
+                    Object.keys(sharedData[section]).forEach(key => {
+                        const item = sharedData[section][key];
+                        if (!item.tenantId) {
+                            item.tenantId = currentTenantId;
+                            if (!item.userId && window.firebaseAuth?.currentUser?.uid) {
+                                item.userId = window.firebaseAuth.currentUser.uid;
+                            }
+                            asignados++;
+                        }
+                    });
+                }
+            });
+            
+            localStorage.setItem('erp_shared_data', JSON.stringify(sharedData));
+            
+            // Asignar en otras claves
+            const otherKeys = ['erp_logistica', 'erp_facturacion', 'erp_trafico', 'erp_diesel_movimientos', 
+                              'erp_operadores_gastos', 'erp_mantenimientos', 'erp_tesoreria_movimientos'];
+            
+            otherKeys.forEach(key => {
+                const data = localStorage.getItem(key);
+                if (data) {
+                    try {
+                        const parsed = JSON.parse(data);
+                        const items = Array.isArray(parsed) ? parsed : Object.values(parsed);
+                        let changed = false;
+                        
+                        items.forEach(item => {
+                            if (!item.tenantId) {
+                                item.tenantId = currentTenantId;
+                                if (!item.userId && window.firebaseAuth?.currentUser?.uid) {
+                                    item.userId = window.firebaseAuth.currentUser.uid;
+                                }
+                                asignados++;
+                                changed = true;
+                            }
+                        });
+                        
+                        if (changed) {
+                            localStorage.setItem(key, JSON.stringify(parsed));
+                        }
+                    } catch (e) {
+                        console.error(`Error procesando ${key}:`, e);
+                    }
+                }
+            });
+            
+            alert(`✅ Se asignó tenantId a ${asignados} registros`);
+            mostrarResultados();
+        }
+        
+        // Cargar resultados al iniciar
+        mostrarResultados();
+    </script>
+</body>
+</html>
+

@@ -1,0 +1,891 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/png" sizes="16x16" href="../assets/img/Logo TF.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="../assets/img/Logo TF.png" />
+    <link rel="icon" type="image/png" sizes="64x64" href="../assets/img/Logo TF.png" />
+    <title>Facturación</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link rel="stylesheet" href="../styles/styles.css" />
+    <link rel="stylesheet" href="../styles/facturacion.css" />
+    <link rel="stylesheet" href="../styles/backend-indicator.css" />
+
+    <!-- Bootstrap JavaScript (requerido para modales) - SIN defer para que cargue inmediatamente -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      // Verificar que Bootstrap se cargó correctamente
+      if (typeof bootstrap === 'undefined') {
+        console.error('❌ Bootstrap no se cargó correctamente');
+      } else {
+        console.log('✅ Bootstrap cargado correctamente');
+      }
+    </script>
+
+    <!-- CRÍTICO: Ocultar elementos del sidebar INMEDIATAMENTE para evitar parpadeo -->
+    <style>
+      /* Ocultar todos los módulos del sidebar inicialmente */
+      .nav-item:not(#nav-menu) {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        height: 0 !important;
+        overflow: hidden !important;
+      }
+      /* Permitir que auth.js muestre los elementos con permisos */
+      .nav-item.permission-granted {
+        display: list-item !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        height: auto !important;
+        overflow: visible !important;
+      }
+    </style>
+
+    <!-- Performance Optimizations y Loaders Comunes -->
+    <script src="../assets/scripts/performance/performance-init.js" defer></script>
+
+    <!-- CRÍTICO: auth.js DEBE cargarse ANTES de common-head-loader.js -->
+    <!-- para que los permisos se apliquen antes de que se oculten elementos -->
+    <script src="../assets/scripts/auth.js"></script>
+
+    <!-- Ahora cargar common-head-loader.js que esperará a que auth.js esté listo -->
+    <script src="../assets/scripts/performance/common-head-loader.js"></script>
+    <script src="../assets/scripts/script-loader.js" defer></script>
+
+    <!-- Scripts críticos específicos de la página -->
+    <!-- Script crítico: Restaurar estado del sidebar ANTES de renderizar para evitar parpadeo -->
+    <script src="../assets/scripts/menu/sidebar-state.js"></script>
+    <!-- Script para actualizar período automáticamente -->
+    <script src="../assets/scripts/periodo.js"></script>
+
+    <!-- ===== FASE 3: Scripts Base del Sistema (SIN defer) ===== -->
+    <!-- CRÍTICO: main.js debe cargarse SIN defer para que initializeRegistrationSystem esté disponible antes de otros scripts -->
+    <script src="../assets/scripts/main.js"></script>
+    <!-- CRÍTICO: cache-manager.js debe cargarse ANTES de otros scripts que usan caché -->
+    <script src="../assets/scripts/cache-manager.js"></script>
+    <!-- CRÍTICO: license-manager.js y plan-limits-manager.js deben cargarse ANTES de data-persistence.js -->
+    <script src="../assets/scripts/license-manager.js"></script>
+    <script src="../assets/scripts/plan-limits-manager.js"></script>
+    <!-- CRÍTICO: data-persistence.js debe cargarse ANTES de otros scripts que usan persistencia -->
+    <script src="../assets/scripts/data-persistence.js"></script>
+
+    <!-- ===== FASE 4: Firebase (SIN defer) ===== -->
+    <!-- CRÍTICO: firebase-init.js debe cargarse PRIMERO para inicializar Firebase -->
+    <script type="module" src="../assets/scripts/firebase-init.js"></script>
+    <!-- CRÍTICO: firebase-ready.js debe cargarse DESPUÉS de firebase-init.js para verificar disponibilidad -->
+    <script src="../assets/scripts/firebase-ready.js"></script>
+    <!-- CRÍTICO: registration-number-binding.js debe cargarse DESPUÉS de firebase-ready.js pero ANTES de main.js -->
+    <script src="../assets/scripts/registration-number-binding.js"></script>
+
+    <!-- ===== FASE 5: Scripts con defer (se ejecutan cuando DOM está listo) ===== -->
+    <!-- CRÍTICO: firebase-repo-base.js debe cargarse para que FirebaseRepoBase esté disponible -->
+    <script src="../assets/scripts/firebase-repo-base.js" defer></script>
+    <!-- CRÍTICO: firebase-repos.js debe cargarse DESPUÉS de firebase-repo-base.js para crear los repositorios -->
+    <script src="../assets/scripts/firebase-repos.js" defer></script>
+
+    <!-- Sistema de limpieza automática de localStorage -->
+    <script src="../assets/scripts/localstorage-cleanup.js" defer></script>
+
+    <!-- ===== SCRIPTS DE FACTURACIÓN (REFACTORIZADOS) ===== -->
+    <!-- Configuración y utilidades base -->
+    <script src="../assets/scripts/facturacion/init-helpers.js"></script>
+    <script src="../assets/scripts/facturacion/currency-utils.js"></script>
+    <script src="../assets/scripts/facturacion/currency-validation.js"></script>
+    <script src="../assets/scripts/facturacion/uuid-validation.js"></script>
+    <script src="../assets/scripts/facturacion/export-utils.js"></script>
+    <script src="../assets/scripts/facturacion/search-fill-data.js"></script>
+    <script src="../assets/scripts/facturacion/form-handler.js"></script>
+
+    <!-- Gestión de registros - Vista y lectura -->
+    <script src="../assets/scripts/facturacion/registros-loader.js"></script>
+    <script src="../assets/scripts/facturacion/registros-view.js"></script>
+
+    <!-- Gestión de registros - CRUD -->
+    <script src="../assets/scripts/facturacion/registros-save.js"></script>
+    <script src="../assets/scripts/facturacion/registros-edit.js"></script>
+    <script src="../assets/scripts/facturacion/registros-delete.js"></script>
+    <script src="../assets/scripts/facturacion/registros-pdf.js"></script>
+
+    <!-- Integración con otros módulos -->
+    <script src="../assets/scripts/facturacion/cxc-integration.js"></script>
+
+    <!-- Utilidades de diagnóstico (carga bajo demanda) -->
+    <script src="../assets/scripts/facturacion/diagnostic-utils.js"></script>
+
+    <!-- Filtros -->
+    <script src="../assets/scripts/facturacion/filtros-manager.js"></script>
+
+    <!-- Script crítico: Restaurar estado del sidebar ANTES de renderizar para evitar parpadeo -->
+    <script src="../assets/scripts/facturacion/sidebar-state.js"></script>
+
+    <!-- Scripts redundantes eliminados - auth.js ya maneja los permisos automáticamente -->
+
+    <!-- Script para contador de pendientes -->
+    <script src="../assets/scripts/facturacion-contador.js" defer></script>
+
+    <!-- CRÍTICO: buzon-pendientes.js debe cargarse ANTES de page-init.js para que mostrarBuzonPendientesFacturacion esté disponible -->
+    <script src="../assets/scripts/facturacion/buzon-pendientes.js" defer></script>
+
+    <!-- Inicialización (debe ser el último) -->
+    <script src="../assets/scripts/facturacion/page-init.js"></script>
+  </head>
+
+  <body>
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="logo">
+          <img src="../assets/img/Logo TF.png" alt="TitanFleet" />
+          <span class="logo-text">TitanFleet</span>
+        </div>
+        <button class="btn-close-sidebar" id="closeSidebar"><i class="fas fa-times"></i></button>
+      </div>
+      <nav class="sidebar-nav">
+        <ul class="nav-menu">
+          <li class="nav-item" id="nav-menu">
+            <a href="menu.html" class="nav-link"
+              ><i class="fa-solid fa-house-chimney"></i><span>Menú</span></a
+            >
+          </li>
+          <li class="nav-item" id="nav-logistica">
+            <a href="logistica.html" class="nav-link"
+              ><i class="fas fa-truck"></i><span>Logística</span></a
+            >
+          </li>
+          <li class="nav-item active" id="nav-facturacion">
+            <a href="facturacion.html" class="nav-link"
+              ><i class="fas fa-file-invoice"></i><span>Facturación</span></a
+            >
+          </li>
+          <li class="nav-item" id="nav-trafico">
+            <a href="trafico.html" class="nav-link"
+              ><i class="fas fa-route"></i><span>Tráfico</span></a
+            >
+          </li>
+          <li class="nav-item" id="nav-operadores">
+            <a href="operadores.html" class="nav-link"
+              ><i class="fas fa-user"></i><span>Operadores</span></a
+            >
+          </li>
+          <li class="nav-item" id="nav-diesel">
+            <a href="diesel.html" class="nav-link"
+              ><i class="fa-solid fa-gas-pump"></i><span>Diesel</span></a
+            >
+          </li>
+          <li class="nav-item" id="nav-mantenimiento">
+            <a href="mantenimiento.html" class="nav-link"
+              ><i class="fa-solid fa-screwdriver-wrench"></i><span>Mantenimiento</span></a
+            >
+          </li>
+          <li class="nav-item" id="nav-tesoreria">
+            <a href="tesoreria.html" class="nav-link"
+              ><i class="fa-solid fa-money-bill"></i><span>Tesoreria</span></a
+            >
+          </li>
+          <li class="nav-item" id="nav-cxc">
+            <a href="CXC.html" class="nav-link"
+              ><i class="fas fa-hand-holding-usd"></i><span>Cuentas x Cobrar</span></a
+            >
+          </li>
+          <li class="nav-item" id="nav-cxp">
+            <a href="CXP.html" class="nav-link"
+              ><i class="fas fa-credit-card"></i><span>Cuentas x Pagar</span></a
+            >
+          </li>
+          <li class="nav-item" id="nav-inventario">
+            <a href="inventario.html" class="nav-link"
+              ><i class="fa-solid fa-cart-flatbed"></i><span>Inventario</span></a
+            >
+          </li>
+          <li class="nav-item" id="nav-configuracion">
+            <a href="configuracion.html" class="nav-link"
+              ><i class="fa-solid fa-gears"></i><span>Configuración</span></a
+            >
+          </li>
+          <li class="nav-item" id="nav-reportes">
+            <a href="reportes.html" class="nav-link"
+              ><i class="fas fa-chart-line"></i><span>Reportes</span></a
+            >
+          </li>
+        </ul>
+      </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+      <!-- Top Bar -->
+      <div class="top-bar">
+        <button class="btn-toggle-sidebar" id="toggleSidebar">
+          <i class="fas fa-bars"></i>
+        </button>
+        <div class="top-bar-content">
+          <div class="page-title-section">
+            <h1 class="page-title">
+              <i class="fas fa-file-invoice"></i>
+              Gestión Facturación
+              <span
+                id="backendReadyIndicator"
+                class="backend-loading-indicator"
+                style="display: none"
+              >
+                <span
+                  class="spinner-border spinner-border-sm"
+                  role="status"
+                  aria-hidden="true"
+                ></span>
+                <span class="ms-2">Cargando datos...</span>
+              </span>
+              <span id="backendReadyBadge" class="backend-ready-badge" style="display: none">
+                <i class="fas fa-check-circle"></i>
+                <span class="ms-2">Listo para trabajar</span>
+              </span>
+            </h1>
+            <div class="current-period">
+              <small class="text-muted">Registro: </small>
+              <span class="period-info" id="currentPeriod">-</span>
+            </div>
+          </div>
+          <div class="user-info">
+            <div class="user-details">
+              <i class="fas fa-user-circle"></i>
+              <span id="currentUserName">Usuario ERP</span>
+            </div>
+            <div class="user-actions">
+              <button class="btn btn-outline-light btn-sm logout-btn" data-action="logout">
+                <i class="fas fa-sign-out-alt"></i> <span class="logout-text">Cerrar Sesión</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Content Area -->
+      <div class="content-wrapper" style="padding: 8px">
+        <div class="container-fluid">
+          <!-- Page Header -->
+          <div class="page-header">
+            <div class="row align-items-center">
+              <div class="col-md-8">
+                <h2 class="mb-2">Gestión Facturación</h2>
+                <p class="text-muted mb-0">
+                  Selecciona el número de registro para acceder a la información y llenar
+                  automáticamente los datos de logística y tráfico.
+                </p>
+              </div>
+              <div class="col-md-4 text-end">
+                <button class="btn btn-warning" id="btnBuzonPendientesFacturacion">
+                  <i class="fas fa-inbox"></i> Buzón de Pendientes
+                  <span class="badge bg-danger ms-1" id="contadorPendientesFacturacion">0</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Form -->
+          <div class="card">
+            <div class="card-body">
+              <form id="facturacionForm" class="needs-validation" novalidate>
+                <!-- Número de Registro -->
+                <div class="form-section">
+                  <h4 class="section-title">
+                    <i class="fas fa-hashtag"></i>
+                    Información del Registro
+                  </h4>
+                  <div class="row g-3">
+                    <div class="col-md-6">
+                      <label for="numeroRegistro" class="form-label">Número de Registro *</label>
+                      <div class="d-flex gap-2">
+                        <input
+                          type="text"
+                          class="form-control"
+                          id="numeroRegistro"
+                          placeholder="Ingresa el Numero de Registro"
+                          required
+                        />
+                        <button
+                          class="btn btn-outline-primary"
+                          type="button"
+                          data-action="safeSearchAndFillData"
+                          title="Buscar"
+                          style="flex-shrink: 0"
+                        >
+                          <i class="fas fa-search"></i>
+                        </button>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <label for="fechaCreacion" class="form-label">Fecha de Registro</label>
+                      <input type="date" class="form-control" id="fechaCreacion" />
+                    </div>
+                  </div>
+                </div>
+                <!-- Informacion de Logistica y Trafico -->
+                <div class="form-section">
+                  <h4 class="section-title">
+                    <i class="fa-solid fa-truck-fast"></i>
+                    Información de Logística y Tráfico
+                  </h4>
+
+                  <div class="row g-1">
+                    <div class="col-md-4">
+                      <label for="Cliente" class="form-label">Cliente</label>
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="Cliente"
+                        placeholder="Se llena en Automatico"
+                        readonly
+                      />
+                    </div>
+
+                    <div class="col-md-4">
+                      <label for="ReferenciaCliente" class="form-label">Referencia Cliente</label>
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="ReferenciaCliente"
+                        placeholder="Se llena en Automatico"
+                        readonly
+                      />
+                    </div>
+
+                    <div class="col-md-4">
+                      <label for="TipoServicio" class="form-label">Tipo de Servicio</label>
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="TipoServicio"
+                        placeholder="Se llena en Automatico"
+                        readonly
+                      />
+                    </div>
+                  </div>
+
+                  <div class="row g-1">
+                    <div class="col-md-4">
+                      <label for="LugarOrigen" class="form-label">Lugar de Origen</label>
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="LugarOrigen"
+                        placeholder="Se llena en Automatico"
+                        readonly
+                      />
+                    </div>
+
+                    <div class="col-md-4">
+                      <label for="LugarDestino" class="form-label">LugarDestino</label>
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="LugarDestino"
+                        placeholder="Se llena en Automatico"
+                        readonly
+                      />
+                    </div>
+
+                    <div class="col-md-4">
+                      <label for="embalajeEspecial" class="form-label">Embalaje Especial</label>
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="embalajeEspecial"
+                        placeholder="Se llena en Automatico"
+                        readonly
+                      />
+                    </div>
+                  </div>
+
+                  <div class="row g-1">
+                    <div class="col-md-4">
+                      <label for="economico" class="form-label">Economico Tractocamion</label>
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="economico"
+                        placeholder="Se llena automáticamente"
+                        readonly
+                      />
+                    </div>
+
+                    <div class="col-md-4">
+                      <label for="Placas" class="form-label">Placas</label>
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="Placas"
+                        placeholder="Se llena en Automatico"
+                        readonly
+                      />
+                    </div>
+
+                    <div class="col-md-4">
+                      <label for="PermisoSCT" class="form-label">Permiso SCT</label>
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="PermisoSCT"
+                        placeholder="Se llena en Automatico"
+                        readonly
+                      />
+                    </div>
+                  </div>
+
+                  <div class="row g-3">
+                    <div class="col-md-6">
+                      <label for="OperadorPrincipal" class="form-label">Operador Principal</label>
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="OperadorPrincipal"
+                        placeholder="Se llena automáticamente"
+                        readonly
+                      />
+                    </div>
+                    <div class="col-md-6">
+                      <label for="Licencia" class="form-label">Licencia</label>
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="Licencia"
+                        placeholder="Se llena en Automatico"
+                        readonly
+                      />
+                    </div>
+                  </div>
+
+                  <div class="row g-3">
+                    <div class="col-md-6">
+                      <label for="operadorsecundario" class="form-label">Operador Secundario</label>
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="operadorsecundario"
+                        placeholder="Se llena en Automatico"
+                        readonly
+                      />
+                    </div>
+                    <div class="col-md-6">
+                      <label for="LicenciaSecundaria" class="form-label">Licencia</label>
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="LicenciaSecundaria"
+                        placeholder="Se llena en Automatico"
+                        readonly
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Datos de la factura -->
+                <div class="form-section">
+                  <h4 class="section-title">
+                    <i class="fa-solid fa-file-invoice-dollar"></i>
+                    Datos de Facturación
+                  </h4>
+                  <div class="row g-3">
+                    <div class="col-md-6">
+                      <label for="serie" class="form-label">Serie </label>
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="serie"
+                        placeholder="Numero de Serie"
+                        required
+                      />
+                      <div class="invalid-feedback">Por favor ingrese el numero de serie</div>
+                    </div>
+                    <div class="col-md-6">
+                      <label for="folio" class="form-label">Folio </label>
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="folio"
+                        placeholder="Numero de Folio"
+                        required
+                      />
+                      <div class="invalid-feedback">Por favor ingrese el numero de folio</div>
+                    </div>
+                    <div class="col-md-6">
+                      <label for="Folio Fiscal" class="form-label">Folio Fiscal (UUID) </label>
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="Folio Fiscal"
+                        placeholder="Ingresa el UUID o Folio Fiscal"
+                        required
+                      />
+                      <div class="invalid-feedback">Por favor ingrese un UUID válido</div>
+                      <small class="form-text text-muted"
+                        >Formato: 32 dígitos hexadecimales separados por guiones (8-4-4-4-12)</small
+                      >
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Detalles de Montos -->
+                <div class="form-section">
+                  <h4 class="section-title">
+                    <i class="fa-solid fa-money-bill-1"></i>
+                    Detalles de Montos
+                  </h4>
+                  <div class="row g-3">
+                    <div class="col-md-6">
+                      <label for="Subtotal" class="form-label">Subtotal </label>
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="Subtotal"
+                        placeholder="Monto Subtotal"
+                        required
+                      />
+                      <div class="invalid-feedback">
+                        Por favor ingrese el subtotal de su factura
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <label for="iva" class="form-label">IVA </label>
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="iva"
+                        placeholder="Monto IVA"
+                        required
+                      />
+                      <div class="invalid-feedback">Por favor ingrese el IVA de su factura</div>
+                    </div>
+                    <div class="col-md-6">
+                      <label for="iva retenido" class="form-label">IVA Retenido </label>
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="iva retenido"
+                        placeholder="Monto IVA Retenido"
+                        required
+                      />
+                      <div class="invalid-feedback">Por favor ingrese el IVA Retenido</div>
+                    </div>
+                    <div class="col-md-6">
+                      <label for="isr retenido" class="form-label">ISR Retenido </label>
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="isr retenido"
+                        placeholder="Monto ISR Retenido"
+                        required
+                      />
+                      <div class="invalid-feedback">Por favor ingrese el ISR Retenido</div>
+                    </div>
+                    <div class="col-md-6">
+                      <label for="otros montos" class="form-label"
+                        >Otros Montos a Favor o Contra
+                      </label>
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="Otros Montos"
+                        placeholder="Ej: 500 o -500"
+                      />
+                      <div class="invalid-feedback">
+                        Por favor ingrese Otros montos a favor o en contra
+                      </div>
+                      <small class="form-text text-muted"
+                        >Puede ser positivo (a favor) o negativo (en contra)</small
+                      >
+                    </div>
+                    <div class="col-md-3">
+                      <label for="tipoMoneda" class="form-label">Tipo de Moneda *</label>
+                      <select class="form-select" id="tipoMoneda" required>
+                        <option value="">Seleccione...</option>
+                        <option value="MXN" selected>MXN - Peso Mexicano</option>
+                        <option value="USD">USD - Dólar Americano</option>
+                      </select>
+                      <div class="invalid-feedback">Por favor seleccione el tipo de moneda</div>
+                    </div>
+                    <div class="col-md-3">
+                      <label for="tipoCambio" class="form-label">Tipo de Cambio</label>
+                      <input
+                        type="number"
+                        class="form-control"
+                        id="tipoCambio"
+                        placeholder="0.0000"
+                        step="0.0001"
+                        min="0"
+                        inputmode="decimal"
+                        max="9999.9999"
+                      />
+                      <div class="invalid-feedback">Por favor ingrese el tipo de cambio</div>
+                      <small class="form-text text-muted"
+                        >Solo requerido si la moneda es USD (hasta 4 decimales, ej: 17.2500)</small
+                      >
+                    </div>
+                    <div class="col-md-6">
+                      <label for="total factura" class="form-label">Total Factura </label>
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="total factura"
+                        placeholder="Total Factura"
+                        readonly
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Observaciones -->
+                <div class="form-section">
+                  <h4 class="section-title">
+                    <i class="fa-solid fa-clipboard"></i>
+                    Observaciones
+                  </h4>
+                  <div class="row g-3">
+                    <div class="col-12">
+                      <div class="form-check form-check-inline">
+                        <input
+                          class="form-check-input"
+                          type="radio"
+                          name="observaciones"
+                          id="observacionesSi"
+                          value="si"
+                        />
+                        <label class="form-check-label" for="observacionesSi">Sí</label>
+                      </div>
+                      <div class="form-check form-check-inline">
+                        <input
+                          class="form-check-input"
+                          type="radio"
+                          name="observaciones"
+                          id="observacionesNo"
+                          value="no"
+                          checked
+                        />
+                        <label class="form-check-label" for="observacionesNo">No</label>
+                      </div>
+                    </div>
+                    <div class="col-12" id="descripcionObservaciones" style="display: none">
+                      <label for="descripcionFacturacion" class="form-label"
+                        >Describe tus Observaciones</label
+                      >
+                      <textarea
+                        class="form-control"
+                        id="descripcionFacturacion"
+                        rows="3"
+                        placeholder="Describe tus Observaciones"
+                      ></textarea>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Botones de Acción -->
+                <div class="form-actions">
+                  <button
+                    type="button"
+                    class="btn btn-outline-warning me-2"
+                    data-action="clearCurrentForm"
+                  >
+                    <i class="fas fa-times"></i> Limpiar
+                  </button>
+                  <button type="submit" class="btn btn-primary me-2">
+                    <i class="fas fa-check"></i> Registrar Envío
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <!-- Lista de Registros de Facturación -->
+          <div class="card mt-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+              <h5 class="mb-0">
+                <i class="fas fa-list"></i>
+                Lista de Registros de Facturación
+              </h5>
+              <button
+                type="button"
+                class="btn btn-outline-light btn-sm exportar-btn-header"
+                data-action="exportarFacturacionExcel"
+              >
+                <i class="fas fa-file-excel"></i> Exportar
+              </button>
+            </div>
+            <!-- Filtros -->
+            <div class="card-body border-bottom filtros-container">
+              <h6 class="mb-3"><i class="fas fa-filter"></i> Filtros de Búsqueda</h6>
+              <div class="row g-3">
+                <div class="col-md-2">
+                  <label for="filtroNumeroRegistroFacturacion" class="form-label small"
+                    >N° Registro</label
+                  >
+                  <input
+                    type="text"
+                    class="form-control form-control-sm"
+                    id="filtroNumeroRegistroFacturacion"
+                    placeholder="Ej: 2500001"
+                    data-action="aplicarFiltrosFacturacion"
+                  />
+                </div>
+                <div class="col-md-2">
+                  <label for="filtroClienteFacturacion" class="form-label small">Cliente</label>
+                  <input
+                    type="text"
+                    class="form-control form-control-sm"
+                    id="filtroClienteFacturacion"
+                    placeholder="Nombre cliente"
+                    data-action="aplicarFiltrosFacturacion"
+                  />
+                </div>
+                <div class="col-md-2">
+                  <label for="filtroSerieFacturacion" class="form-label small">Serie</label>
+                  <input
+                    type="text"
+                    class="form-control form-control-sm"
+                    id="filtroSerieFacturacion"
+                    placeholder="Número serie"
+                    data-action="aplicarFiltrosFacturacion"
+                  />
+                </div>
+                <div class="col-md-2">
+                  <label for="filtroFolioFacturacion" class="form-label small">Folio</label>
+                  <input
+                    type="text"
+                    class="form-control form-control-sm"
+                    id="filtroFolioFacturacion"
+                    placeholder="Número folio"
+                    data-action="aplicarFiltrosFacturacion"
+                  />
+                </div>
+                <div class="col-md-2">
+                  <label for="filtroFechaInicioFacturacion" class="form-label small"
+                    >Fecha Inicio</label
+                  >
+                  <input
+                    type="date"
+                    class="form-control form-control-sm"
+                    id="filtroFechaInicioFacturacion"
+                    data-action="aplicarFiltrosFacturacion"
+                  />
+                </div>
+                <div class="col-md-2">
+                  <label for="filtroFechaFinFacturacion" class="form-label small">Fecha Fin</label>
+                  <input
+                    type="date"
+                    class="form-control form-control-sm"
+                    id="filtroFechaFinFacturacion"
+                    data-action="aplicarFiltrosFacturacion"
+                  />
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                  <button
+                    type="button"
+                    class="btn btn-outline-secondary btn-sm w-100"
+                    data-action="limpiarFiltrosFacturacion"
+                  >
+                    <i class="fas fa-times"></i> Limpiar Filtros
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="table-responsive">
+                <table class="table table-hover" id="tablaRegistrosFacturacion">
+                  <thead class="table-dark">
+                    <tr>
+                      <th>N° Registro</th>
+                      <th>Cliente</th>
+                      <th>RFC</th>
+                      <th>Referencia Cliente</th>
+                      <th>Serie</th>
+                      <th>Folio</th>
+                      <th>Fecha Factura</th>
+                      <th>Moneda</th>
+                      <th>Tipo de Cambio</th>
+                      <th>Subtotal</th>
+                      <th>IVA</th>
+                      <th>IVA Retenido</th>
+                      <th>ISR Retenido</th>
+                      <th>Otros Montos</th>
+                      <th>Total</th>
+                      <th>Hay Observaciones</th>
+                      <th>Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <!-- Los registros se cargarán dinámicamente -->
+                  </tbody>
+                </table>
+              </div>
+              <div id="paginacionFacturacion"></div>
+              <div id="mensajeSinRegistrosFacturacion" class="text-center text-muted py-4">
+                <i class="fas fa-inbox fa-3x mb-3"></i>
+                <p>No hay registros de facturación disponibles</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== SCRIPTS COMUNES Y MÓDULOS (Carga automática) ===== -->
+    <script src="../assets/scripts/performance/common-head-loader.js"></script>
+    <script src="../assets/scripts/performance/common-scripts-loader.js"></script>
+    <script src="../assets/scripts/performance/page-modules-config.js"></script>
+    <script src="../assets/scripts/performance/page-modules-loader.js"></script>
+    <script src="../assets/scripts/facturacion/modules-config.js" defer></script>
+
+    <!-- Script para manejo del sidebar (similar a menu.html y logistica.html) -->
+    <script src="../assets/scripts/menu/sidebar-handler.js"></script>
+
+    <!-- Funciones de exportación movidas a assets/scripts/facturacion/export-utils.js -->
+
+    <!-- Funciones de búsqueda y llenado movidas a assets/scripts/facturacion/search-fill-data.js -->
+
+    <!-- Modal para Ver Detalles de Facturación -->
+    <div
+      class="modal fade"
+      id="modalVerDetallesFacturacion"
+      tabindex="-1"
+      aria-labelledby="modalVerDetallesFacturacionLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header bg-info text-white">
+            <h5 class="modal-title" id="modalVerDetallesFacturacionLabel">
+              <i class="fas fa-eye"></i> Detalles del Registro
+            </h5>
+            <button
+              type="button"
+              class="btn-close btn-close-white"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body" id="modalVerDetallesFacturacionBody">
+            <!-- El contenido se cargará dinámicamente -->
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+              <i class="fas fa-times"></i> Cerrar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scripts movidos a carga bajo demanda arriba -->
+    <!-- Script para indicador de carga del backend (compartido) -->
+    <script src="../assets/scripts/backend-ready-indicator.js"></script>
+
+    <!-- Scripts redundantes eliminados - auth.js ya maneja los permisos automáticamente -->
+  </body>
+</html>

@@ -1,0 +1,61 @@
+{
+  "hosting": {
+    "public": ".",
+    "ignore": [
+      "firebase.json",
+      ".firebaserc",
+      "**/.*",
+      "**/node_modules/**",
+      "**/*.md",
+      "**/docs/**",
+      "**/test*.html",
+      "**/debug.html",
+      "**/fix_*.html",
+      "**/migrate-*.html",
+      "**/eliminar_*.html",
+      "**/DEPLOY.md",
+      "**/LICENSE_SYSTEM_README.md",
+      "**/PAYMENT_SETUP.md",
+      "**/package.json",
+      "**/package-lock.json",
+      "**/.git/**",
+      "**/.gitignore",
+      "**/components/**",
+      "**/layouts/**",
+      "**/assets/styles/**/*.scss",
+      "**/assets/styles/**/_*.scss",
+      "**/*.exe",
+      "**/*.bat",
+      "**/*.cmd",
+      "**/*.ps1",
+      "**/*.sh",
+      "**/*.py",
+      "scripts/**",
+      "tests/**",
+      "**/*.test.js",
+      "**/*.spec.js",
+      "**/playwright.config.js",
+      "**/vitest.config.js"
+    ],
+    "rewrites": [
+      {
+        "source": "!**/*.@(js|css|jpg|jpeg|gif|png|svg|webp|eot|otf|ttf|ttc|woff|woff2|font.css|json|ico)",
+        "destination": "/index.html"
+      }
+    ],
+    "headers": [
+      {
+        "source": "**/*.@(js|css|html|json)",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "max-age=3600"
+          }
+        ]
+      }
+    ]
+  },
+  "firestore": {
+    "rules": "firestore.rules"
+  }
+}

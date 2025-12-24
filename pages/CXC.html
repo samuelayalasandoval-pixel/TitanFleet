@@ -1,0 +1,1010 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/png" sizes="16x16" href="../assets/img/Logo TF.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="../assets/img/Logo TF.png" />
+    <link rel="icon" type="image/png" sizes="64x64" href="../assets/img/Logo TF.png" />
+    <title>Cuentas por Cobrar</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css"
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <link rel="stylesheet" href="../styles/styles.css" />
+    <link rel="stylesheet" href="../styles/cxc.css" />
+    <link rel="stylesheet" href="../styles/backend-indicator.css" />
+
+    <!-- Bootstrap JavaScript (requerido para modales) - SIN defer para que cargue inmediatamente -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      // Verificar que Bootstrap se cargó correctamente
+      if (typeof bootstrap === 'undefined') {
+        console.error('❌ Bootstrap no se cargó correctamente');
+      } else {
+        console.log('✅ Bootstrap cargado correctamente');
+      }
+    </script>
+
+    <!-- CRÍTICO: Ocultar elementos del sidebar INMEDIATAMENTE para evitar parpadeo -->
+    <style>
+      /* Ocultar todos los módulos del sidebar inicialmente */
+      .nav-item:not(#nav-menu) {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        height: 0 !important;
+        overflow: hidden !important;
+      }
+      /* Permitir que auth.js muestre los elementos con permisos */
+      .nav-item.permission-granted {
+        display: list-item !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        height: auto !important;
+        overflow: visible !important;
+      }
+    </style>
+
+    <!-- Performance Optimizations y Loaders Comunes -->
+    <script src="../assets/scripts/performance/performance-init.js" defer></script>
+
+    <!-- CRÍTICO: auth.js DEBE cargarse ANTES de common-head-loader.js -->
+    <!-- para que los permisos se apliquen antes de que se oculten elementos -->
+    <script src="../assets/scripts/auth.js"></script>
+
+    <!-- Ahora cargar common-head-loader.js que esperará a que auth.js esté listo -->
+    <script src="../assets/scripts/performance/common-head-loader.js"></script>
+    <script src="../assets/scripts/script-loader.js" defer></script>
+
+    <!-- Scripts críticos específicos de la página -->
+    <!-- Script crítico: Restaurar estado del sidebar ANTES de renderizar para evitar parpadeo -->
+    <script src="../assets/scripts/menu/sidebar-state.js"></script>
+    <!-- Script para actualizar período automáticamente -->
+    <script src="../assets/scripts/periodo.js"></script>
+
+    <!-- ===== FASE 3: Scripts Base del Sistema (SIN defer) ===== -->
+    <!-- CRÍTICO: main.js debe cargarse SIN defer para que funciones base estén disponibles -->
+    <script src="../assets/scripts/main.js"></script>
+    <!-- CRÍTICO: cache-manager.js debe cargarse ANTES de otros scripts que usan caché -->
+    <script src="../assets/scripts/cache-manager.js"></script>
+    <!-- CRÍTICO: firebase-init.js debe cargarse PRIMERO para inicializar Firebase -->
+    <script type="module" src="../assets/scripts/firebase-init.js"></script>
+    <!-- CRÍTICO: firebase-ready.js debe cargarse DESPUÉS de firebase-init.js para verificar disponibilidad -->
+    <script src="../assets/scripts/firebase-ready.js"></script>
+    <!-- CRÍTICO: firebase-repo-base.js debe cargarse para que FirebaseRepoBase esté disponible -->
+    <script src="../assets/scripts/firebase-repo-base.js" defer></script>
+    <!-- CRÍTICO: firebase-repos.js debe cargarse DESPUÉS de firebase-repo-base.js para crear los repositorios -->
+    <script src="../assets/scripts/firebase-repos.js" defer></script>
+
+    <!-- Sistema de limpieza automática de localStorage -->
+    <script src="../assets/scripts/localstorage-cleanup.js" defer></script>
+  </head>
+
+  <body>
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="logo">
+          <img src="../assets/img/Logo TF.png" alt="TitanFleet" style="height: 50px; width: auto" />
+          <span class="logo-text">TitanFleet</span>
+        </div>
+        <button class="btn-close-sidebar" id="closeSidebar"><i class="fas fa-times"></i></button>
+      </div>
+      <nav class="sidebar-nav">
+        <ul class="nav-menu">
+          <li class="nav-item" id="nav-menu">
+            <a href="menu.html" class="nav-link"
+              ><i class="fa-solid fa-house-chimney"></i><span>Menú</span></a
+            >
+          </li>
+          <li class="nav-item" id="nav-logistica">
+            <a href="logistica.html" class="nav-link"
+              ><i class="fas fa-truck"></i><span>Logística</span></a
+            >
+          </li>
+          <li class="nav-item" id="nav-facturacion">
+            <a href="facturacion.html" class="nav-link"
+              ><i class="fas fa-file-invoice"></i><span>Facturación</span></a
+            >
+          </li>
+          <li class="nav-item" id="nav-trafico">
+            <a href="trafico.html" class="nav-link"
+              ><i class="fas fa-route"></i><span>Tráfico</span></a
+            >
+          </li>
+          <li class="nav-item" id="nav-operadores">
+            <a href="operadores.html" class="nav-link"
+              ><i class="fas fa-user"></i><span>Operadores</span></a
+            >
+          </li>
+          <li class="nav-item" id="nav-diesel">
+            <a href="diesel.html" class="nav-link"
+              ><i class="fa-solid fa-gas-pump"></i><span>Diesel</span></a
+            >
+          </li>
+          <li class="nav-item" id="nav-mantenimiento">
+            <a href="mantenimiento.html" class="nav-link"
+              ><i class="fa-solid fa-screwdriver-wrench"></i><span>Mantenimiento</span></a
+            >
+          </li>
+          <li class="nav-item" id="nav-tesoreria">
+            <a href="tesoreria.html" class="nav-link"
+              ><i class="fa-solid fa-money-bill"></i><span>Tesoreria</span></a
+            >
+          </li>
+          <li class="nav-item active" id="nav-cxc">
+            <a href="CXC.html" class="nav-link"
+              ><i class="fas fa-hand-holding-usd"></i><span>Cuentas x Cobrar</span></a
+            >
+          </li>
+          <li class="nav-item" id="nav-cxp">
+            <a href="CXP.html" class="nav-link"
+              ><i class="fas fa-credit-card"></i><span>Cuentas x Pagar</span></a
+            >
+          </li>
+          <li class="nav-item" id="nav-inventario">
+            <a href="inventario.html" class="nav-link"
+              ><i class="fa-solid fa-cart-flatbed"></i><span>Inventario</span></a
+            >
+          </li>
+          <li class="nav-item" id="nav-configuracion">
+            <a href="configuracion.html" class="nav-link"
+              ><i class="fa-solid fa-gears"></i><span>Configuración</span></a
+            >
+          </li>
+          <li class="nav-item" id="nav-reportes">
+            <a href="reportes.html" class="nav-link"
+              ><i class="fas fa-chart-line"></i><span>Reportes</span></a
+            >
+          </li>
+        </ul>
+      </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+      <!-- Top Bar -->
+      <div class="top-bar">
+        <button class="btn-toggle-sidebar" id="toggleSidebar">
+          <i class="fas fa-bars"></i>
+        </button>
+        <div class="top-bar-content">
+          <div class="page-title-section">
+            <h1 class="page-title">
+              <i class="fas fa-hand-holding-usd"></i>
+              Cuentas por Cobrar
+              <span
+                id="backendReadyIndicator"
+                class="backend-loading-indicator"
+                style="display: none"
+              >
+                <span
+                  class="spinner-border spinner-border-sm"
+                  role="status"
+                  aria-hidden="true"
+                ></span>
+                <span class="ms-2">Cargando datos...</span>
+              </span>
+              <span id="backendReadyBadge" class="backend-ready-badge" style="display: none">
+                <i class="fas fa-check-circle"></i>
+                <span class="ms-2">Listo para trabajar</span>
+              </span>
+            </h1>
+            <div class="current-period">
+              <small class="text-muted">Período: </small>
+              <span class="period-info" id="currentPeriod"></span>
+            </div>
+          </div>
+          <div class="user-info">
+            <div class="user-details">
+              <i class="fas fa-user-circle"></i>
+              <span id="currentUserName">Usuario ERP</span>
+            </div>
+            <div class="user-actions">
+              <button class="btn btn-outline-light btn-sm logout-btn" data-action="logout">
+                <i class="fas fa-sign-out-alt"></i> <span class="logout-text">Cerrar Sesión</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Content Area -->
+      <div class="content-wrapper" style="padding: 8px">
+        <div class="container-fluid">
+          <!-- Page Header -->
+          <div class="page-header">
+            <div class="row align-items-center">
+              <div class="col-md-8">
+                <h2 class="mb-2">Gestión de Cuentas por Cobrar</h2>
+                <p class="text-muted mb-0">
+                  Administra las facturas pendientes de pago y registra los pagos recibidos.
+                </p>
+              </div>
+              <div class="col-md-4 text-end">
+                <!-- Botones removidos según solicitud -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Resumen de Cuentas por Cobrar -->
+          <div class="row mb-4">
+            <div class="col-md-3">
+              <div class="card metric-card">
+                <div class="card-body text-center">
+                  <div class="metric-value" id="facturasPendientes">0</div>
+                  <div class="metric-label">Facturas Pendientes</div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="card metric-card">
+                <div class="card-body text-center">
+                  <div class="metric-value" id="facturasPagadas">0</div>
+                  <div class="metric-label">Facturas Pagadas</div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="card metric-card">
+                <div class="card-body text-center">
+                  <div class="metric-value" id="montoTotalPendiente">$0</div>
+                  <div class="metric-label">Monto Total Pendiente</div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="card metric-card">
+                <div class="card-body text-center">
+                  <div class="metric-value" id="tasaCobranza">0%</div>
+                  <div class="metric-label">Tasa de Cobranza</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Filtros y Búsqueda -->
+          <div class="card mb-4">
+            <div class="card-header" style="background-color: #2e4154; color: #ffffff">
+              <h5 class="mb-0" style="color: #ffffff">
+                <i class="fas fa-filter"></i>
+                Filtros de Búsqueda
+              </h5>
+            </div>
+            <div class="card-body">
+              <div class="row g-3 align-items-end">
+                <div class="col-md-2">
+                  <label class="form-label">Cliente</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="filtroCliente"
+                    placeholder="Buscar por cliente"
+                  />
+                </div>
+                <div class="col-md-2">
+                  <label class="form-label">Serie</label>
+                  <input type="text" class="form-control" id="filtroSerie" placeholder="Ej: A" />
+                </div>
+                <div class="col-md-2">
+                  <label class="form-label">Folio</label>
+                  <input type="text" class="form-control" id="filtroFolio" placeholder="Ej: 15" />
+                </div>
+                <div class="col-md-2">
+                  <label class="form-label">Estado</label>
+                  <select class="form-select" id="filtroEstado">
+                    <option value="">Todos</option>
+                    <option value="pendiente">Pendiente</option>
+                    <option value="pagado">Pagado</option>
+                    <option value="vencido">Vencido</option>
+                  </select>
+                </div>
+                <div class="col-md-2">
+                  <label class="form-label">Fecha Desde</label>
+                  <input type="date" class="form-control" id="fechaDesde" />
+                </div>
+                <div class="col-md-2">
+                  <label class="form-label">Fecha Hasta</label>
+                  <input type="date" class="form-control" id="fechaHasta" />
+                </div>
+                <div class="col-md-12 d-flex justify-content-end gap-2 mt-3">
+                  <button class="btn btn-outline-secondary" data-action="limpiarFiltrosCXC">
+                    <i class="fas fa-times"></i> Limpiar
+                  </button>
+                  <button class="btn btn-success" data-action="generarEstadoCuenta">
+                    <i class="fas fa-file-pdf"></i> Estado de Cuenta
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tabla de Facturas -->
+          <div class="card">
+            <div
+              class="card-header d-flex justify-content-between align-items-center"
+              style="background-color: #2e4154; color: #ffffff"
+            >
+              <h5 class="mb-0" style="color: #ffffff">
+                <i class="fas fa-file-invoice"></i>
+                Facturas por Cobrar
+              </h5>
+              <button
+                class="btn btn-outline-light btn-sm exportar-btn-header"
+                data-action="exportCXCData"
+              >
+                <i class="fas fa-file-excel"></i> Exportar
+              </button>
+            </div>
+            <div class="card-body">
+              <div class="table-responsive">
+                <table class="table table-striped table-hover" id="tablaFacturas">
+                  <thead class="table-dark">
+                    <tr>
+                      <th>
+                        <input type="checkbox" id="selectAll" data-action="toggleAllSelections" />
+                      </th>
+                      <th>Serie y Folio</th>
+                      <th>Cliente</th>
+                      <th>Fecha Emisión</th>
+                      <th>Fecha Vencimiento</th>
+                      <th>Monto Total</th>
+                      <th>Monto Pagado</th>
+                      <th>Monto Pendiente</th>
+                      <th>Estado</th>
+                      <th>Días Vencidos</th>
+                      <th>Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody id="tbodyFacturas">
+                    <!-- Los datos se cargarán dinámicamente -->
+                  </tbody>
+                </table>
+              </div>
+              <div id="paginacionCXC"></div>
+
+              <!-- Botones de pago múltiple -->
+              <div class="mt-3" id="pagoMultipleSection" style="display: none">
+                <div class="alert alert-info">
+                  <strong>Facturas seleccionadas:</strong>
+                  <span id="facturasSeleccionadasCount">0</span>
+                  <br />
+                  <strong>Total a pagar:</strong> $<span id="totalSeleccionado">0.00</span>
+                </div>
+                <div class="d-flex gap-2">
+                  <button class="btn btn-success" data-action="abrirModalPagoMultiple">
+                    <i class="fas fa-credit-card"></i> Registrar Pago Múltiple
+                  </button>
+                  <button class="btn btn-outline-secondary" data-action="limpiarSelecciones">
+                    <i class="fas fa-times"></i> Limpiar Selección
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal para Registrar Pago -->
+    <div
+      class="modal fade"
+      id="modalRegistrarPago"
+      tabindex="-1"
+      aria-labelledby="modalRegistrarPagoLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="modalRegistrarPagoLabel">
+              <i class="fas fa-credit-card"></i>
+              Registrar Pago
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <form id="formRegistrarPago">
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label for="facturaSeleccionada" class="form-label">Factura</label>
+                  <input type="text" class="form-control" id="facturaSeleccionada" readonly />
+                </div>
+                <div class="col-md-6">
+                  <label for="clienteSeleccionado" class="form-label">Cliente</label>
+                  <input type="text" class="form-control" id="clienteSeleccionado" readonly />
+                </div>
+                <div class="col-md-4">
+                  <label for="montoFactura" class="form-label">Monto Total</label>
+                  <input type="text" class="form-control" id="montoFactura" readonly />
+                </div>
+                <div class="col-md-4">
+                  <label for="montoPagado" class="form-label">Monto Pagado</label>
+                  <input type="text" class="form-control" id="montoPagado" readonly />
+                </div>
+                <div class="col-md-4">
+                  <label for="montoPendiente" class="form-label">Monto Pendiente</label>
+                  <input type="text" class="form-control" id="montoPendiente" readonly />
+                </div>
+                <div class="col-md-6">
+                  <label for="montoPago" class="form-label">Monto del Pago *</label>
+                  <input type="number" class="form-control" id="montoPago" step="0.01" required />
+                  <div class="form-text">
+                    <i class="fas fa-info-circle"></i>
+                    Puedes pagar el monto completo o una parcialidad. Máximo:
+                    <span id="maximoPago">$0.00</span>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <label for="fechaPago" class="form-label">Fecha de Pago *</label>
+                  <input type="date" class="form-control" id="fechaPago" required />
+                </div>
+                <div class="col-md-6">
+                  <label for="metodoPago" class="form-label">Método de Pago *</label>
+                  <select class="form-select" id="metodoPago" required>
+                    <option value="">Seleccionar método</option>
+                    <option value="transferencia">Transferencia Bancaria</option>
+                    <option value="cheque">Cheque</option>
+                    <option value="efectivo">Efectivo</option>
+                    <option value="tarjeta">Tarjeta de Crédito</option>
+                    <option value="otro">Otro</option>
+                  </select>
+                </div>
+                <div class="col-md-6">
+                  <label for="bancoOrigen" class="form-label">Banco Origen *</label>
+                  <select
+                    class="form-select"
+                    id="bancoOrigen"
+                    required
+                    data-action="actualizarCuentasOrigenCXC"
+                  >
+                    <option value="">Seleccione un banco...</option>
+                  </select>
+                  <div class="invalid-feedback">Por favor seleccione el banco de origen</div>
+                </div>
+                <div class="col-md-6">
+                  <label for="cuentaPago" class="form-label">Cuenta Origen *</label>
+                  <select class="form-select" id="cuentaPago" required>
+                    <option value="">Primero seleccione un banco</option>
+                  </select>
+                  <div class="invalid-feedback">Por favor seleccione la cuenta de origen</div>
+                </div>
+                <div class="col-md-6">
+                  <label for="bancoDestino" class="form-label">Banco Destino *</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="bancoDestino"
+                    placeholder="Ej: BBVA, Santander, etc."
+                    required
+                  />
+                  <div class="invalid-feedback">Por favor ingrese el banco de destino</div>
+                </div>
+                <div class="col-md-6">
+                  <label for="cuentaDestino" class="form-label">Cuenta Destino *</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="cuentaDestino"
+                    placeholder="Número de cuenta"
+                    required
+                  />
+                  <div class="invalid-feedback">Por favor ingrese la cuenta de destino</div>
+                </div>
+                <div class="col-md-6">
+                  <label for="referenciaPago" class="form-label">Referencia de Pago</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="referenciaPago"
+                    placeholder="Referencia bancaria o comprobante"
+                  />
+                </div>
+                <div class="col-12">
+                  <label for="observacionesPago" class="form-label">Observaciones</label>
+                  <textarea
+                    class="form-control"
+                    id="observacionesPago"
+                    rows="3"
+                    placeholder="Observaciones adicionales sobre el pago"
+                  ></textarea>
+                </div>
+                <div class="col-12">
+                  <label for="comprobantePago" class="form-label">
+                    <i class="fas fa-paperclip"></i>
+                    Comprobante de Pago *
+                  </label>
+                  <input
+                    type="file"
+                    class="form-control"
+                    id="comprobantePago"
+                    accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                    multiple
+                    required
+                  />
+                  <div class="invalid-feedback">Por favor suba al menos un comprobante de pago</div>
+                  <div class="form-text">
+                    <i class="fas fa-info-circle"></i>
+                    Debes adjuntar comprobantes de pago como transferencias, depósitos, cheques,
+                    etc. Formatos permitidos: PDF, JPG, PNG, DOC, DOCX
+                  </div>
+                  <div id="archivosAdjuntos" class="mt-2">
+                    <!-- Los archivos adjuntos se mostrarán aquí -->
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+              Cancelar
+            </button>
+            <button type="button" class="btn btn-success" data-action="registrarPago">
+              <i class="fas fa-check"></i> Registrar Pago
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal para Ver Detalles de Factura -->
+    <div
+      class="modal fade"
+      id="modalDetallesFactura"
+      tabindex="-1"
+      aria-labelledby="modalDetallesFacturaLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="modalDetallesFacturaLabel">
+              <i class="fas fa-file-invoice"></i>
+              Detalles de Factura
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <div id="detallesFacturaContent">
+              <!-- Los detalles se cargarán dinámicamente -->
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal para Pago Múltiple -->
+    <div
+      class="modal fade"
+      id="modalPagoMultiple"
+      tabindex="-1"
+      aria-labelledby="modalPagoMultipleLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="modalPagoMultipleLabel">
+              <i class="fas fa-credit-card"></i>
+              Registrar Pago Múltiple
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3">
+              <h6>Distribución del Pago por Factura:</h6>
+              <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i>
+                Puedes editar el monto a pagar de cada factura individualmente. El sistema validará
+                que no excedas el monto pendiente.
+              </div>
+              <div id="listaFacturasSeleccionadas" class="list-group">
+                <!-- Las facturas se cargarán dinámicamente -->
+              </div>
+            </div>
+
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label for="fechaPagoMultiple" class="form-label">Fecha de Pago</label>
+                <input type="date" class="form-control" id="fechaPagoMultiple" required />
+              </div>
+              <div class="col-md-6">
+                <label for="montoPagoMultiple" class="form-label">Monto Total del Pago</label>
+                <input type="text" class="form-control" id="montoPagoMultiple" readonly />
+              </div>
+              <div class="col-md-6">
+                <label for="metodoPagoMultiple" class="form-label">Método de Pago</label>
+                <select class="form-select" id="metodoPagoMultiple" required>
+                  <option value="">Seleccionar método</option>
+                  <option value="efectivo">Efectivo</option>
+                  <option value="transferencia">Transferencia Bancaria</option>
+                  <option value="cheque">Cheque</option>
+                  <option value="tarjeta">Tarjeta de Crédito/Débito</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label for="bancoOrigenMultiple" class="form-label">Banco Origen</label>
+                <select
+                  class="form-select"
+                  id="bancoOrigenMultiple"
+                  data-action="actualizarCuentasOrigenMultipleCXC"
+                >
+                  <option value="">Seleccione un banco...</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label for="cuentaPagoMultiple" class="form-label">Cuenta Origen</label>
+                <select class="form-select" id="cuentaPagoMultiple">
+                  <option value="">Primero seleccione un banco</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label for="cuentaDestinoMultiple" class="form-label">Cuenta Destino</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="cuentaDestinoMultiple"
+                  placeholder="Número de cuenta destino"
+                />
+              </div>
+              <div class="col-md-6">
+                <label for="bancoDestinoMultiple" class="form-label">Banco Destino</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="bancoDestinoMultiple"
+                  placeholder="Banco destino del pago"
+                />
+              </div>
+              <div class="col-12">
+                <label for="referenciaPagoMultiple" class="form-label">Referencia del Pago</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="referenciaPagoMultiple"
+                  placeholder="Referencia única del pago"
+                />
+              </div>
+              <div class="col-12">
+                <label for="comprobantePagoMultiple" class="form-label">
+                  <i class="fas fa-paperclip"></i>
+                  Comprobante de Pago (PDF) *
+                </label>
+                <input
+                  type="file"
+                  class="form-control"
+                  id="comprobantePagoMultiple"
+                  accept=".pdf"
+                  required
+                />
+                <div class="invalid-feedback">
+                  Por favor adjunte un archivo PDF del comprobante de pago
+                </div>
+                <div class="form-text">
+                  <i class="fas fa-info-circle"></i>
+                  Debes adjuntar el comprobante de pago en formato PDF. Campo obligatorio.
+                </div>
+                <div id="archivosAdjuntosMultiple" class="mt-2">
+                  <!-- Los archivos adjuntos se mostrarán aquí -->
+                </div>
+              </div>
+              <div class="col-12">
+                <label for="observacionesPagoMultiple" class="form-label">Observaciones</label>
+                <textarea
+                  class="form-control"
+                  id="observacionesPagoMultiple"
+                  rows="3"
+                  placeholder="Observaciones adicionales del pago"
+                ></textarea>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+              Cancelar
+            </button>
+            <button type="button" class="btn btn-success" data-action="procesarPagoMultiple">
+              <i class="fas fa-check"></i> Registrar Pago
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal para Estado de Cuenta -->
+    <div
+      class="modal fade"
+      id="modalEstadoCuenta"
+      tabindex="-1"
+      aria-labelledby="modalEstadoCuentaLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="modalEstadoCuentaLabel">
+              <i class="fas fa-file-pdf"></i>
+              Generar Estado de Cuenta
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3">
+              <label for="clienteEstadoCuenta" class="form-label">Seleccionar Cliente</label>
+              <select class="form-select" id="clienteEstadoCuenta" required>
+                <option value="">Seleccionar cliente...</option>
+              </select>
+            </div>
+
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label for="fechaDesdeEstado" class="form-label">Fecha Desde</label>
+                <input type="date" class="form-control" id="fechaDesdeEstado" />
+              </div>
+              <div class="col-md-6">
+                <label for="fechaHastaEstado" class="form-label">Fecha Hasta</label>
+                <input type="date" class="form-control" id="fechaHastaEstado" />
+              </div>
+            </div>
+
+            <div class="mt-3">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="soloVencidas" checked />
+                <label class="form-check-label" for="soloVencidas">
+                  Solo facturas vencidas y pendientes
+                </label>
+              </div>
+            </div>
+
+            <div class="mt-3" id="previewEstadoCuenta" style="display: none">
+              <h6>Vista previa:</h6>
+              <div class="alert alert-info">
+                <strong>Cliente:</strong> <span id="previewCliente"></span><br />
+                <strong>Período:</strong> <span id="previewPeriodo"></span><br />
+                <strong>Facturas encontradas:</strong> <span id="previewCantidad"></span><br />
+                <strong>Total pendiente:</strong> $<span id="previewTotal"></span>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+              Cancelar
+            </button>
+            <button type="button" class="btn btn-info" data-action="previewEstadoCuenta">
+              <i class="fas fa-eye"></i> Vista Previa
+            </button>
+            <button type="button" class="btn btn-success" data-action="generarPDFEstadoCuenta">
+              <i class="fas fa-file-pdf"></i> Generar PDF
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal para Editar Factura -->
+    <div
+      class="modal fade"
+      id="modalEditarFactura"
+      tabindex="-1"
+      aria-labelledby="modalEditarFacturaLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <div class="flex-grow-1">
+              <h5 class="modal-title mb-1" id="modalEditarFacturaLabel">
+                <i class="fas fa-edit"></i> Editar Información de Pago
+              </h5>
+              <small class="text-muted d-block">
+                <i class="fas fa-info-circle"></i> <strong>Nota:</strong> En este módulo solo se
+                puede editar la información del pago. Para modificar los datos de la factura,
+                diríjase al módulo de <strong>Facturación</strong>.
+              </small>
+            </div>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <div id="mensajeSinPago" class="alert alert-info" style="display: none">
+              <div class="d-flex align-items-start">
+                <i class="fas fa-info-circle me-3 mt-1" style="font-size: 1.2rem"></i>
+                <div>
+                  <h6 class="alert-heading mb-2">
+                    <strong>Información sobre el registro de pagos</strong>
+                  </h6>
+                  <p class="mb-2">
+                    Esta factura aún no tiene un pago registrado. Para registrar un pago, utilice el
+                    botón <strong>"Registrar Pago"</strong> ubicado en la columna de acciones de la
+                    tabla.
+                  </p>
+                  <p class="mb-0">
+                    <small class="text-muted"
+                      ><i class="fas fa-info-circle"></i> <strong>Nota:</strong> En este módulo solo
+                      se pueden editar los pagos registrados. Para modificar la información de la
+                      factura, diríjase al módulo de <strong>Facturación</strong>.</small
+                    >
+                  </p>
+                </div>
+              </div>
+            </div>
+            <form id="formEditarFactura" style="display: none">
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label for="editarFacturaNumero" class="form-label">Factura</label>
+                  <input type="text" class="form-control" id="editarFacturaNumero" readonly />
+                </div>
+                <div class="col-md-6">
+                  <label for="editarClientePago" class="form-label">Cliente</label>
+                  <input type="text" class="form-control" id="editarClientePago" readonly />
+                </div>
+                <div class="col-md-6">
+                  <label for="editarMontoPagado" class="form-label">Monto Pagado *</label>
+                  <div class="input-group">
+                    <span class="input-group-text">$</span>
+                    <input
+                      type="number"
+                      class="form-control"
+                      id="editarMontoPagado"
+                      step="0.01"
+                      min="0"
+                      required
+                    />
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <label for="editarFechaPago" class="form-label">Fecha de Pago *</label>
+                  <input type="date" class="form-control" id="editarFechaPago" required />
+                </div>
+                <div class="col-md-6">
+                  <label for="editarMetodoPago" class="form-label">Método de Pago *</label>
+                  <select class="form-select" id="editarMetodoPago" required>
+                    <option value="">Seleccionar método</option>
+                    <option value="efectivo">Efectivo</option>
+                    <option value="transferencia">Transferencia Bancaria</option>
+                    <option value="cheque">Cheque</option>
+                    <option value="tarjeta">Tarjeta de Crédito/Débito</option>
+                    <option value="otro">Otro</option>
+                  </select>
+                </div>
+                <div class="col-md-6">
+                  <label for="editarBancoOrigen" class="form-label">Banco Origen</label>
+                  <select
+                    class="form-select"
+                    id="editarBancoOrigen"
+                    data-action="actualizarCuentasOrigenEditarCXC"
+                  >
+                    <option value="">Seleccione un banco...</option>
+                  </select>
+                </div>
+                <div class="col-md-6">
+                  <label for="editarCuentaOrigen" class="form-label">Cuenta Origen</label>
+                  <select class="form-select" id="editarCuentaOrigen">
+                    <option value="">Seleccione una cuenta...</option>
+                  </select>
+                </div>
+                <div class="col-md-6">
+                  <label for="editarBancoDestino" class="form-label">Banco Destino</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="editarBancoDestino"
+                    placeholder="Ej: BBVA, Santander, etc."
+                  />
+                </div>
+                <div class="col-md-6">
+                  <label for="editarCuentaDestino" class="form-label">Cuenta Destino</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="editarCuentaDestino"
+                    placeholder="Número de cuenta destino"
+                  />
+                </div>
+                <div class="col-md-6">
+                  <label for="editarReferenciaPago" class="form-label">Referencia Pago</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="editarReferenciaPago"
+                    placeholder="Número de referencia, transferencia, cheque, etc."
+                  />
+                </div>
+                <div class="col-md-6">
+                  <label for="editarComprobantePago" class="form-label">Comprobante de Pago</label>
+                  <input
+                    type="file"
+                    class="form-control"
+                    id="editarComprobantePago"
+                    accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                    multiple
+                  />
+                  <div class="form-text">
+                    <i class="fas fa-info-circle"></i>
+                    Puedes actualizar el comprobante de pago. Formatos permitidos: PDF, JPG, PNG,
+                    DOC, DOCX
+                  </div>
+                  <div id="archivosAdjuntosEditar" class="mt-2">
+                    <!-- Los archivos adjuntos actuales se mostrarán aquí -->
+                  </div>
+                </div>
+                <div class="col-12">
+                  <label for="editarObservacionesPago" class="form-label">Observaciones</label>
+                  <textarea
+                    class="form-control"
+                    id="editarObservacionesPago"
+                    rows="3"
+                    placeholder="Observaciones adicionales sobre el pago"
+                  ></textarea>
+                </div>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+              Cancelar
+            </button>
+            <button
+              type="button"
+              class="btn btn-warning"
+              id="btnGuardarEdicion"
+              data-action="guardarEdicionFactura"
+              style="display: none"
+            >
+              <i class="fas fa-save"></i> Guardar Cambios
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== SCRIPTS COMUNES Y MÓDULOS (Carga automática) ===== -->
+    <script src="../assets/scripts/performance/common-head-loader.js"></script>
+    <script src="../assets/scripts/performance/common-scripts-loader.js"></script>
+    <script src="../assets/scripts/performance/page-modules-config.js"></script>
+    <script src="../assets/scripts/performance/page-modules-loader.js"></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"
+      defer
+    ></script>
+    <script src="../assets/scripts/paginacion.js" defer></script>
+    <script src="../assets/scripts/menu/sidebar-handler.js"></script>
+    <!-- cxc.js, print-pdf.js, configuracion.js, connection-monitor.js, firebase-force.js y periodo.js se cargan automáticamente por page-modules-loader.js -->
+    <!-- Script para indicador de carga del backend (compartido) -->
+    <script src="../assets/scripts/backend-ready-indicator.js"></script>
+  </body>
+</html>

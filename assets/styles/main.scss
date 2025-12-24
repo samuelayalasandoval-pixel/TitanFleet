@@ -1,0 +1,34 @@
+// =============================================================================
+// ERP - SISTEMA DE DISEÑO PRINCIPAL
+// =============================================================================
+
+// Usar módulos Sass modernos (reemplaza @import deprecado)
+@use 'sass:color';
+@use 'base/variables' as *;
+@use 'base/mixins' as *;
+// @use 'base/functions' as *; // Archivo no existe
+// @use 'base/reset' as *; // Archivo no existe
+// @use 'base/typography' as *; // Archivo no existe
+
+// Importar componentes
+@use 'components/buttons';
+// @import 'components/forms'; // Archivo no existe
+// @import 'components/cards'; // Archivo no existe
+// @import 'components/carousel'; // Archivo no existe
+// @import 'components/navigation'; // Archivo no existe
+
+// Importar layouts
+// @import 'layouts/header'; // Archivo no existe
+// @import 'layouts/main'; // Archivo no existe
+// @import 'layouts/footer'; // Archivo no existe
+
+// Importar páginas
+// @import 'pages/login'; // Archivo no existe
+// @import 'pages/dashboard'; // Archivo no existe
+
+// Importar utilidades
+// @import 'utilities/spacing'; // Archivo no existe
+// @import 'utilities/colors'; // Archivo no existe
+// @import 'utilities/animations'; // Archivo no existe
+// @import 'utilities/responsive'; // Archivo no existe
+

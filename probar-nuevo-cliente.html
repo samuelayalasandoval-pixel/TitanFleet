@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prueba de Nuevo Cliente - TitanFleet</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 20px;
+        }
+        .card-header {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            border-radius: 15px 15px 0 0 !important;
+        }
+        .btn-action {
+            margin: 5px;
+        }
+        code {
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 0.9em;
+            font-weight: bold;
+        }
+        .status-success {
+            background: #10b981;
+            color: white;
+        }
+        .status-warning {
+            background: #f59e0b;
+            color: white;
+        }
+        .status-danger {
+            background: #ef4444;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card mt-5">
+            <div class="card-header">
+                <h3 class="mb-0">
+                    <i class="fas fa-user-plus me-2"></i>Prueba de Flujo para Nuevo Cliente
+                </h3>
+            </div>
+            <div class="card-body">
+                <!-- Estado Actual -->
+                <div class="alert alert-info">
+                    <h5><i class="fas fa-info-circle me-2"></i>Estado del Sistema</h5>
+                    <div id="systemStatus">
+                        <p>Cargando información...</p>
+                    </div>
+                </div>
+
+                <!-- Acciones Rápidas -->
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <div class="card border-danger">
+                            <div class="card-header bg-danger text-white">
+                                <i class="fas fa-broom me-2"></i>Limpiar Todo
+                            </div>
+                            <div class="card-body">
+                                <p class="small">Elimina todas las sesiones y licencias para simular un cliente completamente nuevo.</p>
+                                <button class="btn btn-danger w-100" onclick="clearEverything()">
+                                    <i class="fas fa-trash me-2"></i>Limpiar Todo
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <div class="card border-success">
+                            <div class="card-header bg-success text-white">
+                                <i class="fas fa-key me-2"></i>Generar Licencia
+                            </div>
+                            <div class="card-body">
+                                <p class="small">Genera una licencia de prueba para usar en el flujo.</p>
+                                <select class="form-select form-select-sm mb-2" id="licenseTypeSelect">
+                                    <option value="anual">Anual (TF25XXA)</option>
+                                    <option value="mensual">Mensual (TF25XXM)</option>
+                                    <option value="trimestral">Trimestral (TF25XXT)</option>
+                                </select>
+                                <button class="btn btn-success w-100" onclick="generateTestLicense()">
+                                    <i class="fas fa-magic me-2"></i>Generar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <div class="card border-primary">
+                            <div class="card-header bg-primary text-white">
+                                <i class="fas fa-rocket me-2"></i>Iniciar Prueba
+                            </div>
+                            <div class="card-body">
+                                <p class="small">Abre la página principal para probar el flujo completo.</p>
+                                <button class="btn btn-primary w-100" onclick="startTest()">
+                                    <i class="fas fa-play me-2"></i>Iniciar Prueba
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Licencia Generada -->
+                <div id="generatedLicense" class="alert alert-success" style="display: none;">
+                    <h5><i class="fas fa-check-circle me-2"></i>Licencia de Prueba Generada</h5>
+                    <p><strong>Clave de Licencia:</strong></p>
+                    <div class="input-group mb-2">
+                        <input type="text" class="form-control" id="generatedLicenseKey" readonly 
+                               style="font-family: 'Courier New', monospace; font-weight: bold; font-size: 1.1em;">
+                        <button class="btn btn-outline-secondary" onclick="copyGeneratedLicense()">
+                            <i class="fas fa-copy"></i> Copiar
+                        </button>
+                    </div>
+                    <p class="mb-0"><small>Usa esta licencia en el flujo de activación.</small></p>
+                </div>
+
+                <!-- Instrucciones -->
+                <div class="alert alert-warning mt-4">
+                    <h5><i class="fas fa-lightbulb me-2"></i>Instrucciones para Probar el Flujo Completo</h5>
+                    <ol>
+                        <li><strong>Limpiar Todo:</strong> Haz clic en "Limpiar Todo" para eliminar sesiones y licencias anteriores</li>
+                        <li><strong>Generar Licencia (Opcional):</strong> Genera una licencia de prueba si quieres usarla</li>
+                        <li><strong>Iniciar Prueba:</strong> Haz clic en "Iniciar Prueba" para abrir la página principal</li>
+                        <li><strong>Activar Licencia:</strong> En la página principal, haz clic en "Acceder al Sistema" → "Activar mi Licencia"</li>
+                        <li><strong>Ingresar Licencia:</strong> Ingresa la licencia de prueba generada o cualquier licencia válida</li>
+                        <li><strong>Crear Usuario:</strong> Completa el formulario para crear el primer usuario administrador</li>
+                        <li><strong>Verificar:</strong> Deberías ser redirigido al menú con el usuario recién creado (no demo)</li>
+                    </ol>
+                    <div class="mt-3">
+                        <strong>💡 Tip:</strong> También puedes usar una ventana de incógnito para probar sin interferencias.
+                    </div>
+                </div>
+
+                <!-- Verificación de Estado -->
+                <div class="card border-info mt-4">
+                    <div class="card-header bg-info text-white">
+                        <i class="fas fa-search me-2"></i>Verificación de Estado
+                    </div>
+                    <div class="card-body">
+                        <button class="btn btn-info" onclick="checkSystemState()">
+                            <i class="fas fa-sync me-2"></i>Verificar Estado Actual
+                        </button>
+                        <div id="verificationResults" class="mt-3" style="display: none;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/scripts/license-manager.js"></script>
+    <script>
+        // Función para generar código aleatorio
+        function generateRandomCode(length = 8) {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let result = '';
+            for (let i = 0; i < length; i++) {
+                result += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return result;
+        }
+
+        // Función para generar licencia de prueba
+        function generateTestLicense() {
+            const tipo = document.getElementById('licenseTypeSelect').value;
+            const fecha = new Date();
+            const año = String(fecha.getFullYear()).slice(-2);
+            const mes = String(fecha.getMonth() + 1).padStart(2, '0');
+            
+            let tipoCodigo = 'A';
+            if (tipo === 'mensual') tipoCodigo = 'M';
+            else if (tipo === 'trimestral') tipoCodigo = 'T';
+            
+            const bloque1 = generateRandomCode(8);
+            const bloque2 = generateRandomCode(8);
+            const licenseKey = `TF${año}${mes}${tipoCodigo}-${bloque1}-${bloque2}`;
+            
+            document.getElementById('generatedLicenseKey').value = licenseKey;
+            document.getElementById('generatedLicense').style.display = 'block';
+            
+            // Copiar automáticamente al portapapeles
+            copyGeneratedLicense();
+            
+            // Scroll a la licencia generada
+            document.getElementById('generatedLicense').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Función para copiar licencia generada
+        function copyGeneratedLicense() {
+            const input = document.getElementById('generatedLicenseKey');
+            input.select();
+            document.execCommand('copy');
+            
+            // Mostrar feedback
+            const btn = event.target;
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-check"></i> Copiado!';
+            btn.classList.add('btn-success');
+            btn.classList.remove('btn-outline-secondary');
+            setTimeout(() => {
+                btn.innerHTML = originalHTML;
+                btn.classList.remove('btn-success');
+                btn.classList.add('btn-outline-secondary');
+            }, 2000);
+        }
+
+        // Función para limpiar todo
+        function clearEverything() {
+            if (!confirm('¿Estás seguro de que quieres limpiar TODAS las sesiones, licencias y datos del localStorage?\n\nEsto simulará un cliente completamente nuevo.')) {
+                return;
+            }
+
+            try {
+                // Lista de claves a limpiar
+                const keysToRemove = [
+                    'titanfleet_license',
+                    'tenantId',
+                    'erpSession',
+                    'erpCurrentUser',
+                    'erp_saved_credentials',
+                    'erp_remember_me',
+                    'sessionClosedExplicitly',
+                    'justCreatedUser'
+                ];
+                
+                let cleaned = 0;
+                keysToRemove.forEach(key => {
+                    if (localStorage.getItem(key)) {
+                        localStorage.removeItem(key);
+                        cleaned++;
+                    }
+                });
+                
+                // Limpiar sessionStorage también
+                try {
+                    sessionStorage.removeItem('erpSession');
+                    sessionStorage.removeItem('erpCurrentUser');
+                    cleaned += 2;
+                } catch(_) {}
+                
+                // Resetear licenseManager si existe
+                if (window.licenseManager) {
+                    window.licenseManager.licenseInfo = null;
+                    window.licenseManager.deactivateLicense();
+                }
+                
+                alert(`✅ Sistema limpiado correctamente.\n\n🗑️ ${cleaned} elementos eliminados.\n\n🔄 Ahora puedes probar el flujo completo de nuevo cliente.`);
+                
+                // Actualizar estado
+                updateSystemStatus();
+            } catch (error) {
+                console.error('Error limpiando sistema:', error);
+                alert('❌ Error al limpiar el sistema: ' + error.message);
+            }
+        }
+
+        // Función para iniciar prueba
+        function startTest() {
+            // Verificar si hay algo en localStorage
+            const hasLicense = localStorage.getItem('titanfleet_license');
+            const hasSession = localStorage.getItem('erpSession');
+            
+            if (hasLicense || hasSession) {
+                if (!confirm('⚠️ Hay datos en el sistema (licencia o sesión).\n\n¿Quieres limpiar todo antes de iniciar la prueba?')) {
+                    // Continuar sin limpiar
+                    window.open('public/index.html', '_blank');
+                    return;
+                } else {
+                    clearEverything();
+                    setTimeout(() => {
+                        window.open('public/index.html', '_blank');
+                    }, 500);
+                    return;
+                }
+            }
+            
+            // Abrir página principal en nueva pestaña
+            window.open('public/index.html', '_blank');
+        }
+
+        // Función para actualizar estado del sistema
+        function updateSystemStatus() {
+            const statusDiv = document.getElementById('systemStatus');
+            
+            try {
+                const licenseData = localStorage.getItem('titanfleet_license');
+                const sessionData = localStorage.getItem('erpSession');
+                const userData = localStorage.getItem('erpCurrentUser');
+                const tenantId = localStorage.getItem('tenantId');
+                
+                let statusHTML = '<div class="row">';
+                
+                // Estado de licencia
+                if (licenseData) {
+                    try {
+                        const license = JSON.parse(licenseData);
+                        statusHTML += `
+                            <div class="col-md-6 mb-2">
+                                <strong>Licencia:</strong> 
+                                <span class="status-badge status-success">Activa</span><br>
+                                <small><code>${license.licenseKey}</code></small><br>
+                                <small>Tipo: ${license.type || 'N/A'}</small>
+                            </div>
+                        `;
+                    } catch(_) {
+                        statusHTML += `
+                            <div class="col-md-6 mb-2">
+                                <strong>Licencia:</strong> 
+                                <span class="status-badge status-warning">Presente (datos inválidos)</span>
+                            </div>
+                        `;
+                    }
+                } else {
+                    statusHTML += `
+                        <div class="col-md-6 mb-2">
+                            <strong>Licencia:</strong> 
+                            <span class="status-badge status-danger">No activa</span>
+                        </div>
+                    `;
+                }
+                
+                // Estado de sesión
+                if (sessionData) {
+                    try {
+                        const session = JSON.parse(sessionData);
+                        statusHTML += `
+                            <div class="col-md-6 mb-2">
+                                <strong>Sesión:</strong> 
+                                <span class="status-badge status-success">Activa</span><br>
+                                <small>Usuario: ${session.user?.email || 'N/A'}</small><br>
+                                <small>Permisos: ${session.user?.permisos?.ver?.length || 0} módulos</small>
+                            </div>
+                        `;
+                    } catch(_) {
+                        statusHTML += `
+                            <div class="col-md-6 mb-2">
+                                <strong>Sesión:</strong> 
+                                <span class="status-badge status-warning">Presente (datos inválidos)</span>
+                            </div>
+                        `;
+                    }
+                } else {
+                    statusHTML += `
+                        <div class="col-md-6 mb-2">
+                            <strong>Sesión:</strong> 
+                            <span class="status-badge status-danger">No iniciada</span>
+                        </div>
+                    `;
+                }
+                
+                // TenantId
+                if (tenantId) {
+                    statusHTML += `
+                        <div class="col-md-12 mt-2">
+                            <strong>Tenant ID:</strong> <code>${tenantId}</code>
+                        </div>
+                    `;
+                }
+                
+                statusHTML += '</div>';
+                statusDiv.innerHTML = statusHTML;
+            } catch (error) {
+                statusDiv.innerHTML = `
+                    <p class="text-danger mb-0">
+                        <i class="fas fa-exclamation-triangle me-2"></i>Error al leer estado: ${error.message}
+                    </p>
+                `;
+            }
+        }
+
+        // Función para verificar estado del sistema
+        function checkSystemState() {
+            const resultsDiv = document.getElementById('verificationResults');
+            resultsDiv.style.display = 'block';
+            
+            let html = '<h6>Resultados de Verificación:</h6><ul class="list-group">';
+            
+            // Verificar localStorage
+            const licenseData = localStorage.getItem('titanfleet_license');
+            const sessionData = localStorage.getItem('erpSession');
+            const userData = localStorage.getItem('erpCurrentUser');
+            const tenantId = localStorage.getItem('tenantId');
+            
+            html += `<li class="list-group-item">
+                <strong>Licencia:</strong> ${licenseData ? '✅ Presente' : '❌ No encontrada'}
+            </li>`;
+            
+            html += `<li class="list-group-item">
+                <strong>Sesión:</strong> ${sessionData ? '✅ Presente' : '❌ No encontrada'}
+            </li>`;
+            
+            html += `<li class="list-group-item">
+                <strong>Usuario:</strong> ${userData ? '✅ Presente' : '❌ No encontrado'}
+            </li>`;
+            
+            html += `<li class="list-group-item">
+                <strong>Tenant ID:</strong> ${tenantId ? `✅ ${tenantId}` : '❌ No configurado'}
+            </li>`;
+            
+            // Verificar Firebase Auth
+            if (window.firebaseAuth && window.firebaseAuth.currentUser) {
+                const currentUser = window.firebaseAuth.currentUser;
+                html += `<li class="list-group-item">
+                    <strong>Firebase Auth:</strong> ✅ Usuario autenticado (${currentUser.email || 'anónimo'})
+                </li>`;
+            } else {
+                html += `<li class="list-group-item">
+                    <strong>Firebase Auth:</strong> ❌ No hay usuario autenticado
+                </li>`;
+            }
+            
+            html += '</ul>';
+            resultsDiv.innerHTML = html;
+        }
+
+        // Actualizar estado al cargar
+        window.addEventListener('load', function() {
+            updateSystemStatus();
+        });
+        
+        // Actualizar estado cada 2 segundos
+        setInterval(updateSystemStatus, 2000);
+    </script>
+</body>
+</html>
+
+

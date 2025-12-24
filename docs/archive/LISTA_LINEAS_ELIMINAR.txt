@@ -1,0 +1,94 @@
+═══════════════════════════════════════════════════════════════
+LISTA EXACTA DE LÍNEAS A ELIMINAR - configuracion.html
+═══════════════════════════════════════════════════════════════
+
+BLOQUE 1: ESTILOS CSS
+─────────────────────────────────────────────────────────────
+Líneas: 22-121 (100 líneas)
+Inicio: Línea 22 - /* Estilos personalizados para las pestañas de configuración */
+Fin: Línea 121 - -->
+
+BLOQUE 2: SCRIPT DE SIDEBAR
+─────────────────────────────────────────────────────────────
+Líneas: 123-175 (53 líneas)
+Inicio: Línea 123 - <!-- NOTA: El script de sidebar ha sido movido...
+Fin: Línea 175 - -->
+
+BLOQUE 3: SCRIPT DE MÓDULOS (Carga bajo demanda)
+─────────────────────────────────────────────────────────────
+Líneas: 1852-1949 (98 líneas)
+Inicio: Línea 1852 - <!-- ===== SISTEMA DE CARGA BAJO DEMANDA...
+Fin: Línea 1949 - -->
+
+BLOQUE 4: SCRIPT DE VERIFICACIÓN
+─────────────────────────────────────────────────────────────
+Líneas: 1951-1968 (18 líneas)
+Inicio: Línea 1951 - <!-- NOTA: El script de verificación ha sido movido...
+Fin: Línea 1968 - -->
+
+BLOQUE 5: SCRIPT DE TRACTOCAMIONES
+─────────────────────────────────────────────────────────────
+Líneas: 2629-2700 (72 líneas)
+Inicio: Línea 2629 - <!-- NOTA: El script de verificación de tractocamiones...
+Fin: Línea 2700 - -->
+
+BLOQUE 6: SCRIPT DE LIMPIEZA
+─────────────────────────────────────────────────────────────
+Líneas: 2702-3127 (426 líneas)
+Inicio: Línea 2702 - <!-- NOTA: El script de limpieza ha sido movido...
+Fin: Línea 3127 - -->
+
+BLOQUE 7: SCRIPT DE BANCOS
+─────────────────────────────────────────────────────────────
+Líneas: 3128-3141 (14 líneas)
+Inicio: Línea 3128 - <script>
+Fin: Línea 3141 - -->
+
+═══════════════════════════════════════════════════════════════
+RESUMEN
+═══════════════════════════════════════════════════════════════
+
+Total de bloques: 7
+Total aproximado de líneas: ~781 líneas
+
+ORDEN RECOMENDADO DE ELIMINACIÓN (de abajo hacia arriba):
+1. Bloque 7 (líneas 3128-3141)
+2. Bloque 6 (líneas 2702-3127)
+3. Bloque 5 (líneas 2629-2700)
+4. Bloque 4 (líneas 1951-1968)
+5. Bloque 3 (líneas 1852-1949)
+6. Bloque 2 (líneas 123-175)
+7. Bloque 1 (líneas 22-121)
+
+═══════════════════════════════════════════════════════════════
+INSTRUCCIONES
+═══════════════════════════════════════════════════════════════
+
+1. Elimina los bloques en orden inverso (de abajo hacia arriba)
+   para que los números de línea no cambien mientras eliminas.
+
+2. Elimina TODO el bloque incluyendo:
+   - Comentarios de "NOTA"
+   - Comentarios de "BLOQUE A ELIMINAR"
+   - Etiquetas de apertura y cierre de comentarios HTML (<!-- y -->)
+   - Todo el código comentado
+
+3. Verifica que los archivos externos existan:
+   ✓ styles/configuracion.css
+   ✓ assets/scripts/configuracion-sidebar.js
+   ✓ assets/scripts/configuracion-modules.js
+   ✓ assets/scripts/configuracion-verificacion.js
+   ✓ assets/scripts/configuracion-tractocamiones.js
+   ✓ assets/scripts/configuracion-limpieza.js
+   ✓ assets/scripts/configuracion-bancos.js
+
+4. Verifica que los enlaces estén en el HTML:
+   ✓ <link rel="stylesheet" href="styles/configuracion.css">
+   ✓ <script src="assets/scripts/configuracion-sidebar.js"></script>
+   ✓ <script src="assets/scripts/configuracion-modules.js"></script>
+   ✓ <script src="assets/scripts/configuracion-verificacion.js"></script>
+   ✓ <script src="assets/scripts/configuracion-tractocamiones.js"></script>
+   ✓ <script src="assets/scripts/configuracion-limpieza.js"></script>
+   ✓ <script src="assets/scripts/configuracion-bancos.js"></script>
+
+═══════════════════════════════════════════════════════════════

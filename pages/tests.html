@@ -1,0 +1,604 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tests - TitanFleet ERP</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <style>
+      body {
+        background-color: #f8f9fa;
+        padding: 20px;
+      }
+      .test-card {
+        margin-bottom: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      .test-card-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 15px;
+        border-radius: 8px 8px 0 0;
+      }
+      .test-results {
+        max-height: 400px;
+        overflow-y: auto;
+        background-color: #1e1e1e;
+        color: #d4d4d4;
+        font-family: 'Courier New', monospace;
+        font-size: 12px;
+        padding: 15px;
+        border-radius: 0 0 8px 8px;
+      }
+      .btn-test {
+        margin: 5px;
+      }
+      .status-badge {
+        display: inline-block;
+        padding: 5px 10px;
+        border-radius: 4px;
+        font-size: 12px;
+        font-weight: bold;
+      }
+      .status-pass {
+        background-color: #28a745;
+        color: white;
+      }
+      .status-fail {
+        background-color: #dc3545;
+        color: white;
+      }
+      .status-warning {
+        background-color: #ffc107;
+        color: #000;
+      }
+
+      /* Estilos para estado de conexión */
+      #connection-status {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      #connection-icon {
+        font-size: 1.2em;
+      }
+      .connection-online {
+        background-color: #d1ecf1;
+        border-color: #bee5eb;
+        color: #0c5460;
+      }
+      .connection-offline {
+        background-color: #fff3cd;
+        border-color: #ffeaa7;
+        color: #856404;
+      }
+
+      /* Estilos para cards deshabilitadas */
+      .card-disabled {
+        opacity: 0.6;
+        pointer-events: none;
+      }
+      .card-disabled .btn {
+        cursor: not-allowed;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1 class="mb-4"><i class="fas fa-vial"></i> Suite de Tests - TitanFleet ERP</h1>
+
+      <!-- Indicador de Conexión -->
+      <div id="connection-status" class="alert alert-info mb-4" role="alert">
+        <i class="fas fa-wifi" id="connection-icon"></i>
+        <span id="connection-text">Verificando conexión...</span>
+      </div>
+
+      <!-- Tests Unitarios -->
+      <div class="card test-card" id="unit-tests-card">
+        <div class="test-card-header">
+          <h3><i class="fas fa-cube"></i> Tests Unitarios</h3>
+          <p class="mb-0">Pruebas de funciones individuales y validaciones</p>
+          <small id="unit-tests-note" class="d-block mt-2" style="opacity: 0.9"></small>
+        </div>
+        <div class="card-body">
+          <button
+            class="btn btn-primary btn-test"
+            data-action="ejecutarUnitTests"
+            id="btn-unit-tests"
+          >
+            <i class="fas fa-play"></i> Ejecutar Tests Unitarios
+          </button>
+          <button
+            class="btn btn-secondary btn-test"
+            data-action="limpiarResultados"
+            data-tipo="unit"
+          >
+            <i class="fas fa-trash"></i> Limpiar
+          </button>
+          <div id="unit-results" class="test-results mt-3" style="display: none">
+            <div id="unit-content"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tests OFFLINE -->
+      <div class="card test-card">
+        <div
+          class="test-card-header"
+          style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%)"
+        >
+          <h3><i class="fas fa-wifi-slash"></i> Tests OFFLINE</h3>
+          <p class="mb-0">Pruebas que NO requieren conexión a internet</p>
+        </div>
+        <div class="card-body">
+          <button class="btn btn-success btn-test" data-action="ejecutarOfflineTests">
+            <i class="fas fa-play"></i> Ejecutar Tests OFFLINE
+          </button>
+          <button
+            class="btn btn-secondary btn-test"
+            data-action="limpiarResultados"
+            data-tipo="offline"
+          >
+            <i class="fas fa-trash"></i> Limpiar
+          </button>
+          <div id="offline-results" class="test-results mt-3" style="display: none">
+            <div id="offline-content"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tests de Integración -->
+      <div class="card test-card" id="integration-tests-card">
+        <div class="test-card-header">
+          <h3><i class="fas fa-project-diagram"></i> Tests de Integración</h3>
+          <p class="mb-0">Pruebas de flujos completos entre módulos</p>
+          <small class="d-block mt-2" style="opacity: 0.9">
+            <i class="fas fa-wifi"></i> Requiere conexión a internet
+          </small>
+        </div>
+        <div class="card-body">
+          <button
+            class="btn btn-primary btn-test"
+            data-action="ejecutarIntegrationTests"
+            id="btn-integration-tests"
+          >
+            <i class="fas fa-play"></i> Ejecutar Tests de Integración
+          </button>
+          <button
+            class="btn btn-secondary btn-test"
+            data-action="limpiarResultados"
+            data-tipo="integration"
+          >
+            <i class="fas fa-trash"></i> Limpiar
+          </button>
+          <div id="integration-results" class="test-results mt-3" style="display: none">
+            <div id="integration-content"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Test Suite Completo -->
+      <div class="card test-card" id="all-tests-card">
+        <div class="test-card-header">
+          <h3><i class="fas fa-layer-group"></i> Test Suite Completo</h3>
+          <p class="mb-0">Ejecuta todas las pruebas del sistema</p>
+          <small class="d-block mt-2" style="opacity: 0.9">
+            <i class="fas fa-wifi"></i> Requiere conexión a internet
+          </small>
+        </div>
+        <div class="card-body">
+          <button
+            class="btn btn-success btn-test"
+            data-action="ejecutarTodosLosTests"
+            id="btn-all-tests"
+          >
+            <i class="fas fa-rocket"></i> Ejecutar Todos los Tests
+          </button>
+          <button
+            class="btn btn-secondary btn-test"
+            data-action="limpiarResultados"
+            data-tipo="all"
+          >
+            <i class="fas fa-trash"></i> Limpiar Todo
+          </button>
+          <div id="all-results" class="test-results mt-3" style="display: none">
+            <div id="all-content"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Resumen -->
+      <div class="card test-card">
+        <div class="card-body">
+          <h4><i class="fas fa-chart-bar"></i> Resumen</h4>
+          <div id="summary"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scripts necesarios -->
+    <!-- Sistema de Event Handlers (reemplaza onclick inline) -->
+    <script src="../assets/scripts/shared/event-handlers.js"></script>
+    <script src="../assets/scripts/tests/event-handlers.js"></script>
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+
+    <script>
+      // Configuración de Firebase - Declarada una sola vez y compartida
+      window.firebaseConfig = {
+        apiKey: 'AIzaSyBh_x0zUdauLERfWn-LMC2xnbxftfTXhhg',
+        authDomain: 'titanfleet-60931.firebaseapp.com',
+        projectId: 'titanfleet-60931',
+        storageBucket: 'titanfleet-60931.firebasestorage.app',
+        messagingSenderId: '766820961328',
+        appId: '1:766820961328:web:5f5a9c98b2f8c27f1f3e6d'
+      };
+
+      // Inicializar Firebase Compat (v9) - ya está cargado arriba
+      if (!firebase.apps.length) {
+        firebase.initializeApp(window.firebaseConfig);
+        console.log('✅ Firebase Compat inicializado');
+      }
+    </script>
+
+    <!-- Cargar Firebase v10 modular usando dynamic import -->
+    <script type="module">
+      // Cargar Firebase v10 modular para compatibilidad con firebase-repo-base.js
+      import {
+        initializeApp,
+        getApps,
+        getApp
+      } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+      import {
+        getAuth,
+        signInAnonymously,
+        onAuthStateChanged
+      } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+      import {
+        getFirestore,
+        doc,
+        setDoc,
+        getDoc,
+        deleteDoc,
+        collection,
+        getDocs,
+        query,
+        where,
+        onSnapshot
+      } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+
+      // Usar la configuración compartida desde window (sin redeclarar)
+      // Inicializar Firebase v10
+      let app;
+      try {
+        const existingApps = getApps();
+        if (existingApps.length > 0) {
+          app = getApp();
+          console.log('✅ Usando instancia de Firebase v10 existente');
+        } else {
+          app = initializeApp(window.firebaseConfig);
+          console.log('✅ Firebase v10 inicializado correctamente');
+        }
+      } catch (error) {
+        console.error('❌ Error inicializando Firebase v10:', error);
+      }
+
+      // Exponer globalmente para firebase-repo-base.js
+      window.firebaseDb = getFirestore(app);
+      window.firebaseAuth = getAuth(app);
+      window.fs = {
+        doc,
+        setDoc,
+        getDoc,
+        deleteDoc,
+        collection,
+        getDocs,
+        query,
+        where,
+        onSnapshot
+      };
+
+      // Marcar Firebase como listo
+      window.firebaseReady = true;
+      if (typeof CustomEvent !== 'undefined') {
+        const firebaseReadyEvent = new CustomEvent('firebaseReady', {
+          detail: {
+            app,
+            auth: window.firebaseAuth,
+            db: window.firebaseDb,
+            config: window.firebaseConfig
+          }
+        });
+        window.dispatchEvent(firebaseReadyEvent);
+        console.log('✅ Evento firebaseReady despachado');
+      }
+
+      // Autenticación anónima para tests
+      signInAnonymously(window.firebaseAuth).catch(error => {
+        console.warn('⚠️ No se pudo autenticar anónimamente:', error);
+      });
+
+      // Promesa para esperar autenticación
+      window.__onAuthReady = new Promise(resolve => {
+        onAuthStateChanged(window.firebaseAuth, user => {
+          if (user) {
+            console.log('✅ Usuario autenticado:', user.uid);
+            resolve(user);
+          }
+        });
+      });
+    </script>
+
+    <!-- Scripts del sistema -->
+    <!-- NO cargar firebase-init.js aquí porque ya inicializamos Firebase v10 arriba -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../assets/scripts/error-handler.js"></script>
+    <script src="../assets/scripts/error-utils.js"></script>
+    <script src="../assets/scripts/firebase-repo-base.js"></script>
+    <script src="../assets/scripts/data-persistence.js"></script>
+    <script src="../assets/scripts/firebase-repos.js"></script>
+    <script src="../assets/scripts/form-validations.js"></script>
+    <script src="../assets/scripts/test-suite.js"></script>
+    <script src="../assets/scripts/tests/unit-tests.js"></script>
+    <script src="../assets/scripts/tests/integration-tests.js"></script>
+    <script src="../assets/scripts/tests/offline-tests.js"></script>
+
+    <script>
+      // Funciones para ejecutar tests
+      async function ejecutarOfflineTests() {
+        const resultsDiv = document.getElementById('offline-results');
+        const contentDiv = document.getElementById('offline-content');
+
+        resultsDiv.style.display = 'block';
+        contentDiv.innerHTML = '<p>Ejecutando tests offline...</p>';
+
+        try {
+          if (!window.offlineTests) {
+            contentDiv.innerHTML =
+              '<p style="color: red;">❌ Tests offline no están disponibles</p>';
+            return;
+          }
+
+          const resultados = await window.offlineTests.ejecutarTodos();
+          mostrarResultados('offline', resultados);
+        } catch (error) {
+          contentDiv.innerHTML = `<p style="color: red;">❌ Error: ${error.message}</p>`;
+          console.error(error);
+        }
+      }
+
+      async function ejecutarUnitTests() {
+        const resultsDiv = document.getElementById('unit-results');
+        const contentDiv = document.getElementById('unit-content');
+
+        resultsDiv.style.display = 'block';
+        contentDiv.innerHTML = '<p>Ejecutando tests unitarios...</p>';
+
+        try {
+          if (!window.unitTests) {
+            contentDiv.innerHTML =
+              '<p style="color: red;">❌ Tests unitarios no están disponibles</p>';
+            return;
+          }
+
+          const resultados = await window.unitTests.ejecutarTodos();
+          mostrarResultados('unit', resultados);
+        } catch (error) {
+          contentDiv.innerHTML = `<p style="color: red;">❌ Error: ${error.message}</p>`;
+          console.error(error);
+        }
+      }
+
+      async function ejecutarIntegrationTests() {
+        const resultsDiv = document.getElementById('integration-results');
+        const contentDiv = document.getElementById('integration-content');
+
+        resultsDiv.style.display = 'block';
+        contentDiv.innerHTML = '<p>Ejecutando tests de integración...</p>';
+
+        try {
+          if (!window.integrationTests) {
+            contentDiv.innerHTML =
+              '<p style="color: red;">❌ Tests de integración no están disponibles</p>';
+            return;
+          }
+
+          const resultados = await window.integrationTests.ejecutarTodos();
+          mostrarResultados('integration', resultados);
+        } catch (error) {
+          contentDiv.innerHTML = `<p style="color: red;">❌ Error: ${error.message}</p>`;
+          console.error(error);
+        }
+      }
+
+      async function ejecutarTodosLosTests() {
+        const resultsDiv = document.getElementById('all-results');
+        const contentDiv = document.getElementById('all-content');
+
+        resultsDiv.style.display = 'block';
+        contentDiv.innerHTML = '<p>Ejecutando todos los tests...</p>';
+
+        try {
+          if (!window.testSuite) {
+            contentDiv.innerHTML = '<p style="color: red;">❌ Test suite no está disponible</p>';
+            return;
+          }
+
+          const resultados = await window.testSuite.ejecutarTodas();
+          mostrarResultados('all', resultados);
+        } catch (error) {
+          contentDiv.innerHTML = `<p style="color: red;">❌ Error: ${error.message}</p>`;
+          console.error(error);
+        }
+      }
+
+      function mostrarResultados(tipo, resultados) {
+        const contentDiv = document.getElementById(`${tipo}-content`);
+        const summaryDiv = document.getElementById('summary');
+
+        let html = '<div style="margin-bottom: 10px;">';
+        html += `<span class="status-badge status-${resultados.tasaExito >= 80 ? 'pass' : resultados.tasaExito >= 50 ? 'warning' : 'fail'}">`;
+        html += `Tasa de éxito: ${resultados.tasaExito}%</span> `;
+        html += `<span class="status-badge status-pass">✅ ${resultados.passed}</span> `;
+        html += `<span class="status-badge status-fail">❌ ${resultados.failed}</span> `;
+        html += `<span class="status-badge status-warning">⚠️ ${resultados.warnings || 0}</span>`;
+        html += '</div>';
+
+        if (resultados.resultados && resultados.resultados.length > 0) {
+          html += '<ul style="list-style: none; padding: 0;">';
+          resultados.resultados.forEach(r => {
+            const icono = r.resultado === 'pass' ? '✅' : r.resultado === 'fail' ? '❌' : '⚠️';
+            const color =
+              r.resultado === 'pass' ? '#28a745' : r.resultado === 'fail' ? '#dc3545' : '#ffc107';
+            html += `<li style="color: ${color}; margin: 5px 0;">${icono} [${r.flujo || r.funcion || r.modulo}] ${r.prueba}: ${r.mensaje}</li>`;
+          });
+          html += '</ul>';
+        }
+
+        contentDiv.innerHTML = html;
+
+        // Actualizar resumen
+        actualizarResumen();
+      }
+
+      function actualizarResumen() {
+        // Esta función puede expandirse para mostrar un resumen consolidado
+        const summaryDiv = document.getElementById('summary');
+        summaryDiv.innerHTML = '<p>Ejecuta los tests para ver el resumen</p>';
+      }
+
+      function limpiarResultados(tipo) {
+        if (tipo === 'all' || tipo === 'unit') {
+          document.getElementById('unit-results').style.display = 'none';
+          document.getElementById('unit-content').innerHTML = '';
+        }
+        if (tipo === 'all' || tipo === 'offline') {
+          document.getElementById('offline-results').style.display = 'none';
+          document.getElementById('offline-content').innerHTML = '';
+        }
+        if (tipo === 'all' || tipo === 'integration') {
+          document.getElementById('integration-results').style.display = 'none';
+          document.getElementById('integration-content').innerHTML = '';
+        }
+        if (tipo === 'all') {
+          document.getElementById('all-results').style.display = 'none';
+          document.getElementById('all-content').innerHTML = '';
+        }
+      }
+
+      // Función para actualizar estado de conexión
+      function actualizarEstadoConexion() {
+        const tieneConexion = navigator.onLine;
+        const statusDiv = document.getElementById('connection-status');
+        const icon = document.getElementById('connection-icon');
+        const text = document.getElementById('connection-text');
+
+        if (tieneConexion) {
+          statusDiv.className = 'alert alert-info connection-online mb-4';
+          icon.className = 'fas fa-wifi';
+          text.textContent = '✅ Conectado a internet - Todos los tests disponibles';
+
+          // Habilitar todos los tests
+          document.getElementById('integration-tests-card').classList.remove('card-disabled');
+          document.getElementById('all-tests-card').classList.remove('card-disabled');
+          document.getElementById('btn-integration-tests').disabled = false;
+          document.getElementById('btn-all-tests').disabled = false;
+
+          // Actualizar nota de tests unitarios
+          document.getElementById('unit-tests-note').textContent =
+            'Algunos tests requieren conexión (Firebase)';
+        } else {
+          statusDiv.className = 'alert alert-warning connection-offline mb-4';
+          icon.className = 'fas fa-wifi-slash';
+          text.textContent = '❌ Sin conexión a internet - Solo tests OFFLINE disponibles';
+
+          // Deshabilitar tests que requieren conexión
+          document.getElementById('integration-tests-card').classList.add('card-disabled');
+          document.getElementById('all-tests-card').classList.add('card-disabled');
+          document.getElementById('btn-integration-tests').disabled = true;
+          document.getElementById('btn-all-tests').disabled = true;
+
+          // Actualizar nota de tests unitarios
+          document.getElementById('unit-tests-note').textContent =
+            '⚠️ Algunos tests no funcionarán sin conexión';
+        }
+      }
+
+      // Escuchar cambios de conexión
+      window.addEventListener('online', function () {
+        console.log('✅ Conexión restaurada');
+        actualizarEstadoConexion();
+      });
+
+      window.addEventListener('offline', function () {
+        console.log('❌ Conexión perdida');
+        actualizarEstadoConexion();
+      });
+
+      // Esperar a que los scripts se carguen y Firebase esté listo
+      window.addEventListener('load', async function () {
+        console.log('✅ Página de tests cargada');
+
+        // Esperar a que Firebase se inicialice (puede tardar un poco)
+        let firebaseReady = false;
+        let attempts = 0;
+        const maxAttempts = 30; // 15 segundos máximo
+
+        while (!firebaseReady && attempts < maxAttempts) {
+          if (window.firebaseDb && window.fs && window.firebaseAuth) {
+            firebaseReady = true;
+            console.log('✅ Firebase inicializado correctamente');
+            break;
+          }
+          await new Promise(resolve => setTimeout(resolve, 500));
+          attempts++;
+
+          if (attempts % 5 === 0) {
+            console.log(`⏳ Esperando Firebase... (${attempts * 0.5}s)`);
+          }
+        }
+
+        if (!firebaseReady) {
+          console.warn('⚠️ Firebase no se inicializó después de 15 segundos');
+          console.warn('💡 Puedes ejecutar tests OFFLINE que no requieren Firebase');
+        }
+
+        console.log('Disponible:');
+        console.log('  - window.offlineTests:', !!window.offlineTests);
+        console.log('  - window.unitTests:', !!window.unitTests);
+        console.log('  - window.integrationTests:', !!window.integrationTests);
+        console.log('  - window.testSuite:', !!window.testSuite);
+        console.log('  - window.firebaseDb:', !!window.firebaseDb);
+        console.log('  - window.firebaseRepos:', !!window.firebaseRepos);
+
+        // Actualizar estado de conexión inicial
+        actualizarEstadoConexion();
+
+        // Mostrar recomendación según conexión
+        if (!navigator.onLine) {
+          console.log(
+            '%c💡 Tip: Usa "Tests OFFLINE" si no tienes conexión',
+            'color: #ffc107; font-weight: bold;'
+          );
+        }
+
+        if (!firebaseReady) {
+          console.log(
+            '%c💡 Tip: Firebase no está listo. Usa "Tests OFFLINE" o espera unos segundos más',
+            'color: #ffc107; font-weight: bold;'
+          );
+        }
+      });
+    </script>
+  </body>
+</html>

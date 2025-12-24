@@ -1,0 +1,326 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // ============================================
+    // FUNCIONES AUXILIARES
+    // ============================================
+    
+    // Verificar si el usuario está autenticado (incluye usuarios anónimos)
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Verificar si es el usuario demo
+    function isDemoUser() {
+      return isAuthenticated() && 
+             request.auth.token.email == 'demo@titanfleet.com';
+    }
+    
+    // Verificar si el documento del usuario existe
+    function userDocExists() {
+      return exists(/databases/$(database)/documents/users/$(request.auth.uid));
+    }
+    
+    // Obtener el tenantId del usuario autenticado desde el documento users/{uid}
+    // Esta función se usa solo cuando es necesario, evitando llamadas costosas
+    function getUserTenantId() {
+      return userDocExists() ? 
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.tenantId : 
+             null;
+    }
+    
+    // Verificar si el documento pertenece al tenantId del usuario
+    function belongsToUserTenant(tenantId) {
+      // Si no hay tenantId en el documento, solo el usuario demo puede acceder (documentos antiguos)
+      // El usuario demo puede acceder a datos con tenantId 'demo' o 'demo_tenant'
+      // Para otros usuarios, verificar que el tenantId coincida
+      return (tenantId == null && isDemoUser()) ||
+             (isDemoUser() && (tenantId == 'demo' || tenantId == 'demo_tenant')) ||
+             (!isDemoUser() && getUserTenantId() != null && tenantId == getUserTenantId());
+    }
+    
+    // Verificar tenantId en datos de escritura
+    function hasValidTenantId(data) {
+      // El documento debe tener tenantId
+      // El usuario demo puede escribir con tenantId 'demo' o 'demo_tenant'
+      // Para otros usuarios, el tenantId debe coincidir con el suyo
+      return data.tenantId != null &&
+             ((isDemoUser() && (data.tenantId == 'demo' || data.tenantId == 'demo_tenant')) ||
+              (!isDemoUser() && getUserTenantId() != null && data.tenantId == getUserTenantId()));
+    }
+    
+    // ============================================
+    // REGLAS PARA USUARIOS
+    // ============================================
+    
+    match /users/{userId} {
+      // Permitir lectura: solo el propio usuario o admin
+      allow read: if isAuthenticated() && 
+                     (request.auth.uid == userId || isDemoUser());
+      
+      // Permitir escritura: solo el propio usuario o admin
+      allow create: if isAuthenticated() && 
+                       (request.auth.uid == userId || isDemoUser()) &&
+                       hasValidTenantId(request.resource.data);
+      
+      allow update: if isAuthenticated() && 
+                      (request.auth.uid == userId || isDemoUser()) &&
+                      // No permitir cambiar tenantId a menos que sea demo
+                      (request.resource.data.tenantId == resource.data.tenantId || isDemoUser());
+      
+      allow delete: if isAuthenticated() && 
+                       (request.auth.uid == userId || isDemoUser());
+    }
+    
+    // ============================================
+    // REGLAS PARA CONFIGURACIÓN
+    // ============================================
+    
+    match /configuracion/{document=**} {
+      // Permitir lectura a usuarios autenticados (incluye anónimos)
+      allow read: if isAuthenticated();
+      
+      // Permitir escritura a usuarios autenticados (incluye anónimos)
+      // Esto permite que usuarios anónimos también puedan guardar configuración
+      allow create: if isAuthenticated();
+      allow update: if isAuthenticated();
+      allow delete: if isAuthenticated();
+    }
+    
+    // ============================================
+    // REGLAS PARA COLECCIONES DE DATOS (con tenantId)
+    // ============================================
+    
+    match /logistica/{documentId} {
+      // Lectura individual de documento: verificar tenantId
+      allow get: if isAuthenticated() && 
+                    (isDemoUser() || 
+                     (resource != null && 
+                      (resource.data.tenantId == null || belongsToUserTenant(resource.data.tenantId))));
+      
+      // Consultas (list): permitir si está autenticado
+      // Firestore filtrará los resultados según el where clause
+      allow list: if isAuthenticated();
+      
+      // Escritura: validar tenantId
+      allow create: if isAuthenticated() && 
+                       (isDemoUser() || hasValidTenantId(request.resource.data));
+      
+      allow update: if isAuthenticated() && 
+                       (isDemoUser() || 
+                        (resource != null && 
+                         (resource.data.tenantId == null || belongsToUserTenant(resource.data.tenantId)))) &&
+                       // No permitir cambiar tenantId
+                       (resource == null || request.resource.data.tenantId == resource.data.tenantId);
+      
+      allow delete: if isAuthenticated() && 
+                       (isDemoUser() || 
+                        (resource != null && 
+                         (resource.data.tenantId == null || belongsToUserTenant(resource.data.tenantId))));
+    }
+    
+    match /trafico/{documentId} {
+      allow get: if isAuthenticated() && 
+                    (isDemoUser() || 
+                     (resource != null && belongsToUserTenant(resource.data.tenantId)));
+      allow list: if isAuthenticated();
+      
+      allow create: if isAuthenticated() && 
+                       hasValidTenantId(request.resource.data);
+      
+      allow update: if isAuthenticated() && 
+                       (isDemoUser() || 
+                        (resource != null && belongsToUserTenant(resource.data.tenantId))) &&
+                       (resource == null || request.resource.data.tenantId == resource.data.tenantId);
+      
+      allow delete: if isAuthenticated() && 
+                       (isDemoUser() || 
+                        (resource != null && belongsToUserTenant(resource.data.tenantId)));
+    }
+    
+    match /facturacion/{documentId} {
+      allow get: if isAuthenticated() && 
+                    (isDemoUser() || 
+                     (resource != null && belongsToUserTenant(resource.data.tenantId)));
+      allow list: if isAuthenticated();
+      
+      allow create: if isAuthenticated() && 
+                       hasValidTenantId(request.resource.data);
+      
+      allow update: if isAuthenticated() && 
+                       (isDemoUser() || 
+                        (resource != null && belongsToUserTenant(resource.data.tenantId))) &&
+                       (resource == null || request.resource.data.tenantId == resource.data.tenantId);
+      
+      allow delete: if isAuthenticated() && 
+                       (isDemoUser() || 
+                        (resource != null && belongsToUserTenant(resource.data.tenantId)));
+    }
+    
+    match /operadores/{documentId} {
+      allow get: if isAuthenticated() && 
+                    (isDemoUser() || 
+                     (resource != null && belongsToUserTenant(resource.data.tenantId)));
+      allow list: if isAuthenticated();
+      
+      allow create: if isAuthenticated() && 
+                       hasValidTenantId(request.resource.data);
+      
+      allow update: if isAuthenticated() && 
+                       (isDemoUser() || 
+                        (resource != null && belongsToUserTenant(resource.data.tenantId))) &&
+                       (resource == null || request.resource.data.tenantId == resource.data.tenantId);
+      
+      allow delete: if isAuthenticated() && 
+                       (isDemoUser() || 
+                        (resource != null && belongsToUserTenant(resource.data.tenantId)));
+    }
+    
+    match /diesel/{documentId} {
+      allow get: if isAuthenticated() && 
+                    (isDemoUser() || 
+                     (resource != null && belongsToUserTenant(resource.data.tenantId)));
+      allow list: if isAuthenticated();
+      
+      allow create: if isAuthenticated() && 
+                       hasValidTenantId(request.resource.data);
+      
+      allow update: if isAuthenticated() && 
+                       (isDemoUser() || 
+                        (resource != null && belongsToUserTenant(resource.data.tenantId))) &&
+                       (resource == null || request.resource.data.tenantId == resource.data.tenantId);
+      
+      allow delete: if isAuthenticated() && 
+                       (isDemoUser() || 
+                        (resource != null && belongsToUserTenant(resource.data.tenantId)));
+    }
+    
+    match /mantenimiento/{documentId} {
+      allow get: if isAuthenticated() && 
+                    (isDemoUser() || 
+                     (resource != null && belongsToUserTenant(resource.data.tenantId)));
+      allow list: if isAuthenticated();
+      
+      allow create: if isAuthenticated() && 
+                       hasValidTenantId(request.resource.data);
+      
+      allow update: if isAuthenticated() && 
+                       (isDemoUser() || 
+                        (resource != null && belongsToUserTenant(resource.data.tenantId))) &&
+                       (resource == null || request.resource.data.tenantId == resource.data.tenantId);
+      
+      allow delete: if isAuthenticated() && 
+                       (isDemoUser() || 
+                        (resource != null && belongsToUserTenant(resource.data.tenantId)));
+    }
+    
+    match /tesoreria/{documentId} {
+      allow get: if isAuthenticated() && 
+                    (isDemoUser() || 
+                     (resource != null && belongsToUserTenant(resource.data.tenantId)));
+      allow list: if isAuthenticated();
+      
+      allow create: if isAuthenticated() && 
+                       hasValidTenantId(request.resource.data);
+      
+      allow update: if isAuthenticated() && 
+                       (isDemoUser() || 
+                        (resource != null && belongsToUserTenant(resource.data.tenantId))) &&
+                       (resource == null || request.resource.data.tenantId == resource.data.tenantId);
+      
+      allow delete: if isAuthenticated() && 
+                       (isDemoUser() || 
+                        (resource != null && belongsToUserTenant(resource.data.tenantId)));
+    }
+    
+    match /cxc/{documentId} {
+      allow get: if isAuthenticated() && 
+                    (isDemoUser() || 
+                     (resource != null && belongsToUserTenant(resource.data.tenantId)));
+      allow list: if isAuthenticated();
+      
+      allow create: if isAuthenticated() && 
+                       hasValidTenantId(request.resource.data);
+      
+      allow update: if isAuthenticated() && 
+                       (isDemoUser() || 
+                        (resource != null && belongsToUserTenant(resource.data.tenantId))) &&
+                       (resource == null || request.resource.data.tenantId == resource.data.tenantId);
+      
+      allow delete: if isAuthenticated() && 
+                       (isDemoUser() || 
+                        (resource != null && belongsToUserTenant(resource.data.tenantId)));
+    }
+    
+    match /cxp/{documentId} {
+      allow get: if isAuthenticated() && 
+                    (isDemoUser() || 
+                     (resource != null && belongsToUserTenant(resource.data.tenantId)));
+      allow list: if isAuthenticated();
+      
+      allow create: if isAuthenticated() && 
+                       hasValidTenantId(request.resource.data);
+      
+      allow update: if isAuthenticated() && 
+                       (isDemoUser() || 
+                        (resource != null && belongsToUserTenant(resource.data.tenantId))) &&
+                       (resource == null || request.resource.data.tenantId == resource.data.tenantId);
+      
+      allow delete: if isAuthenticated() && 
+                       (isDemoUser() || 
+                        (resource != null && belongsToUserTenant(resource.data.tenantId)));
+    }
+    
+    match /inventario/{documentId} {
+      allow get: if isAuthenticated() && 
+                    (isDemoUser() || 
+                     (resource != null && belongsToUserTenant(resource.data.tenantId)));
+      allow list: if isAuthenticated();
+      
+      allow create: if isAuthenticated() && 
+                       hasValidTenantId(request.resource.data);
+      
+      allow update: if isAuthenticated() && 
+                       (isDemoUser() || 
+                        (resource != null && belongsToUserTenant(resource.data.tenantId))) &&
+                       (resource == null || request.resource.data.tenantId == resource.data.tenantId);
+      
+      allow delete: if isAuthenticated() && 
+                       (isDemoUser() || 
+                        (resource != null && belongsToUserTenant(resource.data.tenantId)));
+    }
+    
+    match /reportes/{documentId} {
+      allow get: if isAuthenticated() && 
+                    (isDemoUser() || 
+                     (resource != null && belongsToUserTenant(resource.data.tenantId)));
+      allow list: if isAuthenticated();
+      
+      allow create: if isAuthenticated() && 
+                       hasValidTenantId(request.resource.data);
+      
+      allow update: if isAuthenticated() && 
+                       (isDemoUser() || 
+                        (resource != null && belongsToUserTenant(resource.data.tenantId))) &&
+                       (resource == null || request.resource.data.tenantId == resource.data.tenantId);
+      
+      allow delete: if isAuthenticated() && 
+                       (isDemoUser() || 
+                        (resource != null && belongsToUserTenant(resource.data.tenantId)));
+    }
+    
+    // ============================================
+    // REGLA POR DEFECTO (DENEGAR TODO LO DEMÁS)
+    // ============================================
+    
+    // Cualquier otra colección requiere autenticación
+    match /{document=**} {
+      allow read, write: if isAuthenticated();
+    }
+  }
+}
+
+
+
+

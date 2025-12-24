@@ -1,0 +1,945 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/png" sizes="16x16" href="../assets/img/Logo TF.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="../assets/img/Logo TF.png" />
+    <link rel="icon" type="image/png" sizes="64x64" href="../assets/img/Logo TF.png" />
+    <title>Diesel</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link rel="stylesheet" href="../styles/styles.css" />
+    <link rel="stylesheet" href="../styles/diesel.css" />
+    <link rel="stylesheet" href="../styles/backend-indicator.css" />
+    <!-- Estilos para el componente searchable-select -->
+    <link rel="stylesheet" href="../assets/styles/searchable-select.css" />
+
+    <!-- Bootstrap JavaScript (requerido para modales) - SIN defer para que cargue inmediatamente -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      // Verificar que Bootstrap se cargó correctamente
+      if (typeof bootstrap === 'undefined') {
+        console.error('❌ Bootstrap no se cargó correctamente');
+      } else {
+        console.log('✅ Bootstrap cargado correctamente');
+      }
+    </script>
+
+    <!-- CRÍTICO: Ocultar elementos del sidebar INMEDIATAMENTE para evitar parpadeo -->
+    <style>
+      /* Ocultar todos los módulos del sidebar inicialmente */
+      .nav-item:not(#nav-menu) {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        height: 0 !important;
+        overflow: hidden !important;
+      }
+      /* Permitir que auth.js muestre los elementos con permisos */
+      .nav-item.permission-granted {
+        display: list-item !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        height: auto !important;
+        overflow: visible !important;
+      }
+    </style>
+
+    <!-- Performance Optimizations y Loaders Comunes -->
+    <script src="../assets/scripts/performance/performance-init.js" defer></script>
+
+    <!-- CRÍTICO: auth.js DEBE cargarse ANTES de common-head-loader.js -->
+    <!-- para que los permisos se apliquen antes de que se oculten elementos -->
+    <script src="../assets/scripts/auth.js"></script>
+
+    <!-- Ahora cargar common-head-loader.js que esperará a que auth.js esté listo -->
+    <script src="../assets/scripts/performance/common-head-loader.js"></script>
+    <script src="../assets/scripts/script-loader.js" defer></script>
+
+    <!-- Scripts críticos específicos de la página -->
+    <!-- Script crítico: Restaurar estado del sidebar ANTES de renderizar para evitar parpadeo -->
+    <script src="../assets/scripts/menu/sidebar-state.js"></script>
+    <!-- Script para actualizar período automáticamente -->
+    <script src="../assets/scripts/periodo.js"></script>
+
+    <!-- ===== FASE 3: Scripts Base del Sistema (SIN defer) ===== -->
+    <!-- CRÍTICO: main.js debe cargarse SIN defer para que funciones base estén disponibles -->
+    <script src="../assets/scripts/main.js"></script>
+    <!-- CRÍTICO: cache-manager.js debe cargarse ANTES de otros scripts que usan caché -->
+    <script src="../assets/scripts/cache-manager.js"></script>
+    <!-- CRÍTICO: firebase-init.js debe cargarse PRIMERO para inicializar Firebase -->
+    <script type="module" src="../assets/scripts/firebase-init.js"></script>
+    <!-- CRÍTICO: firebase-ready.js debe cargarse DESPUÉS de firebase-init.js para verificar disponibilidad -->
+    <script src="../assets/scripts/firebase-ready.js"></script>
+    <!-- CRÍTICO: firebase-repo-base.js debe cargarse para que FirebaseRepoBase esté disponible -->
+    <script src="../assets/scripts/firebase-repo-base.js" defer></script>
+    <!-- CRÍTICO: firebase-repos.js debe cargarse DESPUÉS de firebase-repo-base.js para crear los repositorios -->
+    <script src="../assets/scripts/firebase-repos.js" defer></script>
+
+    <!-- Sistema de limpieza automática de localStorage -->
+    <script src="../assets/scripts/localstorage-cleanup.js" defer></script>
+  </head>
+
+  <body>
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="logo">
+          <img src="../assets/img/Logo TF.png" alt="TitanFleet" style="height: 50px; width: auto" />
+          <span class="logo-text">TitanFleet</span>
+        </div>
+        <button class="btn-close-sidebar" id="closeSidebar"><i class="fas fa-times"></i></button>
+      </div>
+      <nav class="sidebar-nav">
+        <ul class="nav-menu">
+          <li class="nav-item" id="nav-menu">
+            <a href="menu.html" class="nav-link"
+              ><i class="fa-solid fa-house-chimney"></i><span>Menú</span></a
+            >
+          </li>
+          <li class="nav-item" id="nav-logistica">
+            <a href="logistica.html" class="nav-link"
+              ><i class="fas fa-truck"></i><span>Logística</span></a
+            >
+          </li>
+          <li class="nav-item" id="nav-facturacion">
+            <a href="facturacion.html" class="nav-link"
+              ><i class="fas fa-file-invoice"></i><span>Facturación</span></a
+            >
+          </li>
+          <li class="nav-item" id="nav-trafico">
+            <a href="trafico.html" class="nav-link"
+              ><i class="fas fa-route"></i><span>Tráfico</span></a
+            >
+          </li>
+          <li class="nav-item" id="nav-operadores">
+            <a href="operadores.html" class="nav-link"
+              ><i class="fas fa-user"></i><span>Operadores</span></a
+            >
+          </li>
+          <li class="nav-item active" id="nav-diesel">
+            <a href="diesel.html" class="nav-link"
+              ><i class="fa-solid fa-gas-pump"></i><span>Diesel</span></a
+            >
+          </li>
+          <li class="nav-item" id="nav-mantenimiento">
+            <a href="mantenimiento.html" class="nav-link"
+              ><i class="fa-solid fa-screwdriver-wrench"></i><span>Mantenimiento</span></a
+            >
+          </li>
+          <li class="nav-item" id="nav-tesoreria">
+            <a href="tesoreria.html" class="nav-link"
+              ><i class="fa-solid fa-money-bill"></i><span>Tesoreria</span></a
+            >
+          </li>
+          <li class="nav-item" id="nav-cxc">
+            <a href="CXC.html" class="nav-link"
+              ><i class="fas fa-hand-holding-usd"></i><span>Cuentas x Cobrar</span></a
+            >
+          </li>
+          <li class="nav-item" id="nav-cxp">
+            <a href="CXP.html" class="nav-link"
+              ><i class="fas fa-credit-card"></i><span>Cuentas x Pagar</span></a
+            >
+          </li>
+          <li class="nav-item" id="nav-inventario">
+            <a href="inventario.html" class="nav-link"
+              ><i class="fa-solid fa-cart-flatbed"></i><span>Inventario</span></a
+            >
+          </li>
+          <li class="nav-item" id="nav-configuracion">
+            <a href="configuracion.html" class="nav-link"
+              ><i class="fa-solid fa-gears"></i><span>Configuración</span></a
+            >
+          </li>
+          <li class="nav-item" id="nav-reportes">
+            <a href="reportes.html" class="nav-link"
+              ><i class="fas fa-chart-line"></i><span>Reportes</span></a
+            >
+          </li>
+        </ul>
+      </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+      <!-- Top Bar -->
+      <div class="top-bar">
+        <button class="btn-toggle-sidebar" id="toggleSidebar">
+          <i class="fas fa-bars"></i>
+        </button>
+        <div class="top-bar-content">
+          <div class="page-title-section">
+            <h1 class="page-title">
+              <i class="fa-solid fa-gas-pump"></i>
+              Consumo Diesel
+              <span
+                id="backendReadyIndicator"
+                class="backend-loading-indicator"
+                style="display: none"
+              >
+                <span
+                  class="spinner-border spinner-border-sm"
+                  role="status"
+                  aria-hidden="true"
+                ></span>
+                <span class="ms-2">Cargando datos...</span>
+              </span>
+              <span id="backendReadyBadge" class="backend-ready-badge" style="display: none">
+                <i class="fas fa-check-circle"></i>
+                <span class="ms-2">Listo para trabajar</span>
+              </span>
+            </h1>
+            <div class="current-period">
+              <small class="text-muted">Período: </small>
+              <span class="period-info" id="currentPeriod"></span>
+            </div>
+          </div>
+          <div class="user-info">
+            <div class="user-details">
+              <i class="fas fa-user-circle"></i>
+              <span id="currentUserName">Usuario ERP</span>
+            </div>
+            <div class="user-actions">
+              <button class="btn btn-outline-light btn-sm logout-btn" data-action="logout">
+                <i class="fas fa-sign-out-alt"></i> <span class="logout-text">Cerrar Sesión</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Content Area -->
+      <div class="content-wrapper" style="padding: 8px">
+        <div class="container-fluid">
+          <!-- Page Header -->
+          <div class="page-header">
+            <div class="row align-items-center">
+              <div class="col-md-8">
+                <h2 class="mb-2">Registro Consumo Diesel</h2>
+                <p class="text-muted mb-0">
+                  Registra el consumo de Diesel llenando la siguiente Información.
+                </p>
+              </div>
+              <div class="col-md-4 text-end">
+                <!-- Botones removidos según solicitud -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Form -->
+          <div class="card">
+            <div class="card-body">
+              <form class="needs-validation" novalidate>
+                <!-- Formulario Diesel  -->
+                <div class="form-section">
+                  <h4 class="section-title">
+                    <i class="fa-solid fa-droplet"></i>
+                    Información de Consumo Diesel
+                  </h4>
+
+                  <div class="row g-3">
+                    <div class="col-md-6">
+                      <label for="estacionservicio" class="form-label">Estacion de Servicio</label>
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="estacionservicio"
+                        placeholder="Ingresa la estacion de Servicio"
+                        required
+                      />
+                    </div>
+                    <div class="col-md-6">
+                      <label for="fechaconsumo" class="form-label">Fecha</label>
+                      <input
+                        type="date"
+                        class="form-control"
+                        id="fechaconsumo"
+                        placeholder="Ingresa la Fecha de Consumo"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div class="row g-1">
+                    <div class="col-md-4">
+                      <label for="economico" class="form-label">Económico Tractocamión *</label>
+                      <div class="searchable-select-container">
+                        <div class="search-input-wrapper">
+                          <input
+                            type="text"
+                            id="economico"
+                            class="form-control"
+                            placeholder="Escriba para buscar económico..."
+                            autocomplete="off"
+                            required
+                          />
+                          <i class="fas fa-search search-icon"></i>
+                          <button
+                            id="btn-clear-economico"
+                            class="btn btn-outline-secondary btn-sm btn-clear"
+                            type="button"
+                            title="Limpiar"
+                          >
+                            <i class="fas fa-times"></i>
+                          </button>
+                        </div>
+                        <div id="select-economico" class="filtered-select"></div>
+                      </div>
+                      <input type="hidden" id="economico_value" />
+                      <div class="invalid-feedback">Por favor seleccione un económico</div>
+                      <small class="text-muted"
+                        >Los datos se llenarán automáticamente al seleccionar</small
+                      >
+                    </div>
+
+                    <div class="col-md-4">
+                      <label for="kilometraje" class="form-label">Kilometraje</label>
+                      <input
+                        type="number"
+                        class="form-control"
+                        id="kilometraje"
+                        placeholder="Ingresa el Kilometraje"
+                        required
+                      />
+                    </div>
+
+                    <div class="col-md-4">
+                      <label for="Placas" class="form-label">Placas</label>
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="Placas"
+                        placeholder="Se llena en Automatico"
+                        readonly
+                      />
+                    </div>
+                  </div>
+
+                  <div class="row g-1">
+                    <div class="col-md-4">
+                      <label for="Litros" class="form-label">Litros Consumidos</label>
+                      <input
+                        type="number"
+                        class="form-control"
+                        id="Litros"
+                        placeholder="Ingresa los litros Consumidos"
+                        required
+                        step="0.0001"
+                        min="0"
+                        oninput="if(typeof calcularCostoTotalDiesel==='function')calcularCostoTotalDiesel()"
+                        onchange="if(typeof calcularCostoTotalDiesel==='function')calcularCostoTotalDiesel()"
+                      />
+                    </div>
+
+                    <div class="col-md-4">
+                      <label for="costoporlitro" class="form-label">Costo por Litro</label>
+                      <input
+                        type="number"
+                        class="form-control"
+                        id="costoporlitro"
+                        placeholder="Ingresa el costo por litro"
+                        required
+                        step="0.0001"
+                        min="0"
+                        oninput="if(typeof calcularCostoTotalDiesel==='function')calcularCostoTotalDiesel()"
+                        onchange="if(typeof calcularCostoTotalDiesel==='function')calcularCostoTotalDiesel()"
+                      />
+                    </div>
+
+                    <div class="col-md-4">
+                      <label for="costototal" class="form-label">Costo Total</label>
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="costototal"
+                        placeholder="Se llena en Automatico"
+                        readonly
+                      />
+                    </div>
+                  </div>
+
+                  <div class="row g-3">
+                    <div class="col-md-6">
+                      <label for="formapago" class="form-label">Forma de Pago</label>
+                      <select id="formapago" class="form-select" required>
+                        <option value="">Seleccione...</option>
+                        <option value="efectivo">Efectivo</option>
+                        <option value="transferencia">Transferencia</option>
+                        <option value="tarjeta_credito">Tarjeta de Crédito</option>
+                        <option value="tarjeta_debito">Tarjeta de Débito</option>
+                        <option value="cheque">Cheque</option>
+                        <option value="vale">Vale</option>
+                        <option value="monedero">Monedero Electrónico</option>
+                        <option value="otro">Otro</option>
+                      </select>
+                    </div>
+                    <div class="col-md-4">
+                      <label for="Evidencia" class="form-label">Evidencia</label>
+                      <form method="post" action="/send/" enctype="multipart/form-data">
+                        <input type="file" />
+                      </form>
+                    </div>
+                  </div>
+
+                  <div class="row g-3">
+                    <div class="col-md-6">
+                      <label for="operadorprincipal" class="form-label">Operador Principal *</label>
+                      <div class="searchable-select-container">
+                        <div class="search-input-wrapper">
+                          <input
+                            type="text"
+                            id="operadorprincipal"
+                            class="form-control"
+                            placeholder="Escriba para buscar operador..."
+                            autocomplete="off"
+                            required
+                          />
+                          <i class="fas fa-search search-icon"></i>
+                          <button
+                            id="btn-clear-operadorprincipal"
+                            class="btn btn-outline-secondary btn-sm btn-clear"
+                            type="button"
+                            title="Limpiar"
+                          >
+                            <i class="fas fa-times"></i>
+                          </button>
+                        </div>
+                        <div id="select-operadorprincipal" class="filtered-select"></div>
+                      </div>
+                      <input type="hidden" id="operadorprincipal_value" />
+                      <div class="invalid-feedback">Por favor seleccione un operador principal</div>
+                      <small class="text-muted"
+                        >Los datos se llenarán automáticamente al seleccionar</small
+                      >
+                    </div>
+                    <div class="col-md-6">
+                      <label for="operadorsecundario" class="form-label">Operador Secundario</label>
+                      <div class="searchable-select-container">
+                        <div class="search-input-wrapper">
+                          <input
+                            type="text"
+                            id="operadorsecundario"
+                            class="form-control"
+                            placeholder="Escriba para buscar operador..."
+                            autocomplete="off"
+                          />
+                          <i class="fas fa-search search-icon"></i>
+                          <button
+                            id="btn-clear-operadorsecundario"
+                            class="btn btn-outline-secondary btn-sm btn-clear"
+                            type="button"
+                            title="Limpiar"
+                          >
+                            <i class="fas fa-times"></i>
+                          </button>
+                        </div>
+                        <div id="select-operadorsecundario" class="filtered-select"></div>
+                      </div>
+                      <input type="hidden" id="operadorsecundario_value" />
+                      <small class="text-muted"
+                        >Opcional - Los datos se llenarán automáticamente</small
+                      >
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Embalaje Especial -->
+                <div class="form-section">
+                  <h4 class="section-title">
+                    <i class="fa-solid fa-clipboard"></i>
+                    Observaciones
+                  </h4>
+                  <div class="row g-3">
+                    <div class="col-12">
+                      <div class="form-check form-check-inline">
+                        <input
+                          class="form-check-input"
+                          type="radio"
+                          name="Observaciones"
+                          id="observacionesSi"
+                          value="si"
+                        />
+                        <label class="form-check-label" for="observacionesSi">Sí</label>
+                      </div>
+                      <div class="form-check form-check-inline">
+                        <input
+                          class="form-check-input"
+                          type="radio"
+                          name="Observaciones"
+                          id="observacionesNo"
+                          value="no"
+                          checked
+                        />
+                        <label class="form-check-label" for="observacionesNo">No</label>
+                      </div>
+                    </div>
+                    <div class="col-12" id="Observaciones" style="display: none">
+                      <label for="descripcion" class="form-label"
+                        >Descripción de las Observaciones</label
+                      >
+                      <textarea
+                        class="form-control"
+                        id="descripcion"
+                        rows="3"
+                        placeholder="Describa las Observaciones"
+                      ></textarea>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Botones de Acción -->
+                <div class="form-actions">
+                  <button
+                    type="button"
+                    class="btn btn-outline-warning me-2"
+                    data-action="clearCurrentForm"
+                  >
+                    <i class="fas fa-times"></i> Limpiar
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-primary me-2"
+                    data-action="guardarMovimientoDiesel"
+                  >
+                    <i class="fas fa-check"></i> Registrar Consumo
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <!-- Historial de Movimientos Diesel -->
+          <div class="card mt-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+              <h5 class="mb-0">
+                <i class="fa-solid fa-gas-pump"></i>
+                Historial de Movimientos Diesel
+              </h5>
+              <button
+                type="button"
+                class="btn btn-outline-light btn-sm exportar-btn-header"
+                data-action="exportarDieselExcel"
+              >
+                <i class="fas fa-file-excel"></i> Exportar
+              </button>
+            </div>
+            <div class="card-body">
+              <!-- Filtros -->
+              <div class="card mb-3">
+                <div class="card-header bg-light">
+                  <h6 class="mb-0"><i class="fas fa-filter"></i> Filtros de Búsqueda</h6>
+                </div>
+                <div class="card-body">
+                  <div class="row g-3">
+                    <div class="col-md-2">
+                      <label for="filtroIdDiesel" class="form-label">ID</label>
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="filtroIdDiesel"
+                        placeholder="Buscar por ID"
+                        oninput="aplicarFiltrosDiesel()"
+                      />
+                    </div>
+                    <div class="col-md-2">
+                      <label for="filtroEstacionDiesel" class="form-label">Estación</label>
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="filtroEstacionDiesel"
+                        placeholder="Buscar estación"
+                        oninput="aplicarFiltrosDiesel()"
+                      />
+                    </div>
+                    <div class="col-md-2">
+                      <label for="filtroEconomicoDiesel" class="form-label">Económico</label>
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="filtroEconomicoDiesel"
+                        placeholder="Buscar económico"
+                        oninput="aplicarFiltrosDiesel()"
+                      />
+                    </div>
+                    <div class="col-md-2">
+                      <label for="filtroFormaPagoDiesel" class="form-label">Forma de Pago</label>
+                      <select
+                        class="form-select"
+                        id="filtroFormaPagoDiesel"
+                        data-action="aplicarFiltrosDiesel"
+                      >
+                        <option value="">Todas</option>
+                        <option value="efectivo">Efectivo</option>
+                        <option value="tarjeta">Tarjeta</option>
+                        <option value="cheque">Cheque</option>
+                        <option value="vale">Vale</option>
+                        <option value="monedero">Monedero Electrónico</option>
+                        <option value="otro">Otro</option>
+                      </select>
+                    </div>
+                    <div class="col-md-2">
+                      <label for="filtroFechaDesdeDiesel" class="form-label">Fecha Desde</label>
+                      <input
+                        type="date"
+                        class="form-control"
+                        id="filtroFechaDesdeDiesel"
+                        data-action="aplicarFiltrosDiesel"
+                      />
+                    </div>
+                    <div class="col-md-2">
+                      <label for="filtroFechaHastaDiesel" class="form-label">Fecha Hasta</label>
+                      <input
+                        type="date"
+                        class="form-control"
+                        id="filtroFechaHastaDiesel"
+                        data-action="aplicarFiltrosDiesel"
+                      />
+                    </div>
+                  </div>
+                  <div class="row mt-3">
+                    <div class="col-12 text-end">
+                      <button
+                        type="button"
+                        class="btn btn-outline-secondary btn-sm"
+                        data-action="limpiarFiltrosDiesel"
+                      >
+                        <i class="fas fa-times"></i> Limpiar Filtros
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="table-responsive">
+                <table class="table table-hover">
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Fecha</th>
+                      <th>Estación</th>
+                      <th>Económico</th>
+                      <th>Placas</th>
+                      <th>Litros</th>
+                      <th>Costo/Litro</th>
+                      <th>Total</th>
+                      <th>Forma Pago</th>
+                      <th>Operador</th>
+                      <th>Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody id="tablaHistorialDiesel">
+                    <tr>
+                      <td colspan="11" class="text-center text-muted">
+                        No hay registros de diesel
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div id="paginacionDiesel"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal para Detalles de Movimiento Diesel -->
+    <div
+      class="modal fade"
+      id="modalDetalleDiesel"
+      tabindex="-1"
+      aria-labelledby="modalDetalleDieselLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="modalDetalleDieselLabel">
+              <i class="fa-solid fa-gas-pump"></i> Detalle del Movimiento Diesel
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body" id="modalDetalleDieselBody">
+            <!-- El contenido se llenará dinámicamente -->
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal para Editar Movimiento Diesel -->
+    <div
+      class="modal fade"
+      id="modalEditarDiesel"
+      tabindex="-1"
+      aria-labelledby="modalEditarDieselLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="modalEditarDieselLabel">
+              <i class="fas fa-edit"></i> Editar Movimiento Diesel
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <form id="formEditarDiesel" class="needs-validation" novalidate>
+              <input type="hidden" id="editarDiesel_id" />
+
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label for="editarDiesel_estacionservicio" class="form-label"
+                    >Estación de Servicio *</label
+                  >
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="editarDiesel_estacionservicio"
+                    required
+                  />
+                  <div class="invalid-feedback">Por favor ingrese la estación de servicio</div>
+                </div>
+
+                <div class="col-md-6">
+                  <label for="editarDiesel_fechaconsumo" class="form-label">Fecha *</label>
+                  <input type="date" class="form-control" id="editarDiesel_fechaconsumo" required />
+                  <div class="invalid-feedback">Por favor seleccione la fecha</div>
+                </div>
+
+                <div class="col-md-4">
+                  <label for="editarDiesel_economico" class="form-label"
+                    >Económico Tractocamión *</label
+                  >
+                  <div class="searchable-select-container">
+                    <div class="search-input-wrapper">
+                      <input
+                        type="text"
+                        id="editarDiesel_economico"
+                        class="form-control"
+                        placeholder="Escriba para buscar económico..."
+                        autocomplete="off"
+                        required
+                      />
+                      <i class="fas fa-search search-icon"></i>
+                      <button
+                        id="btn-clear-economico-editar"
+                        class="btn btn-outline-secondary btn-sm btn-clear"
+                        type="button"
+                        title="Limpiar"
+                      >
+                        <i class="fas fa-times"></i>
+                      </button>
+                    </div>
+                    <div id="select-economico-editar" class="filtered-select"></div>
+                  </div>
+                  <input type="hidden" id="editarDiesel_economico_value" />
+                  <div class="invalid-feedback">Por favor seleccione un económico</div>
+                </div>
+
+                <div class="col-md-4">
+                  <label for="editarDiesel_kilometraje" class="form-label">Kilometraje</label>
+                  <input type="number" class="form-control" id="editarDiesel_kilometraje" />
+                </div>
+
+                <div class="col-md-4">
+                  <label for="editarDiesel_placas" class="form-label">Placas</label>
+                  <input type="text" class="form-control" id="editarDiesel_placas" readonly />
+                </div>
+
+                <div class="col-md-4">
+                  <label for="editarDiesel_litros" class="form-label">Litros Consumidos *</label>
+                  <input
+                    type="number"
+                    class="form-control"
+                    id="editarDiesel_litros"
+                    step="0.0001"
+                    min="0"
+                    required
+                    oninput="if(typeof calcularCostoTotalDieselEditar==='function')calcularCostoTotalDieselEditar()"
+                    onchange="if(typeof calcularCostoTotalDieselEditar==='function')calcularCostoTotalDieselEditar()"
+                  />
+                  <div class="invalid-feedback">Por favor ingrese los litros consumidos</div>
+                </div>
+
+                <div class="col-md-4">
+                  <label for="editarDiesel_costoporlitro" class="form-label"
+                    >Costo por Litro *</label
+                  >
+                  <input
+                    type="number"
+                    class="form-control"
+                    id="editarDiesel_costoporlitro"
+                    step="0.0001"
+                    min="0"
+                    required
+                    oninput="if(typeof calcularCostoTotalDieselEditar==='function')calcularCostoTotalDieselEditar()"
+                    onchange="if(typeof calcularCostoTotalDieselEditar==='function')calcularCostoTotalDieselEditar()"
+                  />
+                  <div class="invalid-feedback">Por favor ingrese el costo por litro</div>
+                </div>
+
+                <div class="col-md-4">
+                  <label for="editarDiesel_costototal" class="form-label">Costo Total</label>
+                  <input type="text" class="form-control" id="editarDiesel_costototal" readonly />
+                </div>
+
+                <div class="col-md-6">
+                  <label for="editarDiesel_formapago" class="form-label">Forma de Pago *</label>
+                  <select id="editarDiesel_formapago" class="form-select" required>
+                    <option value="">Seleccione...</option>
+                    <option value="efectivo">Efectivo</option>
+                    <option value="transferencia">Transferencia</option>
+                    <option value="tarjeta_credito">Tarjeta de Crédito</option>
+                    <option value="tarjeta_debito">Tarjeta de Débito</option>
+                    <option value="cheque">Cheque</option>
+                    <option value="vale">Vale</option>
+                    <option value="monedero">Monedero Electrónico</option>
+                    <option value="otro">Otro</option>
+                  </select>
+                  <div class="invalid-feedback">Por favor seleccione la forma de pago</div>
+                </div>
+
+                <div class="col-md-6">
+                  <label for="editarDiesel_operadorprincipal" class="form-label"
+                    >Operador Principal *</label
+                  >
+                  <div class="searchable-select-container">
+                    <div class="search-input-wrapper">
+                      <input
+                        type="text"
+                        id="editarDiesel_operadorprincipal"
+                        class="form-control"
+                        placeholder="Escriba para buscar operador..."
+                        autocomplete="off"
+                        required
+                      />
+                      <i class="fas fa-search search-icon"></i>
+                      <button
+                        id="btn-clear-operadorprincipal-editar"
+                        class="btn btn-outline-secondary btn-sm btn-clear"
+                        type="button"
+                        title="Limpiar"
+                      >
+                        <i class="fas fa-times"></i>
+                      </button>
+                    </div>
+                    <div id="select-operadorprincipal-editar" class="filtered-select"></div>
+                  </div>
+                  <input type="hidden" id="editarDiesel_operadorprincipal_value" />
+                  <div class="invalid-feedback">Por favor seleccione un operador principal</div>
+                </div>
+
+                <div class="col-md-6">
+                  <label for="editarDiesel_operadorsecundario" class="form-label"
+                    >Operador Secundario</label
+                  >
+                  <div class="searchable-select-container">
+                    <div class="search-input-wrapper">
+                      <input
+                        type="text"
+                        id="editarDiesel_operadorsecundario"
+                        class="form-control"
+                        placeholder="Escriba para buscar operador..."
+                        autocomplete="off"
+                      />
+                      <i class="fas fa-search search-icon"></i>
+                      <button
+                        id="btn-clear-operadorsecundario-editar"
+                        class="btn btn-outline-secondary btn-sm btn-clear"
+                        type="button"
+                        title="Limpiar"
+                      >
+                        <i class="fas fa-times"></i>
+                      </button>
+                    </div>
+                    <div id="select-operadorsecundario-editar" class="filtered-select"></div>
+                  </div>
+                  <input type="hidden" id="editarDiesel_operadorsecundario_value" />
+                </div>
+
+                <div class="col-12">
+                  <label class="form-label">Observaciones</label>
+                  <div class="form-check form-check-inline">
+                    <input
+                      class="form-check-input"
+                      type="radio"
+                      name="editarDiesel_observaciones"
+                      id="editarDiesel_observacionesSi"
+                      value="si"
+                    />
+                    <label class="form-check-label" for="editarDiesel_observacionesSi">Sí</label>
+                  </div>
+                  <div class="form-check form-check-inline">
+                    <input
+                      class="form-check-input"
+                      type="radio"
+                      name="editarDiesel_observaciones"
+                      id="editarDiesel_observacionesNo"
+                      value="no"
+                      checked
+                    />
+                    <label class="form-check-label" for="editarDiesel_observacionesNo">No</label>
+                  </div>
+                </div>
+
+                <div class="col-12" id="editarDiesel_observacionesDiv" style="display: none">
+                  <label for="editarDiesel_descripcion" class="form-label"
+                    >Descripción de las Observaciones</label
+                  >
+                  <textarea class="form-control" id="editarDiesel_descripcion" rows="3"></textarea>
+                </div>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+              Cancelar
+            </button>
+            <button type="button" class="btn btn-primary" data-action="guardarDieselEditado">
+              <i class="fas fa-save"></i> Guardar Cambios
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== SCRIPTS COMUNES Y MÓDULOS (Carga automática) ===== -->
+    <script src="../assets/scripts/performance/common-head-loader.js"></script>
+    <script src="../assets/scripts/performance/common-scripts-loader.js"></script>
+    <script src="../assets/scripts/performance/page-modules-config.js"></script>
+    <script src="../assets/scripts/performance/page-modules-loader.js"></script>
+    <script src="../assets/scripts/paginacion.js" defer></script>
+    <!-- Scripts del componente searchable-select -->
+    <script src="../assets/scripts/searchable-select.js"></script>
+    <!-- Scripts de inicialización para searchable-select en diesel -->
+    <script src="../assets/scripts/diesel/searchable-select-economicos.js" defer></script>
+    <script src="../assets/scripts/diesel/searchable-select-operadores.js" defer></script>
+
+    <script src="../assets/scripts/diesel/diesel-modal-editar.js" defer></script>
+    <script src="../assets/scripts/diesel/event-handlers.js" defer></script>
+    <script src="../assets/scripts/diesel.js" defer></script>
+    <script src="../assets/scripts/menu/sidebar-handler.js"></script>
+    <!-- Script para indicador de carga del backend (compartido) -->
+    <script src="../assets/scripts/backend-ready-indicator.js"></script>
+  </body>
+</html>

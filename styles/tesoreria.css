@@ -1,0 +1,281 @@
+/* Variables CSS específicas para tesorería */
+:root {
+  --top-bar-height: 85px;
+}
+
+/* Estilos del top-bar (igual que facturación, operadores, logística y tráfico) */
+.main-content {
+  padding: 0;
+}
+
+.top-bar {
+    background: white;
+    height: var(--top-bar-height);
+    display: flex;
+    align-items: center;
+    padding: 0 30px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-bottom: 1px solid var(--border-color);
+    margin: 20px;
+    border-radius: 8px;
+}
+
+.btn-toggle-sidebar {
+    background: none;
+    border: none;
+    font-size: 18px;
+    color: var(--text-color);
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    margin-right: 20px;
+}
+
+.btn-toggle-sidebar:hover {
+    background-color: var(--background-color);
+}
+
+.top-bar-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.page-title-section {
+    display: flex;
+    flex-direction: column;
+}
+
+.page-title {
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--text-color);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.page-title i {
+    color: var(--secondary-color);
+}
+
+.current-period {
+    font-size: 14px;
+    color: var(--text-muted);
+    margin-top: 2px;
+}
+
+.period-info {
+    font-weight: 600;
+    color: var(--secondary-color);
+    background: rgba(52, 152, 219, 0.1);
+    padding: 4px 8px;
+    border-radius: 4px;
+    border: 1px solid rgba(52, 152, 219, 0.2);
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.user-details {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-color);
+}
+
+.user-details i {
+    font-size: 20px;
+    color: var(--secondary-color);
+}
+
+.user-actions {
+    display: flex;
+    gap: 10px;
+}
+
+/* Estilos para botón Exportar en header */
+.exportar-btn-header {
+  background-color: transparent;
+  border-color: rgba(255, 255, 255, 0.5);
+  color: #ffffff;
+}
+.exportar-btn-header:hover {
+  background-color: #198754 !important;
+  border-color: #198754 !important;
+  color: #ffffff !important;
+}
+/* Estilo específico para botón PDF - color rojo en hover */
+#btnExportarPDFEstadoCuenta:hover {
+  background-color: #dc3545 !important;
+  border-color: #dc3545 !important;
+  color: #ffffff !important;
+}
+.exportar-btn-header:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.nav-tabs {
+  background-color: transparent;
+  border: none;
+  padding: 0;
+  margin-bottom: 0;
+}
+.nav-tabs .nav-link {
+  border: none;
+  color: var(--primary-color, #2e4154);
+  font-weight: 500;
+  padding: 0.75rem 1.5rem;
+}
+.nav-tabs .nav-link:hover {
+  color: var(--primary-color, #2e4154);
+  background-color: rgba(46, 65, 84, 0.1);
+}
+.nav-tabs .nav-link.active {
+  background: var(--primary-color, #2e4154);
+  color: white;
+  border-radius: 8px 8px 0 0;
+}
+.tab-content {
+  background: white;
+  border: 1px solid #dee2e6;
+  border-top: none;
+  border-radius: 0 0 10px 10px;
+  padding: 1.5rem;
+}
+.table thead th { background-color: #f3f4f6; }
+.card-header { background: #ffffff; border-bottom: 3px solid #2e4154; }
+.card-header h5 { color: #2e4154 !important; font-weight: 600; }
+.card-header h5 i { color: #2e4154 !important; }
+.historial-header { background: #2e4154 !important; border-bottom: none !important; }
+.historial-header h5 { color: #ffffff !important; }
+.historial-header h5 i { color: #3498db !important; }
+.filter-section { background: #f8fafc; border-radius: 15px; padding: 1.5rem; box-shadow: 0 2px 4px rgba(0,0,0,0.08); }
+
+/* Estilos para logo cuando sidebar está colapsada */
+.sidebar.collapsed .logo {
+  justify-content: center;
+  align-items: center;
+  gap: 0;
+  width: 100%;
+  padding: 0;
+}
+
+.sidebar.collapsed .logo img {
+  height: 40px !important;
+  width: auto !important;
+  margin: 0 auto;
+  display: block;
+}
+
+.sidebar.collapsed .sidebar-header {
+  padding: 15px 5px;
+  justify-content: center;
+}
+
+/* Estilos para botón de cerrar sesión - solo icono por defecto */
+.logout-btn {
+  position: relative;
+  overflow: visible;
+  padding: 0.375rem 0.75rem;
+  transition: all 0.3s ease;
+}
+
+.logout-btn .logout-text {
+  opacity: 0;
+  width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  transition: opacity 0.3s ease, width 0.3s ease, margin-left 0.3s ease;
+  margin-left: 0;
+  display: inline-block;
+}
+
+.logout-btn:hover .logout-text {
+  opacity: 1;
+  width: auto;
+  margin-left: 0.5rem;
+}
+
+.logout-btn i {
+  transition: transform 0.3s ease;
+}
+
+.logout-btn:hover i {
+  transform: scale(1.1);
+}
+
+/* Remover estado de focus después de perder el foco - FORZAR con !important */
+.form-control:not(:focus):not(:active),
+.form-select:not(:focus):not(:active),
+input.form-control:not(:focus):not(:active),
+select.form-select:not(:focus):not(:active),
+input[type="text"]:not(:focus):not(:active),
+input[type="number"]:not(:focus):not(:active) {
+  background-color: #fff !important;
+  border-color: #ced4da !important;
+  box-shadow: none !important;
+  outline: none !important;
+  outline-offset: 0 !important;
+}
+
+/* Campos específicos de tesorería */
+#Proveedor:not(:focus),
+#numeroFactura:not(:focus),
+#bancodestino:not(:focus),
+#cuentadestino:not(:focus),
+#referenciabancaria:not(:focus) {
+  background-color: #fff !important;
+  border-color: #ced4da !important;
+  box-shadow: none !important;
+  outline: none !important;
+  outline-offset: 0 !important;
+}
+
+/* Asegurar que los campos no mantengan el estado de focus */
+.form-control:focus,
+.form-select:focus {
+  background-color: #fff !important;
+  border-color: #80bdff !important;
+  outline: 0 !important;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25) !important;
+}
+
+/* Remover focus cuando no está activo */
+.form-control:focus:not(:focus-visible),
+.form-select:focus:not(:focus-visible) {
+  box-shadow: none !important;
+  border-color: #ced4da !important;
+}
+
+/* Clase específica para remover focus - máxima prioridad */
+.form-control.no-focus,
+.form-select.no-focus,
+input.no-focus,
+select.no-focus {
+  background-color: #fff !important;
+  border-color: #ced4da !important;
+  box-shadow: none !important;
+  outline: none !important;
+  outline-offset: 0 !important;
+}
+
+/* Forzar remoción de focus en campos específicos */
+#Proveedor.no-focus,
+#numeroFactura.no-focus,
+#bancodestino.no-focus,
+#cuentadestino.no-focus,
+#referenciabancaria.no-focus {
+  background-color: #fff !important;
+  border-color: #ced4da !important;
+  box-shadow: none !important;
+  outline: none !important;
+  outline-offset: 0 !important;
+}

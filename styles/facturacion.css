@@ -1,0 +1,242 @@
+/* Variables CSS específicas para facturación */
+:root {
+  --top-bar-height: 85px;
+}
+
+/* Estilos del top-bar (igual que operadores y logística) */
+.main-content {
+  padding: 0;
+}
+
+.top-bar {
+    background: white;
+    height: var(--top-bar-height);
+    display: flex;
+    align-items: center;
+    padding: 0 30px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-bottom: 1px solid var(--border-color);
+    margin: 20px;
+    border-radius: 8px;
+}
+
+.btn-toggle-sidebar {
+    background: none;
+    border: none;
+    font-size: 18px;
+    color: var(--text-color);
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    margin-right: 20px;
+}
+
+.btn-toggle-sidebar:hover {
+    background-color: var(--background-color);
+}
+
+.top-bar-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.page-title-section {
+    display: flex;
+    flex-direction: column;
+}
+
+.page-title {
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--text-color);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.page-title i {
+    color: var(--secondary-color);
+}
+
+.current-period {
+    font-size: 14px;
+    color: var(--text-muted);
+    margin-top: 2px;
+}
+
+.period-info {
+    font-weight: 600;
+    color: var(--secondary-color);
+    background: rgba(52, 152, 219, 0.1);
+    padding: 4px 8px;
+    border-radius: 4px;
+    border: 1px solid rgba(52, 152, 219, 0.2);
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.user-details {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-color);
+}
+
+.user-details i {
+    font-size: 20px;
+    color: var(--secondary-color);
+}
+
+.user-actions {
+    display: flex;
+    gap: 10px;
+}
+
+/* Estilos para validación de números de registro */
+.form-control.is-invalid {
+  border-color: #dc3545;
+  box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+}
+.form-control.is-valid {
+  border-color: #198754;
+  box-shadow: 0 0 0 0.2rem rgba(25, 135, 84, 0.25);
+}
+.invalid-feedback {
+  display: none;
+  width: 100%;
+  margin-top: 0.25rem;
+  font-size: 0.875em;
+  color: #dc3545;
+  font-weight: 500;
+}
+.valid-feedback {
+  display: none;
+  width: 100%;
+  margin-top: 0.25rem;
+  font-size: 0.875em;
+  color: #198754;
+  font-weight: 500;
+}
+/* Mostrar mensaje solo cuando el input esté inválido */
+.form-control.is-invalid + .invalid-feedback { display: block; }
+.input-group:has(.form-control.is-invalid) .invalid-feedback { display: block; }
+/* Mostrar mensaje solo cuando el input esté válido */
+.form-control.is-valid + .valid-feedback { display: block; }
+.input-group:has(.form-control.is-valid) .valid-feedback { display: block; }
+.input-group .form-control.is-invalid {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+/* Estilos para campos de solo lectura */
+.form-control[readonly] {
+  background-color: #f8f9fa;
+  border-color: #e9ecef;
+  color: #6c757d;
+  cursor: not-allowed;
+}
+
+.form-control[readonly]:focus {
+  background-color: #f8f9fa;
+  border-color: #e9ecef;
+  box-shadow: none;
+}
+.exportar-btn-header {
+  border-color: rgba(255, 255, 255, 0.5);
+  color: #ffffff;
+}
+.exportar-btn-header:hover {
+  background-color: #198754 !important;
+  border-color: #198754 !important;
+  color: #ffffff !important;
+}
+
+/* Estilos para logo cuando sidebar está colapsada */
+.sidebar.collapsed .logo {
+  justify-content: center;
+  align-items: center;
+  gap: 0;
+  width: 100%;
+  padding: 0;
+}
+
+.sidebar.collapsed .logo img {
+  height: 40px !important;
+  width: auto !important;
+  margin: 0 auto;
+  display: block;
+}
+
+.sidebar.collapsed .sidebar-header {
+  padding: 15px 5px;
+  justify-content: center;
+}
+
+/* Estilos para botón de cerrar sesión - solo icono por defecto */
+.logout-btn {
+  position: relative;
+  overflow: visible;
+  padding: 0.375rem 0.75rem;
+  transition: all 0.3s ease;
+}
+
+.logout-btn .logout-text {
+  opacity: 0;
+  width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  transition: opacity 0.3s ease, width 0.3s ease, margin-left 0.3s ease;
+  margin-left: 0;
+  display: inline-block;
+}
+
+.logout-btn:hover .logout-text {
+  opacity: 1;
+  width: auto;
+  margin-left: 0.5rem;
+}
+
+.logout-btn i {
+  transition: transform 0.3s ease;
+}
+
+.logout-btn:hover i {
+  transform: scale(1.1);
+}
+
+/* Estilos para logo del sidebar */
+.sidebar .logo img {
+  height: 50px;
+  width: auto;
+}
+
+/* Estilos para sección de observaciones */
+#descripcionObservaciones {
+  display: none;
+}
+
+#descripcionObservaciones.show {
+  display: block;
+}
+
+/* Estilos para área de filtros */
+.filtros-container {
+  background-color: #f8f9fa;
+}
+
+/* Estilos para mensaje sin registros */
+#mensajeSinRegistrosFacturacion {
+  display: none;
+}
+
+#mensajeSinRegistrosFacturacion.show {
+  display: block;
+}

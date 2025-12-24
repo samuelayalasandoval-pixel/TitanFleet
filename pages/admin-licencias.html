@@ -1,0 +1,541 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Administración de Licencias - TitanFleet ERP</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link rel="stylesheet" href="../styles/styles.css" />
+    <link rel="stylesheet" href="../styles/backend-indicator.css" />
+    <style>
+      .license-card {
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        transition: box-shadow 0.3s;
+      }
+      .license-card:hover {
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+      .license-type-venta {
+        border-left: 4px solid #10b981;
+      }
+      .license-type-renta {
+        border-left: 4px solid #f59e0b;
+      }
+      .stats-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container-fluid py-4">
+      <div class="row mb-4">
+        <div class="col-12">
+          <h1 class="display-5">
+            <i class="fas fa-key"></i> Administración de Licencias
+            <span
+              id="backendReadyIndicator"
+              class="backend-loading-indicator"
+              style="display: none"
+            >
+              <span
+                class="spinner-border spinner-border-sm"
+                role="status"
+                aria-hidden="true"
+              ></span>
+              <span class="ms-2">Cargando datos...</span>
+            </span>
+            <span id="backendReadyBadge" class="backend-ready-badge" style="display: none">
+              <i class="fas fa-check-circle"></i>
+              <span class="ms-2">Listo para trabajar</span>
+            </span>
+          </h1>
+          <p class="text-muted">Gestiona las licencias de venta y renta del sistema</p>
+        </div>
+      </div>
+
+      <!-- Estadísticas Principales -->
+      <div class="row mb-4">
+        <div class="col-md-3">
+          <div class="stats-card">
+            <h6 class="text-white-50">Total Licencias</h6>
+            <h2 id="totalLicenses">0</h2>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div
+            class="stats-card"
+            style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)"
+          >
+            <h6 class="text-white-50">Licencias Mensuales</h6>
+            <h2 id="mensualLicenses">0</h2>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div
+            class="stats-card"
+            style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%)"
+          >
+            <h6 class="text-white-50">Licencias Trimestrales</h6>
+            <h2 id="trimestralLicenses">0</h2>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div
+            class="stats-card"
+            style="background: linear-gradient(135deg, #10b981 0%, #059669 100%)"
+          >
+            <h6 class="text-white-50">Licencias Anuales</h6>
+            <h2 id="anualLicenses">0</h2>
+          </div>
+        </div>
+      </div>
+      <div class="row mb-4">
+        <div class="col-md-3">
+          <div
+            class="stats-card"
+            style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)"
+          >
+            <h6 class="text-white-50">Licencias Activas</h6>
+            <h2 id="activeLicenses">0</h2>
+          </div>
+        </div>
+      </div>
+
+      <!-- Estadísticas Detalladas -->
+      <div class="row mb-4">
+        <div class="col-12">
+          <div class="card">
+            <div class="card-header bg-light">
+              <h5 class="mb-0"><i class="fas fa-chart-bar"></i> Estadísticas Detalladas</h5>
+            </div>
+            <div class="card-body">
+              <div class="row">
+                <div class="col-md-3">
+                  <h6 class="text-muted">Licencias Mensuales</h6>
+                  <ul class="list-unstyled">
+                    <li>
+                      <strong>Disponibles:</strong>
+                      <span id="mensualDisponible" class="badge bg-success">0</span>
+                    </li>
+                    <li>
+                      <strong>Activadas:</strong>
+                      <span id="mensualActivada" class="badge bg-primary">0</span>
+                    </li>
+                    <li>
+                      <strong>Expiradas:</strong>
+                      <span id="mensualExpirada" class="badge bg-danger">0</span>
+                    </li>
+                  </ul>
+                </div>
+                <div class="col-md-3">
+                  <h6 class="text-muted">Licencias Trimestrales</h6>
+                  <ul class="list-unstyled">
+                    <li>
+                      <strong>Disponibles:</strong>
+                      <span id="trimestralDisponible" class="badge bg-success">0</span>
+                    </li>
+                    <li>
+                      <strong>Activadas:</strong>
+                      <span id="trimestralActivada" class="badge bg-primary">0</span>
+                    </li>
+                    <li>
+                      <strong>Expiradas:</strong>
+                      <span id="trimestralExpirada" class="badge bg-danger">0</span>
+                    </li>
+                  </ul>
+                </div>
+                <div class="col-md-3">
+                  <h6 class="text-muted">Licencias Anuales</h6>
+                  <ul class="list-unstyled">
+                    <li>
+                      <strong>Disponibles:</strong>
+                      <span id="anualDisponible" class="badge bg-success">0</span>
+                    </li>
+                    <li>
+                      <strong>Activadas:</strong>
+                      <span id="anualActivada" class="badge bg-primary">0</span>
+                    </li>
+                    <li>
+                      <strong>Expiradas:</strong>
+                      <span id="anualExpirada" class="badge bg-danger">0</span>
+                    </li>
+                  </ul>
+                </div>
+                <div class="col-md-3">
+                  <h6 class="text-muted">Resumen General</h6>
+                  <ul class="list-unstyled">
+                    <li>
+                      <strong>Disponibles:</strong>
+                      <span id="disponibles" class="badge bg-success">0</span>
+                    </li>
+                    <li>
+                      <strong>Expiradas:</strong>
+                      <span id="expiradas" class="badge bg-danger">0</span>
+                    </li>
+                  </ul>
+                  <div class="d-grid gap-2 mt-2">
+                    <button class="btn btn-sm btn-outline-primary" data-action="loadLicenses">
+                      <i class="fas fa-sync"></i> Actualizar
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Acciones -->
+      <div class="row mb-4">
+        <div class="col-12">
+          <div class="card">
+            <div class="card-header bg-primary text-white">
+              <h5 class="mb-0"><i class="fas fa-plus-circle"></i> Generar Nuevas Licencias</h5>
+            </div>
+            <div class="card-body">
+              <div class="row">
+                <div class="col-md-4">
+                  <label class="form-label">Tipo de Plan <span class="text-danger">*</span></label>
+                  <select class="form-select" id="licensePlanSelect" required>
+                    <option value="">Seleccionar plan...</option>
+                    <option value="basico">Básico</option>
+                    <option value="estandar">Estándar</option>
+                    <option value="premium">Premium</option>
+                    <option value="enterprise">Enterprise</option>
+                    <option value="custom">Personalizado</option>
+                  </select>
+                  <small class="form-text text-muted" id="planLimitInfo"
+                    >Selecciona el plan para ver el límite de registros</small
+                  >
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">Periodo <span class="text-danger">*</span></label>
+                  <select class="form-select" id="licensePeriodSelect" required>
+                    <option value="">Seleccionar periodo...</option>
+                    <option value="mensual">Mensual (30 días)</option>
+                    <option value="anual">Anual (365 días)</option>
+                  </select>
+                  <small class="form-text text-muted">Selecciona el periodo de la licencia</small>
+                </div>
+                <div class="col-md-2">
+                  <label class="form-label">Cantidad</label>
+                  <input
+                    type="number"
+                    class="form-control"
+                    id="licenseCount"
+                    value="1"
+                    min="1"
+                    max="100"
+                  />
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                  <button
+                    class="btn btn-primary w-100"
+                    data-action="generateLicenses"
+                    id="generateBtn"
+                    disabled
+                  >
+                    <i class="fas fa-key"></i> Generar
+                  </button>
+                </div>
+              </div>
+              <div class="row mt-3">
+                <div class="col-12">
+                  <div class="alert alert-info" role="alert">
+                    <i class="fas fa-info-circle"></i> <strong>Instrucciones:</strong> Selecciona el
+                    tipo de plan y el periodo. El sistema asignará automáticamente el límite de
+                    registros según la combinación plan/periodo seleccionada.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Lista de Licencias -->
+      <div class="row">
+        <div class="col-12">
+          <div class="card">
+            <div class="card-header bg-light">
+              <div class="row align-items-center">
+                <div class="col-md-6">
+                  <h5 class="mb-0"><i class="fas fa-list"></i> Licencias Generadas</h5>
+                </div>
+                <div class="col-md-6 text-end">
+                  <button class="btn btn-sm btn-outline-primary" data-action="exportLicenses">
+                    <i class="fas fa-download"></i> Exportar CSV
+                  </button>
+                  <button class="btn btn-sm btn-outline-secondary" data-action="loadLicenses">
+                    <i class="fas fa-sync"></i> Actualizar
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="card-body">
+              <!-- Filtros -->
+              <div class="row mb-3">
+                <div class="col-md-3">
+                  <label class="form-label"><i class="fas fa-filter"></i> Filtrar por Tipo</label>
+                  <select
+                    class="form-select form-select-sm"
+                    id="filterType"
+                    onchange="applyFilters()"
+                  >
+                    <option value="all">Todos</option>
+                    <option value="mensual">Mensual</option>
+                    <option value="trimestral">Trimestral</option>
+                    <option value="anual">Anual</option>
+                  </select>
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label"><i class="fas fa-filter"></i> Filtrar por Estado</label>
+                  <select
+                    class="form-select form-select-sm"
+                    id="filterStatus"
+                    onchange="applyFilters()"
+                  >
+                    <option value="all">Todos</option>
+                    <option value="disponible">Disponibles</option>
+                    <option value="activada">Activadas</option>
+                    <option value="expirada">Expiradas</option>
+                  </select>
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label"
+                    ><i class="fas fa-filter"></i> Filtrar por Registros</label
+                  >
+                  <select
+                    class="form-select form-select-sm"
+                    id="filterRegistros"
+                    onchange="applyFilters()"
+                  >
+                    <option value="all">Todos</option>
+                    <option value="0-100">0 - 100 registros</option>
+                    <option value="101-500">101 - 500 registros</option>
+                    <option value="501-1000">501 - 1,000 registros</option>
+                    <option value="1001-2000">1,001 - 2,000 registros</option>
+                    <option value="2001-3000">2,001 - 3,000 registros</option>
+                    <option value="3001-5000">3,001 - 5,000 registros</option>
+                    <option value="5001-10000">5,001 - 10,000 registros</option>
+                    <option value="10001+">10,001+ registros</option>
+                  </select>
+                </div>
+                <div class="col-md-3 d-flex align-items-end">
+                  <button class="btn btn-sm btn-outline-secondary w-100" onclick="clearFilters()">
+                    <i class="fas fa-times"></i> Limpiar Filtros
+                  </button>
+                </div>
+              </div>
+              <div class="table-responsive">
+                <table class="table table-hover">
+                  <thead>
+                    <tr>
+                      <th>Licencia</th>
+                      <th>Plan</th>
+                      <th>Periodo</th>
+                      <th>Registros</th>
+                      <th>Tenant ID</th>
+                      <th>Estado</th>
+                      <th>Fecha Generación</th>
+                      <th>Expiración</th>
+                      <th>Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody id="licensesTableBody">
+                    <tr>
+                      <td colspan="8" class="text-center text-muted">
+                        <i class="fas fa-spinner fa-spin"></i> Cargando licencias...
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal para detalles de licencia -->
+    <div class="modal fade" id="licenseDetailsModal" tabindex="-1">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header bg-primary text-white">
+            <h5 class="modal-title">Detalles de Licencia</h5>
+            <button
+              type="button"
+              class="btn-close btn-close-white"
+              data-bs-dismiss="modal"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <div id="licenseDetailsContent"></div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            <button type="button" class="btn btn-primary" data-action="copyLicenseKey">
+              <i class="fas fa-copy"></i> Copiar Clave
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sistema de Event Handlers (reemplaza onclick inline) -->
+    <script src="../assets/scripts/shared/event-handlers.js"></script>
+    <script src="../assets/scripts/admin-licencias/event-handlers.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../assets/scripts/error-handler.js"></script>
+    <script src="../assets/scripts/error-utils.js"></script>
+    <script src="../assets/scripts/generate-licenses.js"></script>
+    <script src="../assets/scripts/license-admin.js"></script>
+    <!-- Script para indicador de carga del backend (compartido) -->
+    <script src="../assets/scripts/backend-ready-indicator.js"></script>
+
+    <!-- Script para manejar la lógica del formulario de generación -->
+    <script>
+      (function () {
+        'use strict';
+
+        // Límites de registros por combinación de plan y periodo
+        const planLimits = {
+          basico: {
+            mensual: '100',
+            anual: '1200'
+          },
+          estandar: {
+            mensual: '500',
+            anual: '600'
+          },
+          premium: {
+            mensual: '2000',
+            anual: '24000'
+          },
+          enterprise: {
+            mensual: '5000',
+            anual: '60000'
+          },
+          custom: {
+            mensual: 'ilimitado',
+            anual: 'ilimitado'
+          }
+        };
+
+        // Función para obtener el límite de registros según plan y periodo
+        function getRegistrosLimit(plan, period) {
+          if (!plan || !period || plan === '' || period === '') {
+            return null;
+          }
+          return planLimits[plan]?.[period] || null;
+        }
+
+        // Función para actualizar la información del límite de registros
+        function updatePlanLimitInfo() {
+          const planSelect = document.getElementById('licensePlanSelect');
+          const periodSelect = document.getElementById('licensePeriodSelect');
+          const planLimitInfo = document.getElementById('planLimitInfo');
+
+          if (!planSelect || !periodSelect || !planLimitInfo) return;
+
+          const plan = planSelect.value;
+          const period = periodSelect.value;
+
+          if (plan && period && plan !== '' && period !== '') {
+            const limit = getRegistrosLimit(plan, period);
+            if (limit) {
+              if (limit === 'ilimitado') {
+                planLimitInfo.textContent = `Límite: ${limit} registros`;
+                planLimitInfo.className = 'form-text text-muted text-success';
+              } else {
+                planLimitInfo.textContent = `Límite: hasta ${limit} registros`;
+                planLimitInfo.className = 'form-text text-muted';
+              }
+            } else {
+              planLimitInfo.textContent = 'Selecciona el plan para ver el límite de registros';
+              planLimitInfo.className = 'form-text text-muted';
+            }
+          } else {
+            planLimitInfo.textContent = 'Selecciona el plan para ver el límite de registros';
+            planLimitInfo.className = 'form-text text-muted';
+          }
+        }
+
+        // Función para validar y habilitar/deshabilitar el botón de generar
+        function validateGenerateButton() {
+          const planSelect = document.getElementById('licensePlanSelect');
+          const periodSelect = document.getElementById('licensePeriodSelect');
+          const generateBtn = document.getElementById('generateBtn');
+
+          if (!planSelect || !periodSelect || !generateBtn) return;
+
+          const plan = planSelect.value;
+          const period = periodSelect.value;
+
+          // Habilitar solo si plan y periodo están seleccionados
+          if (plan && plan !== '' && period && period !== '') {
+            generateBtn.disabled = false;
+          } else {
+            generateBtn.disabled = true;
+          }
+        }
+
+        // Inicializar cuando el DOM esté listo
+        function initLicenseForm() {
+          const periodSelect = document.getElementById('licensePeriodSelect');
+          const planSelect = document.getElementById('licensePlanSelect');
+
+          if (!periodSelect || !planSelect) {
+            console.warn('⚠️ Elementos del formulario de licencias no encontrados');
+            return;
+          }
+
+          // Agregar listeners
+          planSelect.addEventListener('change', function () {
+            updatePlanLimitInfo();
+            validateGenerateButton();
+          });
+
+          periodSelect.addEventListener('change', function () {
+            updatePlanLimitInfo();
+            validateGenerateButton();
+          });
+
+          // Validar estado inicial
+          updatePlanLimitInfo();
+          validateGenerateButton();
+
+          console.log('✅ Formulario de generación de licencias inicializado');
+        }
+
+        // Exponer función para obtener límite de registros
+        window.getRegistrosLimit = getRegistrosLimit;
+
+        // Ejecutar cuando el DOM esté listo
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', initLicenseForm);
+        } else {
+          initLicenseForm();
+        }
+
+        // También ejecutar después de un pequeño delay para asegurar que otros scripts se hayan cargado
+        setTimeout(initLicenseForm, 200);
+      })();
+    </script>
+  </body>
+</html>

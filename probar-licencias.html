@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Herramienta de Prueba de Licencias - TitanFleet</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        .card-header {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            border-radius: 15px 15px 0 0 !important;
+        }
+        .btn-action {
+            margin: 5px;
+        }
+        code {
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card mt-5">
+            <div class="card-header">
+                <h3 class="mb-0">
+                    <i class="fas fa-key me-2"></i>Herramienta de Prueba de Licencias
+                </h3>
+            </div>
+            <div class="card-body">
+                <!-- Información de Licencia Actual -->
+                <div class="alert alert-info">
+                    <h5><i class="fas fa-info-circle me-2"></i>Estado Actual de la Licencia</h5>
+                    <div id="licenseStatus">
+                        <p>Cargando información...</p>
+                    </div>
+                </div>
+
+                <!-- Acciones -->
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <div class="card border-primary">
+                            <div class="card-header bg-primary text-white">
+                                <i class="fas fa-broom me-2"></i>Limpiar Licencia
+                            </div>
+                            <div class="card-body">
+                                <p>Elimina la licencia activa actual del localStorage para poder probar una nueva.</p>
+                                <button class="btn btn-danger w-100" onclick="clearLicense()">
+                                    <i class="fas fa-trash me-2"></i>Limpiar Licencia Activa
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <div class="card border-success">
+                            <div class="card-header bg-success text-white">
+                                <i class="fas fa-key me-2"></i>Generar Licencia de Prueba
+                            </div>
+                            <div class="card-body">
+                                <p>Genera una licencia de prueba para usar en el sistema.</p>
+                                <select class="form-select mb-2" id="licenseTypeSelect">
+                                    <option value="anual">Anual (TF25XXA)</option>
+                                    <option value="mensual">Mensual (TF25XXM)</option>
+                                    <option value="trimestral">Trimestral (TF25XXT)</option>
+                                </select>
+                                <button class="btn btn-success w-100" onclick="generateTestLicense()">
+                                    <i class="fas fa-magic me-2"></i>Generar Licencia de Prueba
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Licencia Generada -->
+                <div id="generatedLicense" class="alert alert-success" style="display: none;">
+                    <h5><i class="fas fa-check-circle me-2"></i>Licencia Generada</h5>
+                    <p><strong>Clave de Licencia:</strong></p>
+                    <div class="input-group mb-2">
+                        <input type="text" class="form-control" id="generatedLicenseKey" readonly 
+                               style="font-family: 'Courier New', monospace; font-weight: bold;">
+                        <button class="btn btn-outline-secondary" onclick="copyGeneratedLicense()">
+                            <i class="fas fa-copy"></i> Copiar
+                        </button>
+                    </div>
+                    <p class="mb-0"><small>Puedes usar esta licencia para probar el flujo de activación.</small></p>
+                </div>
+
+                <!-- Instrucciones -->
+                <div class="alert alert-warning mt-4">
+                    <h5><i class="fas fa-lightbulb me-2"></i>Instrucciones para Probar</h5>
+                    <ol>
+                        <li>Revisa el estado de tu licencia actual arriba</li>
+                        <li>Si tienes una licencia activa, haz clic en "Limpiar Licencia Activa"</li>
+                        <li>Opcionalmente, genera una licencia de prueba</li>
+                        <li>Ve a la página principal y haz clic en "Acceder al Sistema"</li>
+                        <li>Haz clic en "Activar mi Licencia" o usa el enlace al final del modal</li>
+                        <li>Ingresa la licencia de prueba o una nueva licencia</li>
+                        <li>Sigue el flujo de activación</li>
+                    </ol>
+                </div>
+
+                <!-- Ir a la página principal -->
+                <div class="text-center mt-4">
+                    <a href="public/index.html" class="btn btn-primary btn-lg">
+                        <i class="fas fa-home me-2"></i>Ir a la Página Principal
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/scripts/license-manager.js"></script>
+    <script>
+        // Función para generar código aleatorio
+        function generateRandomCode(length = 8) {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let result = '';
+            for (let i = 0; i < length; i++) {
+                result += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return result;
+        }
+
+        // Función para generar licencia de prueba
+        function generateTestLicense() {
+            const tipo = document.getElementById('licenseTypeSelect').value;
+            const fecha = new Date();
+            const año = String(fecha.getFullYear()).slice(-2);
+            const mes = String(fecha.getMonth() + 1).padStart(2, '0');
+            
+            let tipoCodigo = 'A';
+            if (tipo === 'mensual') tipoCodigo = 'M';
+            else if (tipo === 'trimestral') tipoCodigo = 'T';
+            
+            const bloque1 = generateRandomCode(8);
+            const bloque2 = generateRandomCode(8);
+            const licenseKey = `TF${año}${mes}${tipoCodigo}-${bloque1}-${bloque2}`;
+            
+            document.getElementById('generatedLicenseKey').value = licenseKey;
+            document.getElementById('generatedLicense').style.display = 'block';
+            
+            // Scroll a la licencia generada
+            document.getElementById('generatedLicense').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Función para copiar licencia generada
+        function copyGeneratedLicense() {
+            const input = document.getElementById('generatedLicenseKey');
+            input.select();
+            document.execCommand('copy');
+            alert('✅ Licencia copiada al portapapeles');
+        }
+
+        // Función para limpiar licencia
+        function clearLicense() {
+            if (!confirm('¿Estás seguro de que quieres eliminar la licencia activa? Esto te permitirá probar el flujo de activación nuevamente.')) {
+                return;
+            }
+
+            try {
+                // Eliminar licencia del localStorage
+                localStorage.removeItem('titanfleet_license');
+                localStorage.removeItem('tenantId');
+                
+                // Si existe licenseManager, resetearlo
+                if (window.licenseManager) {
+                    window.licenseManager.licenseInfo = null;
+                    window.licenseManager.deactivateLicense();
+                }
+                
+                alert('✅ Licencia eliminada correctamente. Ahora puedes probar el flujo de activación.');
+                
+                // Actualizar estado
+                updateLicenseStatus();
+            } catch (error) {
+                console.error('Error limpiando licencia:', error);
+                alert('❌ Error al limpiar la licencia: ' + error.message);
+            }
+        }
+
+        // Función para actualizar estado de licencia
+        function updateLicenseStatus() {
+            const statusDiv = document.getElementById('licenseStatus');
+            
+            try {
+                const licenseData = localStorage.getItem('titanfleet_license');
+                
+                if (!licenseData) {
+                    statusDiv.innerHTML = `
+                        <p class="text-muted mb-0">
+                            <i class="fas fa-info-circle me-2"></i>No hay licencia activa en el sistema.
+                        </p>
+                    `;
+                    return;
+                }
+
+                const license = JSON.parse(licenseData);
+                
+                // Verificar si está activa
+                const isActive = license.status === 'active';
+                let expiresInfo = '';
+                
+                if (license.expiresAt) {
+                    const expiresDate = new Date(license.expiresAt);
+                    const now = new Date();
+                    const isExpired = now > expiresDate;
+                    
+                    if (isExpired) {
+                        expiresInfo = `<span class="badge bg-danger">Expirada el ${expiresDate.toLocaleDateString('es-MX')}</span>`;
+                    } else {
+                        const daysLeft = Math.ceil((expiresDate - now) / (1000 * 60 * 60 * 24));
+                        expiresInfo = `<span class="badge bg-warning">Expira en ${daysLeft} días (${expiresDate.toLocaleDateString('es-MX')})</span>`;
+                    }
+                } else {
+                    expiresInfo = '<span class="badge bg-success">Sin expiración</span>';
+                }
+
+                statusDiv.innerHTML = `
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Clave:</strong> <code>${license.licenseKey}</code></p>
+                            <p><strong>Tipo:</strong> 
+                                <span class="badge bg-info">
+                                    ${license.type === 'anual' ? 'Anual' : 
+                                      license.type === 'mensual' ? 'Mensual' : 'Trimestral'}
+                                </span>
+                            </p>
+                            <p><strong>Estado:</strong> 
+                                ${isActive ? '<span class="badge bg-success">Activa</span>' : '<span class="badge bg-danger">Inactiva</span>'}
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Tenant ID:</strong> <code>${license.tenantId || 'No asignado'}</code></p>
+                            <p><strong>Activada:</strong> ${license.activatedAt ? new Date(license.activatedAt).toLocaleString('es-MX') : 'No activada'}</p>
+                            <p><strong>Expiración:</strong> ${expiresInfo}</p>
+                        </div>
+                    </div>
+                `;
+            } catch (error) {
+                statusDiv.innerHTML = `
+                    <p class="text-danger mb-0">
+                        <i class="fas fa-exclamation-triangle me-2"></i>Error al leer información de licencia: ${error.message}
+                    </p>
+                `;
+            }
+        }
+
+        // Actualizar estado al cargar
+        window.addEventListener('load', function() {
+            updateLicenseStatus();
+        });
+    </script>
+</body>
+</html>
+
+

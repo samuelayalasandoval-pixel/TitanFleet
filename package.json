@@ -1,0 +1,83 @@
+{
+  "name": "erp-rankiao",
+  "version": "1.0.0",
+  "description": "Sistema ERP empresarial para Rankiao - Gestión integral de recursos",
+  "main": "index.html",
+  "scripts": {
+    "dev": "sass --watch assets/styles/main.scss:styles/main.css",
+    "build": "sass assets/styles/main.scss:styles/main.css --style compressed",
+    "build:dev": "sass assets/styles/main.scss:styles/main.css --style expanded",
+    "serve": "live-server --port=3000 --open=/",
+    "start": "npm run dev & npm run serve",
+    "lint": "eslint assets/scripts/**/*.js --ext .js",
+    "lint:fix": "eslint assets/scripts/**/*.js --ext .js --fix",
+    "lint:css": "stylelint assets/styles/**/*.scss",
+    "format": "prettier --write \"assets/scripts/**/*.js\" \"pages/**/*.html\"",
+    "format:check": "prettier --check \"assets/scripts/**/*.js\" \"pages/**/*.html\"",
+    "format:css": "prettier --write assets/styles/**/*.scss",
+    "format:all": "npm run format && npm run format:css",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest run --coverage",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:headed": "playwright test --headed",
+    "test:all": "npm run test && npm run test:e2e",
+    "evaluate": "node scripts/evaluar-proyecto.js",
+    "deploy": "npm run build && firebase deploy --only hosting",
+    "deploy:hosting": "npm run build && firebase deploy --only hosting",
+    "deploy:firestore": "firebase deploy --only firestore:rules",
+    "deploy:all": "npm run build && firebase deploy --only hosting,firestore:rules",
+    "deploy:quick": "npm run build && firebase deploy --only hosting --force"
+  },
+  "keywords": [
+    "erp",
+    "empresa",
+    "gestión",
+    "rankiao",
+    "sistema",
+    "web",
+    "scss",
+    "componentes"
+  ],
+  "author": "Equipo Rankiao",
+  "license": "MIT",
+  "devDependencies": {
+    "@playwright/test": "^1.40.0",
+    "@vitest/coverage-v8": "^1.0.4",
+    "@vitest/ui": "^1.0.4",
+    "eslint": "^8.57.0",
+    "jsdom": "^23.0.1",
+    "prettier": "^3.0.3",
+    "sass": "^1.69.0",
+    "live-server": "^1.2.2",
+    "stylelint": "^15.11.0",
+    "stylelint-config-standard-scss": "^11.1.0",
+    "vitest": "^1.0.4"
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead"
+  ],
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

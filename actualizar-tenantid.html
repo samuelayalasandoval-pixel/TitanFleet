@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Actualizar TenantId</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+        .info-box {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 15px;
+            margin: 10px 0;
+        }
+        .warning-box {
+            background: #fff3e0;
+            border-left: 4px solid #ff9800;
+            padding: 15px;
+            margin: 10px 0;
+        }
+        .success-box {
+            background: #e8f5e9;
+            border-left: 4px solid #4caf50;
+            padding: 15px;
+            margin: 10px 0;
+        }
+        button {
+            background: #2196f3;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 16px;
+        }
+        button:hover {
+            background: #1976d2;
+        }
+        .danger-button {
+            background: #f44336;
+        }
+        .danger-button:hover {
+            background: #d32f2f;
+        }
+        pre {
+            background: #f5f5f5;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔧 Actualizar TenantId</h1>
+    
+    <div class="container">
+        <h2>Estado Actual</h2>
+        <div id="estadoActual"></div>
+    </div>
+    
+    <div class="container">
+        <h2>Acción</h2>
+        <div class="info-box">
+            <strong>⚠️ IMPORTANTE:</strong> Esto actualizará tu tenantId de <code>demo</code> a <code>demo_tenant</code> para que coincida con los registros en Firebase.
+        </div>
+        <button onclick="actualizarTenantId()">✅ Actualizar TenantId a demo_tenant</button>
+        <div id="resultado"></div>
+    </div>
+
+    <script type="module">
+        import { getFirestore, doc, getDoc, setDoc } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+        
+        const firebaseConfig = {
+            apiKey: 'AIzaSyBh_x0zUdauLERfWn-LMC2xnbxftfTXhhg',
+            authDomain: 'titanfleet-60931.firebaseapp.com',
+            projectId: 'titanfleet-60931'
+        };
+        
+        // Esperar a que Firebase esté disponible
+        async function waitForFirebase() {
+            while (!window.firebaseDb) {
+                await new Promise(resolve => setTimeout(resolve, 100));
+            }
+            return window.firebaseDb;
+        }
+        
+        // Mostrar estado actual
+        async function mostrarEstadoActual() {
+            const div = document.getElementById('estadoActual');
+            const user = window.firebaseAuth?.currentUser;
+            const currentUser = JSON.parse(localStorage.getItem('erpCurrentUser') || 'null');
+            const savedTenantId = localStorage.getItem('tenantId');
+            
+            let html = '<table style="width: 100%; border-collapse: collapse;">';
+            html += '<tr><th style="text-align: left; padding: 8px; border: 1px solid #ddd;">Campo</th><th style="text-align: left; padding: 8px; border: 1px solid #ddd;">Valor Actual</th></tr>';
+            
+            if (user) {
+                html += `<tr><td style="padding: 8px; border: 1px solid #ddd;">Email (Firebase Auth)</td><td style="padding: 8px; border: 1px solid #ddd;">${user.email || 'N/A'}</td></tr>`;
+                html += `<tr><td style="padding: 8px; border: 1px solid #ddd;">UID</td><td style="padding: 8px; border: 1px solid #ddd;">${user.uid}</td></tr>`;
+            }
+            
+            if (currentUser) {
+                html += `<tr><td style="padding: 8px; border: 1px solid #ddd;">TenantId (localStorage erpCurrentUser)</td><td style="padding: 8px; border: 1px solid #ddd;"><strong>${currentUser.tenantId || '❌ NO TIENE'}</strong></td></tr>`;
+            }
+            
+            html += `<tr><td style="padding: 8px; border: 1px solid #ddd;">TenantId (localStorage tenantId)</td><td style="padding: 8px; border: 1px solid #ddd;"><strong>${savedTenantId || '❌ NO TIENE'}</strong></td></tr>`;
+            
+            // Obtener tenantId del documento de usuario en Firebase
+            if (user) {
+                try {
+                    const db = await waitForFirebase();
+                    const userDocRef = doc(db, 'users', user.uid);
+                    const userDoc = await getDoc(userDocRef);
+                    
+                    if (userDoc.exists()) {
+                        const userData = userDoc.data();
+                        html += `<tr><td style="padding: 8px; border: 1px solid #ddd;">TenantId (Firebase users/)</td><td style="padding: 8px; border: 1px solid #ddd;"><strong>${userData.tenantId || '❌ NO TIENE'}</strong></td></tr>`;
+                    } else {
+                        html += '<tr><td style="padding: 8px; border: 1px solid #ddd;">Documento users/</td><td style="padding: 8px; border: 1px solid #ddd;">❌ No existe en Firebase</td></tr>';
+                    }
+                } catch (error) {
+                    html += `<tr><td style="padding: 8px; border: 1px solid #ddd;">Error obteniendo datos</td><td style="padding: 8px; border: 1px solid #ddd;">${error.message}</td></tr>`;
+                }
+            }
+            
+            html += '</table>';
+            
+            // Verificar repositorio
+            const repo = window.firebaseRepos?.logistica;
+            if (repo) {
+                html += '<div style="margin-top: 15px;"><strong>Repositorio de Logística:</strong></div>';
+                html += `<div>TenantId: <strong>${repo.tenantId || '❌ NO TIENE'}</strong></div>`;
+            }
+            
+            div.innerHTML = html;
+        }
+        
+        // Actualizar tenantId
+        window.actualizarTenantId = async function() {
+            const resultadoDiv = document.getElementById('resultado');
+            resultadoDiv.innerHTML = '<div class="info-box">⏳ Actualizando tenantId...</div>';
+            
+            try {
+                const user = window.firebaseAuth?.currentUser;
+                if (!user) {
+                    resultadoDiv.innerHTML = '<div class="warning-box">❌ No hay usuario autenticado. Por favor inicia sesión primero.</div>';
+                    return;
+                }
+                
+                const nuevoTenantId = 'demo_tenant';
+                let actualizaciones = [];
+                
+                // 1. Actualizar localStorage erpCurrentUser
+                const currentUser = JSON.parse(localStorage.getItem('erpCurrentUser') || 'null');
+                if (currentUser) {
+                    const tenantIdAnterior = currentUser.tenantId;
+                    currentUser.tenantId = nuevoTenantId;
+                    localStorage.setItem('erpCurrentUser', JSON.stringify(currentUser));
+                    actualizaciones.push(`✅ localStorage erpCurrentUser: ${tenantIdAnterior || 'N/A'} → ${nuevoTenantId}`);
+                } else {
+                    actualizaciones.push('⚠️ No se encontró erpCurrentUser en localStorage');
+                }
+                
+                // 2. Actualizar localStorage tenantId
+                const tenantIdAnterior = localStorage.getItem('tenantId');
+                localStorage.setItem('tenantId', nuevoTenantId);
+                actualizaciones.push(`✅ localStorage tenantId: ${tenantIdAnterior || 'N/A'} → ${nuevoTenantId}`);
+                
+                // 3. Actualizar erpSession si existe
+                const session = JSON.parse(localStorage.getItem('erpSession') || 'null');
+                if (session && session.user) {
+                    const sessionTenantIdAnterior = session.user.tenantId;
+                    session.user.tenantId = nuevoTenantId;
+                    localStorage.setItem('erpSession', JSON.stringify(session));
+                    actualizaciones.push(`✅ localStorage erpSession: ${sessionTenantIdAnterior || 'N/A'} → ${nuevoTenantId}`);
+                }
+                
+                // 4. Actualizar documento en Firebase
+                try {
+                    const db = await waitForFirebase();
+                    const userDocRef = doc(db, 'users', user.uid);
+                    const userDoc = await getDoc(userDocRef);
+                    
+                    if (userDoc.exists()) {
+                        const userData = userDoc.data();
+                        const firebaseTenantIdAnterior = userData.tenantId;
+                        await setDoc(userDocRef, {
+                            ...userData,
+                            tenantId: nuevoTenantId
+                        }, { merge: true });
+                        actualizaciones.push(`✅ Firebase users/${user.uid}: ${firebaseTenantIdAnterior || 'N/A'} → ${nuevoTenantId}`);
+                    } else {
+                        // Crear documento si no existe
+                        await setDoc(userDocRef, {
+                            uid: user.uid,
+                            email: user.email || '',
+                            tenantId: nuevoTenantId,
+                            nombre: currentUser?.nombre || (user.email ? user.email.split('@')[0] : ''),
+                            permisos: currentUser?.permisos || { ver: [], editar: [] },
+                            createdAt: new Date().toISOString(),
+                            updatedAt: new Date().toISOString()
+                        });
+                        actualizaciones.push(`✅ Firebase users/${user.uid}: Creado con tenantId ${nuevoTenantId}`);
+                    }
+                } catch (firebaseError) {
+                    actualizaciones.push(`⚠️ Error actualizando Firebase: ${firebaseError.message}`);
+                }
+                
+                // 5. Forzar re-inicialización de repositorios
+                // Esperar a que los repositorios estén disponibles
+                let intentos = 0;
+                while (!window.firebaseRepos && intentos < 20) {
+                    await new Promise(resolve => setTimeout(resolve, 200));
+                    intentos++;
+                }
+                
+                if (window.firebaseRepos) {
+                    // Actualizar todos los repositorios
+                    const repos = ['logistica', 'trafico', 'facturacion', 'cxc', 'cxp', 'diesel', 'mantenimiento', 'tesoreria', 'operadores', 'inventario'];
+                    for (const repoName of repos) {
+                        const repo = window.firebaseRepos[repoName];
+                        if (repo) {
+                            const repoTenantIdAnterior = repo.tenantId;
+                            repo.tenantId = nuevoTenantId;
+                            
+                            // Re-inicializar el repositorio para que use el nuevo tenantId
+                            if (typeof repo.init === 'function') {
+                                try {
+                                    // Resetear el estado de inicialización para forzar re-inicialización
+                                    repo._initialized = false;
+                                    repo._initPromise = null;
+                                    await repo.init();
+                                    actualizaciones.push(`✅ Repositorio ${repoName}: ${repoTenantIdAnterior || 'N/A'} → ${nuevoTenantId} (re-inicializado)`);
+                                } catch (initError) {
+                                    actualizaciones.push(`⚠️ Error re-inicializando ${repoName}: ${initError.message}`);
+                                }
+                            } else {
+                                actualizaciones.push(`✅ Repositorio ${repoName}: ${repoTenantIdAnterior || 'N/A'} → ${nuevoTenantId}`);
+                            }
+                        }
+                    }
+                } else {
+                    actualizaciones.push('⚠️ Repositorios no disponibles (se actualizarán al recargar la página)');
+                }
+                
+                // Mostrar resultado
+                let html = '<div class="success-box">';
+                html += '<h3>✅ Actualización Completada</h3>';
+                html += '<ul>';
+                actualizaciones.forEach(act => {
+                    html += `<li>${act}</li>`;
+                });
+                html += '</ul>';
+                html += '<div style="margin-top: 15px;"><strong>⚠️ IMPORTANTE:</strong> Recarga la página para que los cambios surtan efecto.</div>';
+                html += '</div>';
+                
+                resultadoDiv.innerHTML = html;
+                
+                // Actualizar estado actual
+                await mostrarEstadoActual();
+                
+            } catch (error) {
+                resultadoDiv.innerHTML = `<div class="warning-box">❌ Error: ${error.message}</div>`;
+                console.error('Error actualizando tenantId:', error);
+            }
+        };
+        
+        // Función para forzar carga de registros
+        window.forzarCargaRegistros = async function() {
+            const resultadoDiv = document.getElementById('resultado');
+            resultadoDiv.innerHTML += '<div class="info-box">⏳ Intentando cargar registros...</div>';
+            
+            try {
+                // Forzar re-inicialización del repositorio
+                if (window.firebaseRepos?.logistica) {
+                    const repo = window.firebaseRepos.logistica;
+                    repo._initialized = false;
+                    repo._initPromise = null;
+                    await repo.init();
+                    console.log('✅ Repositorio re-inicializado');
+                }
+                
+                // Intentar cargar registros
+                if (typeof window.cargarRegistrosLogistica === 'function') {
+                    await window.cargarRegistrosLogistica();
+                    resultadoDiv.innerHTML += '<div class="success-box">✅ Registros cargados exitosamente</div>';
+                } else {
+                    resultadoDiv.innerHTML += '<div class="warning-box">⚠️ Función cargarRegistrosLogistica no disponible. Recarga la página.</div>';
+                }
+            } catch (error) {
+                resultadoDiv.innerHTML += `<div class="warning-box">❌ Error: ${error.message}</div>`;
+                console.error('Error forzando carga:', error);
+            }
+        };
+        
+        // Ejecutar al cargar
+        window.addEventListener('load', async () => {
+            await waitForFirebase();
+            await mostrarEstadoActual();
+        });
+    </script>
+    
+    <script src="../assets/scripts/firebase-init.js" type="module"></script>
+</body>
+</html>
+

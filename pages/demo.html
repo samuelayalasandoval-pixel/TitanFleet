@@ -1,0 +1,1948 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/png" sizes="16x16" href="../assets/img/Logo TF.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="../assets/img/Logo TF.png" />
+    <link rel="icon" type="image/png" sizes="64x64" href="../assets/img/Logo TF.png" />
+    <title>Demo</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link rel="stylesheet" href="../styles/styles.css" />
+    <link rel="stylesheet" href="../styles/demo.css" />
+  </head>
+  <body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg fixed-top demo-navbar">
+      <div class="container">
+        <a class="navbar-brand" href="#inicio">
+          <img
+            src="../assets/img/Logo TF color.png"
+            alt="TitanFleet"
+            style="height: 30px; width: auto; margin-right: 8px"
+          />TitanFleet
+        </a>
+
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNavDemo"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNavDemo">
+          <ul class="navbar-nav me-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="#inicio">Inicio</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#features">Características</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#precios">Precios</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#info">Información</a>
+            </li>
+          </ul>
+
+          <div class="d-flex align-items-center gap-2">
+            <button
+              class="btn btn-primary btn-demo-nav"
+              onclick="window.iniciarDemo(); return false;"
+            >
+              <i class="fas fa-rocket me-2"></i>Iniciar Demo
+            </button>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <div class="hero-section" id="inicio">
+      <div class="container">
+        <div class="row align-items-center">
+          <div class="col-lg-6">
+            <h1 class="display-4 fw-bold mb-4">
+              <img src="../assets/img/Logo TF.png" alt="TitanFleet" class="hero-logo" />TitanFleet
+            </h1>
+            <p class="lead mb-4">
+              Sistema completo de gestión empresarial. Prueba todas las funcionalidades sin
+              compromiso y descubre cómo podemos transformar tu negocio.
+            </p>
+            <div class="d-flex gap-3 flex-wrap mb-4">
+              <button class="btn btn-light btn-lg" onclick="window.iniciarDemo(); return false;">
+                <i class="fas fa-play-circle me-2"></i> Iniciar Demo Gratis
+              </button>
+              <button class="btn btn-outline-light btn-lg" data-action="scrollToFeatures">
+                <i class="fas fa-info-circle me-2"></i> Ver Características
+              </button>
+            </div>
+            <div class="d-flex align-items-center gap-4 flex-wrap">
+              <div class="d-flex align-items-center">
+                <i class="fas fa-shield-alt text-white me-2" style="font-size: 1.2rem"></i>
+                <span>100% Seguro</span>
+              </div>
+              <div class="d-flex align-items-center">
+                <i class="fas fa-clock text-white me-2" style="font-size: 1.2rem"></i>
+                <span>Sin límite de tiempo</span>
+              </div>
+              <div class="d-flex align-items-center">
+                <i class="fas fa-user-check text-white me-2" style="font-size: 1.2rem"></i>
+                <span>Sin registro</span>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-6 text-center">
+            <div class="demo-badge-container">
+              <span class="demo-badge">
+                <i class="fas fa-check-circle"></i> Demo 100% Funcional
+              </span>
+              <div class="mt-4">
+                <div class="row g-3 text-white">
+                  <div class="col-6">
+                    <div class="stat-box">
+                      <div class="stat-number">11</div>
+                      <div class="stat-label">Módulos</div>
+                    </div>
+                  </div>
+                  <div class="col-6">
+                    <div class="stat-box">
+                      <div class="stat-number">100%</div>
+                      <div class="stat-label">Funcional</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tutoriales -->
+    <section id="features" class="tutorials-section">
+      <div class="container">
+        <div class="text-center mb-5">
+          <h2 class="tutorials-title">Tutoriales y Guías</h2>
+          <p class="tutorials-subtitle">
+            Aprende a usar cada módulo de TitanFleet con nuestros tutoriales paso a paso
+          </p>
+        </div>
+
+        <div class="row">
+          <!-- Menú Lateral de Módulos -->
+          <div class="col-lg-3 col-md-4 mb-4">
+            <div class="tutorials-sidebar">
+              <h5 class="sidebar-title"><i class="fas fa-list me-2"></i>Módulos</h5>
+              <nav class="tutorials-nav">
+                <ul class="nav flex-column" id="tutorialsNav">
+                  <li class="nav-item">
+                    <a
+                      class="nav-link active"
+                      href="#"
+                      data-module="introduccion"
+                      onclick="showTutorial('introduccion'); return false;"
+                    >
+                      <i class="fas fa-play-circle me-2"></i>Introducción
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a
+                      class="nav-link"
+                      href="#"
+                      data-module="menu"
+                      onclick="showTutorial('menu'); return false;"
+                    >
+                      <i class="fas fa-bars me-2"></i>Menú Principal
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a
+                      class="nav-link"
+                      href="#"
+                      data-module="logistica"
+                      onclick="showTutorial('logistica'); return false;"
+                    >
+                      <i class="fas fa-truck me-2"></i>Logística
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a
+                      class="nav-link"
+                      href="#"
+                      data-module="facturacion"
+                      onclick="showTutorial('facturacion'); return false;"
+                    >
+                      <i class="fas fa-file-invoice me-2"></i>Facturación
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a
+                      class="nav-link"
+                      href="#"
+                      data-module="trafico"
+                      onclick="showTutorial('trafico'); return false;"
+                    >
+                      <i class="fas fa-route me-2"></i>Tráfico
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a
+                      class="nav-link"
+                      href="#"
+                      data-module="operadores"
+                      onclick="showTutorial('operadores'); return false;"
+                    >
+                      <i class="fas fa-users me-2"></i>Operadores
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a
+                      class="nav-link"
+                      href="#"
+                      data-module="diesel"
+                      onclick="showTutorial('diesel'); return false;"
+                    >
+                      <i class="fas fa-gas-pump me-2"></i>Diesel
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a
+                      class="nav-link"
+                      href="#"
+                      data-module="mantenimiento"
+                      onclick="showTutorial('mantenimiento'); return false;"
+                    >
+                      <i class="fas fa-tools me-2"></i>Mantenimiento
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a
+                      class="nav-link"
+                      href="#"
+                      data-module="tesoreria"
+                      onclick="showTutorial('tesoreria'); return false;"
+                    >
+                      <i class="fas fa-wallet me-2"></i>Tesorería
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a
+                      class="nav-link"
+                      href="#"
+                      data-module="cxc"
+                      onclick="showTutorial('cxc'); return false;"
+                    >
+                      <i class="fas fa-hand-holding-usd me-2"></i>Cuentas por Cobrar
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a
+                      class="nav-link"
+                      href="#"
+                      data-module="cxp"
+                      onclick="showTutorial('cxp'); return false;"
+                    >
+                      <i class="fas fa-credit-card me-2"></i>Cuentas por Pagar
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a
+                      class="nav-link"
+                      href="#"
+                      data-module="inventario"
+                      onclick="showTutorial('inventario'); return false;"
+                    >
+                      <i class="fas fa-boxes me-2"></i>Inventario
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a
+                      class="nav-link"
+                      href="#"
+                      data-module="reportes"
+                      onclick="showTutorial('reportes'); return false;"
+                    >
+                      <i class="fas fa-chart-line me-2"></i>Reportes
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a
+                      class="nav-link"
+                      href="#"
+                      data-module="configuracion"
+                      onclick="showTutorial('configuracion'); return false;"
+                    >
+                      <i class="fas fa-cog me-2"></i>Configuración
+                    </a>
+                  </li>
+                </ul>
+              </nav>
+            </div>
+          </div>
+
+          <!-- Área de Contenido de Tutoriales -->
+          <div class="col-lg-9 col-md-8">
+            <div class="tutorials-content">
+              <!-- Tutorial: Introducción -->
+              <div class="tutorial-module active" id="tutorial-introduccion">
+                <div class="tutorial-header">
+                  <h3><i class="fas fa-play-circle me-2"></i>Introducción a TitanFleet</h3>
+                  <p class="text-muted">
+                    Conoce los conceptos básicos y cómo comenzar a usar el sistema
+                  </p>
+                </div>
+                <div class="tutorial-videos">
+                  <div class="video-placeholder">
+                    <div class="placeholder-content">
+                      <i class="fab fa-youtube"></i>
+                      <p>Video tutorial próximamente</p>
+                      <small class="text-muted"
+                        >El video se mostrará aquí cuando esté disponible</small
+                      >
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Tutorial: Menú -->
+              <div class="tutorial-module" id="tutorial-menu">
+                <div class="tutorial-header">
+                  <h3><i class="fas fa-bars me-2"></i>Menú Principal</h3>
+                  <p class="text-muted">Aprende a navegar por el sistema y acceder a cada módulo</p>
+                </div>
+                <div class="tutorial-videos">
+                  <div class="video-placeholder">
+                    <div class="placeholder-content">
+                      <i class="fab fa-youtube"></i>
+                      <p>Video tutorial próximamente</p>
+                      <small class="text-muted"
+                        >El video se mostrará aquí cuando esté disponible</small
+                      >
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Tutorial: Logística -->
+              <div class="tutorial-module" id="tutorial-logistica">
+                <div class="tutorial-header">
+                  <h3><i class="fas fa-truck me-2"></i>Módulo de Logística</h3>
+                  <p class="text-muted">Gestiona envíos, rutas y entregas de manera eficiente</p>
+                </div>
+                <div class="tutorial-videos">
+                  <div class="video-placeholder">
+                    <div class="placeholder-content">
+                      <i class="fab fa-youtube"></i>
+                      <p>Video tutorial próximamente</p>
+                      <small class="text-muted"
+                        >El video se mostrará aquí cuando esté disponible</small
+                      >
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Tutorial: Facturación -->
+              <div class="tutorial-module" id="tutorial-facturacion">
+                <div class="tutorial-header">
+                  <h3><i class="fas fa-file-invoice me-2"></i>Módulo de Facturación</h3>
+                  <p class="text-muted">
+                    Emite y controla facturas electrónicas con integración SAT
+                  </p>
+                </div>
+                <div class="tutorial-videos">
+                  <div class="video-placeholder">
+                    <div class="placeholder-content">
+                      <i class="fab fa-youtube"></i>
+                      <p>Video tutorial próximamente</p>
+                      <small class="text-muted"
+                        >El video se mostrará aquí cuando esté disponible</small
+                      >
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Tutorial: Tráfico -->
+              <div class="tutorial-module" id="tutorial-trafico">
+                <div class="tutorial-header">
+                  <h3><i class="fas fa-route me-2"></i>Módulo de Tráfico</h3>
+                  <p class="text-muted">
+                    Controla unidades, operadores y viajes con geolocalización
+                  </p>
+                </div>
+                <div class="tutorial-videos">
+                  <div class="video-placeholder">
+                    <div class="placeholder-content">
+                      <i class="fab fa-youtube"></i>
+                      <p>Video tutorial próximamente</p>
+                      <small class="text-muted"
+                        >El video se mostrará aquí cuando esté disponible</small
+                      >
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Tutorial: Operadores -->
+              <div class="tutorial-module" id="tutorial-operadores">
+                <div class="tutorial-header">
+                  <h3><i class="fas fa-users me-2"></i>Módulo de Operadores</h3>
+                  <p class="text-muted">Administra información de operadores y conductores</p>
+                </div>
+                <div class="tutorial-videos">
+                  <div class="video-placeholder">
+                    <div class="placeholder-content">
+                      <i class="fab fa-youtube"></i>
+                      <p>Video tutorial próximamente</p>
+                      <small class="text-muted"
+                        >El video se mostrará aquí cuando esté disponible</small
+                      >
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Tutorial: Diesel -->
+              <div class="tutorial-module" id="tutorial-diesel">
+                <div class="tutorial-header">
+                  <h3><i class="fas fa-gas-pump me-2"></i>Módulo de Diesel</h3>
+                  <p class="text-muted">Registra y controla el consumo de combustible</p>
+                </div>
+                <div class="tutorial-videos">
+                  <div class="video-placeholder">
+                    <div class="placeholder-content">
+                      <i class="fab fa-youtube"></i>
+                      <p>Video tutorial próximamente</p>
+                      <small class="text-muted"
+                        >El video se mostrará aquí cuando esté disponible</small
+                      >
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Tutorial: Mantenimiento -->
+              <div class="tutorial-module" id="tutorial-mantenimiento">
+                <div class="tutorial-header">
+                  <h3><i class="fas fa-tools me-2"></i>Módulo de Mantenimiento</h3>
+                  <p class="text-muted">Gestiona el mantenimiento de unidades y vehículos</p>
+                </div>
+                <div class="tutorial-videos">
+                  <div class="video-placeholder">
+                    <div class="placeholder-content">
+                      <i class="fab fa-youtube"></i>
+                      <p>Video tutorial próximamente</p>
+                      <small class="text-muted"
+                        >El video se mostrará aquí cuando esté disponible</small
+                      >
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Tutorial: Tesorería -->
+              <div class="tutorial-module" id="tutorial-tesoreria">
+                <div class="tutorial-header">
+                  <h3><i class="fas fa-wallet me-2"></i>Módulo de Tesorería</h3>
+                  <p class="text-muted">
+                    Administra los movimientos de efectivo y cuentas bancarias
+                  </p>
+                </div>
+                <div class="tutorial-videos">
+                  <div class="video-placeholder">
+                    <div class="placeholder-content">
+                      <i class="fab fa-youtube"></i>
+                      <p>Video tutorial próximamente</p>
+                      <small class="text-muted"
+                        >El video se mostrará aquí cuando esté disponible</small
+                      >
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Tutorial: Cuentas por Cobrar -->
+              <div class="tutorial-module" id="tutorial-cxc">
+                <div class="tutorial-header">
+                  <h3><i class="fas fa-hand-holding-usd me-2"></i>Cuentas por Cobrar</h3>
+                  <p class="text-muted">Gestiona cobros y facturas pendientes de clientes</p>
+                </div>
+                <div class="tutorial-videos">
+                  <div class="video-placeholder">
+                    <div class="placeholder-content">
+                      <i class="fab fa-youtube"></i>
+                      <p>Video tutorial próximamente</p>
+                      <small class="text-muted"
+                        >El video se mostrará aquí cuando esté disponible</small
+                      >
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Tutorial: Cuentas por Pagar -->
+              <div class="tutorial-module" id="tutorial-cxp">
+                <div class="tutorial-header">
+                  <h3><i class="fas fa-credit-card me-2"></i>Cuentas por Pagar</h3>
+                  <p class="text-muted">Controla proveedores y pagos pendientes</p>
+                </div>
+                <div class="tutorial-videos">
+                  <div class="video-placeholder">
+                    <div class="placeholder-content">
+                      <i class="fab fa-youtube"></i>
+                      <p>Video tutorial próximamente</p>
+                      <small class="text-muted"
+                        >El video se mostrará aquí cuando esté disponible</small
+                      >
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Tutorial: Inventario -->
+              <div class="tutorial-module" id="tutorial-inventario">
+                <div class="tutorial-header">
+                  <h3><i class="fas fa-boxes me-2"></i>Módulo de Inventario</h3>
+                  <p class="text-muted">Controla el inventario de refacciones y materiales</p>
+                </div>
+                <div class="tutorial-videos">
+                  <div class="video-placeholder">
+                    <div class="placeholder-content">
+                      <i class="fab fa-youtube"></i>
+                      <p>Video tutorial próximamente</p>
+                      <small class="text-muted"
+                        >El video se mostrará aquí cuando esté disponible</small
+                      >
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Tutorial: Reportes -->
+              <div class="tutorial-module" id="tutorial-reportes">
+                <div class="tutorial-header">
+                  <h3><i class="fas fa-chart-line me-2"></i>Módulo de Reportes</h3>
+                  <p class="text-muted">Genera reportes y análisis de tu operación</p>
+                </div>
+                <div class="tutorial-videos">
+                  <div class="video-placeholder">
+                    <div class="placeholder-content">
+                      <i class="fab fa-youtube"></i>
+                      <p>Video tutorial próximamente</p>
+                      <small class="text-muted"
+                        >El video se mostrará aquí cuando esté disponible</small
+                      >
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Tutorial: Configuración -->
+              <div class="tutorial-module" id="tutorial-configuracion">
+                <div class="tutorial-header">
+                  <h3><i class="fas fa-cog me-2"></i>Módulo de Configuración</h3>
+                  <p class="text-muted">Configura parámetros del sistema y datos maestros</p>
+                </div>
+                <div class="tutorial-videos">
+                  <div class="video-placeholder">
+                    <div class="placeholder-content">
+                      <i class="fab fa-youtube"></i>
+                      <p>Video tutorial próximamente</p>
+                      <small class="text-muted"
+                        >El video se mostrará aquí cuando esté disponible</small
+                      >
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Sección de Precios -->
+    <section id="precios" class="pricing-section">
+      <div class="container">
+        <div class="text-center mb-5">
+          <h2 class="pricing-title">Planes y Precios</h2>
+          <p class="pricing-subtitle">
+            Precios mensuales basados en el volumen de registros de logística
+          </p>
+        </div>
+
+        <!-- Explicación del Sistema -->
+        <div class="pricing-explanation mb-5">
+          <div class="card">
+            <div class="card-body p-4">
+              <h4 class="mb-3">
+                <i class="fas fa-info-circle text-primary me-2"></i>¿Cómo funcionan los registros?
+              </h4>
+
+              <div class="row">
+                <div class="col-md-6">
+                  <h5 class="mb-3">
+                    <i class="fas fa-calculator text-primary me-2"></i>¿Qué cuenta como un registro?
+                  </h5>
+                  <p class="mb-3">
+                    Cada movimiento que generas en el modulo de <strong>Logística</strong> cuenta
+                    como 1 registro. Por ejemplo:
+                  </p>
+                  <ul class="list-unstyled">
+                    <li class="mb-2">
+                      <i class="fas fa-check-circle text-success me-2"></i
+                      ><strong>Crear un envío</strong> = Una unidad que va del punto A al punto B
+                      registrado en la hoja de logistica
+                    </li>
+                  </ul>
+                  <div class="alert alert-light mt-3 mb-0">
+                    <i class="fas fa-lightbulb me-2"></i>
+                    <strong>Ejemplo práctico:</strong> Si tu empresa hace 300 envíos al mes,
+                    necesitarías el <strong>Plan Estándar</strong> (hasta 500 registros/mes). Puedes
+                    crear esos 300 envíos (y hasta 200 más) sin costo adicional.
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <h5 class="mb-3">
+                    <i class="fas fa-database text-primary me-2"></i>¿Qué incluye cada plan?
+                  </h5>
+                  <p class="mb-3">
+                    Cada plan incluye un <strong>rango de registros mensuales</strong> y
+                    <strong>almacenamiento</strong> para todos tus datos:
+                  </p>
+                  <ul class="list-unstyled">
+                    <li class="mb-2">
+                      <i class="fas fa-check-circle text-success me-2"></i
+                      ><strong>Plan Básico:</strong> Hasta 100 registros/mes (1,200/año en plan
+                      anual) - 10 GB de almacenamiento
+                    </li>
+                    <li class="mb-2">
+                      <i class="fas fa-check-circle text-success me-2"></i
+                      ><strong>Plan Estándar:</strong> Hasta 500 registros/mes (600/año en plan
+                      anual) - 25 GB de almacenamiento
+                    </li>
+                    <li class="mb-2">
+                      <i class="fas fa-check-circle text-success me-2"></i
+                      ><strong>Plan Premium:</strong> Hasta 2,000 registros/mes (24,000/año en plan
+                      anual) - 100 GB de almacenamiento
+                    </li>
+                    <li class="mb-2">
+                      <i class="fas fa-check-circle text-success me-2"></i
+                      ><strong>Plan Enterprise:</strong> Hasta 5,000 registros/mes (60,000/año en
+                      plan anual) - Almacenamiento ilimitado
+                    </li>
+                  </ul>
+                  <div class="alert alert-info mt-3 mb-0">
+                    <i class="fas fa-infinity me-2"></i>
+                    <strong>¡Importante!</strong> Todos los planes incluyen
+                    <strong>sin límites de usuarios</strong> y acceso completo a los
+                    <strong>11 módulos</strong> del ERP (Logística, Facturación, Tráfico,
+                    Operadores, Diesel, Mantenimiento, Tesorería, CXC, CXP, Inventario y Reportes).
+                  </div>
+                </div>
+              </div>
+
+              <!-- Alertas lado a lado -->
+              <div class="row mt-4">
+                <div class="col-md-6">
+                  <div class="alert alert-success mb-0 h-100">
+                    <i class="fas fa-shield-alt me-2"></i>
+                    <strong>Importante:</strong> Los registros en otros departamentos como Cuentas
+                    por Pagar, Gastos de Diesel, Tráfico o Facturación
+                    <strong>NO generan costos adicionales</strong>. Solo los registros creados en
+                    <strong>Logística</strong> cuentan como registros. Tráfico y Facturación son
+                    extensiones del mismo registro de Logística y no cuentan por separado. Una vez
+                    que contratas un plan, puedes usar
+                    <strong>todos los registros incluidos sin costo extra</strong>. Solo si superas
+                    el límite de tu plan, podrías considerar actualizar a un plan superior.
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="alert alert-info mb-0 h-100">
+                    <i class="fas fa-database me-2"></i>
+                    <strong>Almacenamiento incluido:</strong> El almacenamiento cubre todos tus
+                    datos: registros de logística, imágenes de documentos, PDFs, facturas
+                    electrónicas, comprobantes fiscales, fotografías de entregas, documentos de
+                    operadores, y cualquier archivo adjunto.
+                    <strong
+                      >Todo esto está incluido en el precio del plan, sin costos
+                      adicionales.</strong
+                    >
+                  </div>
+                </div>
+              </div>
+
+              <!-- Sección de Preguntas Frecuentes -->
+              <div class="row mt-4">
+                <div class="col-12">
+                  <h5 class="mb-3">
+                    <i class="fas fa-question-circle text-primary me-2"></i>Preguntas Frecuentes
+                  </h5>
+                  <div class="accordion" id="faqAccordion">
+                    <div class="accordion-item">
+                      <h2 class="accordion-header">
+                        <button
+                          class="accordion-button"
+                          type="button"
+                          data-bs-toggle="collapse"
+                          data-bs-target="#faq1"
+                        >
+                          ¿Pago algo extra si uso todos los registros de mi plan?
+                        </button>
+                      </h2>
+                      <div
+                        id="faq1"
+                        class="accordion-collapse collapse show"
+                        data-bs-parent="#faqAccordion"
+                      >
+                        <div class="accordion-body">
+                          <strong>No.</strong> El precio de tu plan es fijo mensual. Puedes usar
+                          todos los registros incluidos en tu plan sin costo adicional. Por ejemplo,
+                          si contratas el <strong>Plan Estándar</strong> por $4,999/mes, puedes
+                          crear hasta 500 registros al mes sin pagar nada extra.
+                        </div>
+                      </div>
+                    </div>
+                    <div class="accordion-item">
+                      <h2 class="accordion-header">
+                        <button
+                          class="accordion-button collapsed"
+                          type="button"
+                          data-bs-toggle="collapse"
+                          data-bs-target="#faq2"
+                        >
+                          ¿Qué pasa si supero el límite de registros de mi plan?
+                        </button>
+                      </h2>
+                      <div
+                        id="faq2"
+                        class="accordion-collapse collapse"
+                        data-bs-parent="#faqAccordion"
+                      >
+                        <div class="accordion-body">
+                          Si te quedas sin registros en tu plan actual, tienes dos opciones:
+                          <ul class="mt-2 mb-2">
+                            <li>
+                              <strong>Comprar un paquete adicional:</strong> Puedes adquirir otro
+                              paquete de registros del mismo plan. Por ejemplo, si tienes el Plan
+                              Básico Mensual (100 registros) y te quedas sin registros, puedes
+                              comprar otro paquete de 100 registros por $1,999 MXN. Esto iniciará un
+                              nuevo ciclo mensual. Si tienes el Plan Básico Anual (1,200 registros)
+                              y te quedas sin registros, puedes comprar otro paquete de 1,200
+                              registros por $21,989 MXN. Esto iniciará un nuevo ciclo anual.
+                            </li>
+                            <li>
+                              <strong>Actualizar a un plan superior:</strong> Si necesitas más
+                              registros frecuentemente, te recomendamos actualizar a un plan
+                              superior (Estándar, Premium o Enterprise) que se adapte mejor a las
+                              necesidades de tu empresa.
+                            </li>
+                          </ul>
+                          <strong
+                            >El cambio es inmediato y no hay penalizaciones ni costos
+                            ocultos.</strong
+                          >
+                        </div>
+                      </div>
+                    </div>
+                    <div class="accordion-item">
+                      <h2 class="accordion-header">
+                        <button
+                          class="accordion-button collapsed"
+                          type="button"
+                          data-bs-toggle="collapse"
+                          data-bs-target="#faq3"
+                        >
+                          ¿Los registros se acumulan si no los uso todos?
+                        </button>
+                      </h2>
+                      <div
+                        id="faq3"
+                        class="accordion-collapse collapse"
+                        data-bs-parent="#faqAccordion"
+                      >
+                        <div class="accordion-body">
+                          <strong>Planes Mensuales:</strong> Los registros se cuentan mensualmente.
+                          Si en un mes usas menos registros de los incluidos en tu plan, no se
+                          acumulan para el siguiente mes. Cada mes comienza con el límite completo
+                          de tu plan. <br /><br />
+                          <strong>Planes Anuales:</strong> Los registros se cuentan durante todo el
+                          año. Por ejemplo, el Plan Básico Anual incluye 1,200 registros (100 x 12
+                          meses) que puedes usar durante todo el año. Si en un mes usas menos
+                          registros, puedes usarlos en otros meses del mismo año. Los registros no
+                          se acumulan al siguiente año, pero sí puedes distribuirlos libremente
+                          durante el período anual contratado. <br /><br />
+                          Esto te permite tener meses con mayor actividad sin preocuparte,
+                          especialmente con planes anuales donde tienes más flexibilidad para
+                          distribuir tus registros a lo largo del año.
+                        </div>
+                      </div>
+                    </div>
+                    <div class="accordion-item">
+                      <h2 class="accordion-header">
+                        <button
+                          class="accordion-button collapsed"
+                          type="button"
+                          data-bs-toggle="collapse"
+                          data-bs-target="#faq5"
+                        >
+                          ¿Cómo funciona el plan anual?
+                        </button>
+                      </h2>
+                      <div
+                        id="faq5"
+                        class="accordion-collapse collapse"
+                        data-bs-parent="#faqAccordion"
+                      >
+                        <div class="accordion-body">
+                          <strong>El plan anual te ofrece mayor flexibilidad y ahorro.</strong> Aquí
+                          te explicamos cómo funciona: <br /><br />
+                          <h6>
+                            <i class="fas fa-calendar-alt text-primary me-2"></i
+                            ><strong>Límites de Registros Anuales:</strong>
+                          </h6>
+                          <ul class="mt-2 mb-3">
+                            <li>
+                              <strong>Plan Básico Anual:</strong> 1,200 registros (100 x 12 meses)
+                              para usar durante todo el año
+                            </li>
+                            <li>
+                              <strong>Plan Estándar Anual:</strong> 6,000 registros (500 x 12 meses)
+                              para usar durante todo el año
+                            </li>
+                            <li>
+                              <strong>Plan Premium Anual:</strong> 24,000 registros (2,000 x 12
+                              meses) para usar durante todo el año
+                            </li>
+                          </ul>
+
+                          <h6>
+                            <i class="fas fa-chart-line text-primary me-2"></i
+                            ><strong>Flexibilidad de Distribución:</strong>
+                          </h6>
+                          <p>
+                            Con un plan anual, puedes distribuir tus registros libremente durante
+                            los 12 meses. Por ejemplo:
+                          </p>
+                          <ul class="mt-2 mb-3">
+                            <li>
+                              Si tienes el <strong>Plan Básico Anual (1,200 registros)</strong>,
+                              puedes usar 200 en enero, 50 en febrero, 300 en marzo, y así
+                              sucesivamente.
+                            </li>
+                            <li>
+                              No estás limitado a usar exactamente 100 registros por mes. Puedes
+                              usar más en meses de alta actividad y menos en meses tranquilos.
+                            </li>
+                            <li>
+                              Los registros no se acumulan al siguiente año, pero sí puedes
+                              distribuirlos como mejor se adapte a tu negocio durante el período
+                              anual.
+                            </li>
+                          </ul>
+
+                          <h6>
+                            <i class="fas fa-piggy-bank text-primary me-2"></i
+                            ><strong>Ventajas del Plan Anual:</strong>
+                          </h6>
+                          <ul class="mt-2 mb-3">
+                            <li>
+                              <strong>Ahorro:</strong> El plan anual incluye el equivalente a 1 mes
+                              gratis comparado con el plan mensual
+                            </li>
+                            <li>
+                              <strong>Flexibilidad:</strong> Distribuye tus registros según las
+                              necesidades de cada mes
+                            </li>
+                            <li>
+                              <strong>Previsibilidad:</strong> Un solo pago anual, sin preocuparte
+                              por renovaciones mensuales
+                            </li>
+                            <li>
+                              <strong>Ideal para empresas estacionales:</strong> Perfecto si tu
+                              negocio tiene meses de alta y baja actividad
+                            </li>
+                          </ul>
+
+                          <div class="alert alert-info mt-3 mb-0">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <strong>Ejemplo práctico:</strong> Si tu empresa hace 150 envíos en
+                            diciembre (temporada alta) pero solo 30 en enero (temporada baja), el
+                            Plan Básico Anual te permite usar esos 150 registros en diciembre sin
+                            problema, y compensar con menos registros en otros meses del año.
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="accordion-item">
+                      <h2 class="accordion-header">
+                        <button
+                          class="accordion-button collapsed"
+                          type="button"
+                          data-bs-toggle="collapse"
+                          data-bs-target="#faq4"
+                        >
+                          ¿Puedo cambiar de plan en cualquier momento?
+                        </button>
+                      </h2>
+                      <div
+                        id="faq4"
+                        class="accordion-collapse collapse"
+                        data-bs-parent="#faqAccordion"
+                      >
+                        <div class="accordion-body">
+                          <strong>Sí, completamente flexible.</strong> Puedes cambiar a un plan
+                          superior en cualquier momento según las necesidades de tu empresa. Los
+                          cambios son inmediatos y comenzarás a disfrutar de los beneficios del
+                          nuevo plan de inmediato. <br /><br />
+                          <strong>Nota:</strong> Si te quedas sin registros en tu plan actual,
+                          puedes comprar un paquete adicional de registros del mismo plan, o
+                          actualizar a un plan superior que se adapte mejor a tu volumen de trabajo.
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tabla de Precios Escalonada -->
+        <div class="pricing-table-container mb-5">
+          <div class="card">
+            <div class="card-header bg-primary text-white">
+              <h4 class="mb-0"><i class="fas fa-table me-2"></i>Tabla de Precios Mensuales</h4>
+            </div>
+            <div class="card-body p-0">
+              <div class="table-responsive">
+                <table class="table table-hover mb-0 pricing-tier-table">
+                  <thead class="table-light">
+                    <tr>
+                      <th>Plan</th>
+                      <th>Registros</th>
+                      <th>Precio Mensual</th>
+                      <th>Precio Anual</th>
+                      <th>Almacenamiento</th>
+                      <th>Ahorro Anual</th>
+                      <th>Acción</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr class="table-success">
+                      <td>
+                        <strong>Plan Básico</strong>
+                        <span class="badge bg-success ms-2">Ideal para empezar</span>
+                      </td>
+                      <td>
+                        Hasta 100 registros/mes<br /><small class="text-muted"
+                          >(1,200/año en plan anual)</small
+                        >
+                      </td>
+                      <td>
+                        <span class="price-badge price-badge-starter">$1,999</span>
+                        <small class="text-muted">/mes</small>
+                      </td>
+                      <td>
+                        <span class="price-badge-annual">$21,989</span>
+                        <small class="text-muted">/año</small>
+                      </td>
+                      <td>
+                        10 GB <small class="text-muted d-block">(incluye imágenes y PDFs)</small>
+                      </td>
+                      <td>
+                        <span class="text-success"
+                          ><i class="fas fa-gift me-1"></i>1 mes gratis</span
+                        >
+                      </td>
+                      <td>
+                        <button class="btn btn-sm btn-success" onclick="contactarVentas('basico')">
+                          Contratar
+                        </button>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong>Plan Estándar</strong>
+                        <span class="badge bg-primary ms-2">⭐ Recomendado</span>
+                      </td>
+                      <td>
+                        Hasta 500 registros/mes<br /><small class="text-muted"
+                          >(600/año en plan anual)</small
+                        >
+                      </td>
+                      <td>
+                        <span class="price-badge">$4,999</span>
+                        <small class="text-muted">/mes</small>
+                      </td>
+                      <td>
+                        <span class="price-badge-annual">$54,989</span>
+                        <small class="text-muted">/año</small>
+                      </td>
+                      <td>
+                        25 GB <small class="text-muted d-block">(incluye imágenes y PDFs)</small>
+                      </td>
+                      <td>
+                        <span class="text-success"
+                          ><i class="fas fa-gift me-1"></i>1 mes gratis</span
+                        >
+                      </td>
+                      <td>
+                        <button
+                          class="btn btn-sm btn-primary"
+                          onclick="contactarVentas('estandar')"
+                        >
+                          Contratar
+                        </button>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong>Plan Premium</strong>
+                        <span class="badge bg-warning text-dark ms-2">Popular</span>
+                      </td>
+                      <td>
+                        Hasta 2,000 registros/mes<br /><small class="text-muted"
+                          >(24,000/año en plan anual)</small
+                        >
+                      </td>
+                      <td>
+                        <span class="price-badge">$8,999</span>
+                        <small class="text-muted">/mes</small>
+                      </td>
+                      <td>
+                        <span class="price-badge-annual">$98,989</span>
+                        <small class="text-muted">/año</small>
+                      </td>
+                      <td>
+                        100 GB <small class="text-muted d-block">(incluye imágenes y PDFs)</small>
+                      </td>
+                      <td>
+                        <span class="text-success"
+                          ><i class="fas fa-gift me-1"></i>1 mes gratis</span
+                        >
+                      </td>
+                      <td>
+                        <button class="btn btn-sm btn-primary" onclick="contactarVentas('premium')">
+                          Contratar
+                        </button>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong>Plan Enterprise</strong>
+                        <span class="badge bg-danger ms-2">Máximo</span>
+                      </td>
+                      <td>Hasta 5,000/mes (60,000/año)</td>
+                      <td>
+                        <span class="price-badge">$14,999</span>
+                        <small class="text-muted">/mes</small>
+                      </td>
+                      <td>
+                        <span class="price-badge-annual">$164,989</span>
+                        <small class="text-muted">/año</small>
+                      </td>
+                      <td>
+                        Ilimitado
+                        <small class="text-muted d-block">(incluye imágenes y PDFs)</small>
+                      </td>
+                      <td>
+                        <span class="text-success"
+                          ><i class="fas fa-gift me-1"></i>1 mes gratis</span
+                        >
+                      </td>
+                      <td>
+                        <button
+                          class="btn btn-sm btn-primary"
+                          onclick="contactarVentas('enterprise')"
+                        >
+                          Contratar
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Plan Demo Gratis -->
+        <div class="row justify-content-center mb-5">
+          <div class="col-lg-6 col-md-8">
+            <div class="pricing-card pricing-card-demo">
+              <div class="pricing-header">
+                <h3 class="pricing-plan-name">Demo Gratis</h3>
+                <div class="pricing-price">
+                  <span class="price-amount">$0</span>
+                  <span class="price-period">/siempre</span>
+                </div>
+                <p class="pricing-description">Prueba todas las funcionalidades sin compromiso</p>
+              </div>
+              <div class="pricing-body">
+                <ul class="pricing-features">
+                  <li><i class="fas fa-check"></i> Acceso completo a todos los módulos</li>
+                  <li><i class="fas fa-check"></i> Datos de ejemplo pre-cargados</li>
+                  <li><i class="fas fa-check"></i> Sin límite de tiempo</li>
+                  <li><i class="fas fa-check"></i> Sin registro necesario</li>
+                  <li><i class="fas fa-check"></i> Sesión completamente aislada</li>
+                </ul>
+              </div>
+              <div class="pricing-footer">
+                <button
+                  class="btn btn-outline-primary btn-pricing"
+                  onclick="window.iniciarDemo(); return false;"
+                >
+                  <i class="fas fa-play-circle me-2"></i>Iniciar Demo
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Valor Percibido - Ahorro vs Múltiples Sistemas -->
+        <div class="value-proposition mb-5">
+          <div class="card border-success">
+            <div class="card-header bg-success text-white">
+              <h4 class="mb-0">
+                <i class="fas fa-calculator me-2"></i>¿Cuánto ahorras con TitanFleet?
+              </h4>
+            </div>
+            <div class="card-body">
+              <div class="row">
+                <div class="col-md-6">
+                  <h5 class="text-success mb-3">
+                    <i class="fas fa-dollar-sign me-2"></i>Comparación de Costos
+                  </h5>
+                  <p>
+                    En lugar de contratar múltiples sistemas separados, TitanFleet integra todo en
+                    uno:
+                  </p>
+                  <ul class="list-unstyled">
+                    <li class="mb-2">
+                      <i class="fas fa-check-circle text-success me-2"></i
+                      ><strong>Sistema de Logística:</strong> $8,000-15,000/mes
+                    </li>
+                    <li class="mb-2">
+                      <i class="fas fa-check-circle text-success me-2"></i
+                      ><strong>Sistema de Facturación:</strong> $5,000-10,000/mes
+                    </li>
+                    <li class="mb-2">
+                      <i class="fas fa-check-circle text-success me-2"></i
+                      ><strong>Sistema de Tráfico:</strong> $6,000-12,000/mes
+                    </li>
+                    <li class="mb-2">
+                      <i class="fas fa-check-circle text-success me-2"></i
+                      ><strong>ERP Financiero:</strong> $10,000-20,000/mes
+                    </li>
+                    <li class="mb-2">
+                      <i class="fas fa-check-circle text-success me-2"></i
+                      ><strong>Total aproximado:</strong> $29,000-57,000/mes
+                    </li>
+                  </ul>
+                  <div class="alert alert-success mt-3 mb-0">
+                    <strong><i class="fas fa-piggy-bank me-2"></i>Ahorro estimado:</strong> Con
+                    TitanFleet desde $1,999/mes (Plan Básico), ahorras hasta
+                    <strong>$55,001/mes</strong> comparado con sistemas separados. ¡Más del 95% de
+                    ahorro!
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <h5 class="text-primary mb-3">
+                    <i class="fas fa-chart-line me-2"></i>ROI Estimado
+                  </h5>
+                  <p>Beneficios adicionales que no tienen precio:</p>
+                  <ul class="list-unstyled">
+                    <li class="mb-2">
+                      <i class="fas fa-check-circle text-primary me-2"></i
+                      ><strong>Integración automática:</strong> Sin duplicación de datos
+                    </li>
+                    <li class="mb-2">
+                      <i class="fas fa-check-circle text-primary me-2"></i
+                      ><strong>Ahorro de tiempo:</strong> Hasta 20 horas/semana en procesos manuales
+                    </li>
+                    <li class="mb-2">
+                      <i class="fas fa-check-circle text-primary me-2"></i
+                      ><strong>Reducción de errores:</strong> Menos del 1% de errores vs 5-10%
+                      manual
+                    </li>
+                    <li class="mb-2">
+                      <i class="fas fa-check-circle text-primary me-2"></i
+                      ><strong>Reportes en tiempo real:</strong> Decisiones más rápidas y acertadas
+                    </li>
+                    <li class="mb-2">
+                      <i class="fas fa-check-circle text-primary me-2"></i
+                      ><strong>Capacitación incluida:</strong> Sin costos adicionales de
+                      entrenamiento
+                    </li>
+                  </ul>
+                  <div class="alert alert-info mt-3 mb-0">
+                    <strong><i class="fas fa-lightbulb me-2"></i>Retorno de inversión:</strong> La
+                    mayoría de nuestros clientes recuperan su inversión en los primeros 2-3 meses.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Opciones de Pago Flexibles -->
+        <div class="payment-options mb-5">
+          <div class="card">
+            <div class="card-header bg-primary text-white">
+              <h4 class="mb-0">
+                <i class="fas fa-credit-card me-2"></i>Opciones de Pago Flexibles
+              </h4>
+            </div>
+            <div class="card-body">
+              <div class="row g-4">
+                <div class="col-md-4">
+                  <div class="payment-option-card text-center">
+                    <div class="payment-icon monthly">
+                      <i class="fas fa-calendar-alt"></i>
+                    </div>
+                    <h5>Pago Mensual</h5>
+                    <p class="text-muted">Flexibilidad total</p>
+                    <ul class="list-unstyled text-start">
+                      <li><i class="fas fa-check text-success me-2"></i>Pago mes a mes</li>
+                      <li><i class="fas fa-check text-success me-2"></i>Sin compromiso</li>
+                      <li>
+                        <i class="fas fa-check text-success me-2"></i>Cancelación en cualquier
+                        momento
+                      </li>
+                    </ul>
+                    <p class="mt-3">
+                      <strong>Ideal para:</strong> Empresas que prefieren flexibilidad
+                    </p>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="payment-option-card text-center payment-option-featured">
+                    <div class="payment-badge">Más Popular</div>
+                    <div class="payment-icon annual">
+                      <i class="fas fa-calendar-check"></i>
+                    </div>
+                    <h5>Pago Anual</h5>
+                    <p class="text-muted">1 mes gratis</p>
+                    <ul class="list-unstyled text-start">
+                      <li><i class="fas fa-check text-success me-2"></i>Paga 11 meses, usa 12</li>
+                      <li><i class="fas fa-check text-success me-2"></i>Ahorro del 8.33%</li>
+                      <li>
+                        <i class="fas fa-check text-success me-2"></i>Sin cambios de precio durante
+                        el año
+                      </li>
+                    </ul>
+                    <p class="mt-3"><strong>Ideal para:</strong> Empresas establecidas</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Plan de Pago Inicial -->
+        <div class="starter-plan mb-5">
+          <div class="card border-warning">
+            <div class="card-header bg-warning text-white">
+              <h4 class="mb-0 text-white">
+                <i class="fas fa-rocket me-2"></i>Plan de Pago Inicial - Oferta Especial
+              </h4>
+            </div>
+            <div class="card-body">
+              <div class="row align-items-center">
+                <div class="col-md-8">
+                  <h5 class="mb-3">Descuento Especial para Tu Primera Compra</h5>
+                  <p class="mb-3">
+                    Si es tu primera compra, te ofrecemos un <strong>descuento del 20%</strong> en
+                    <strong>todos los planes</strong> (Básico, Estándar, Premium y Enterprise).
+                  </p>
+                  <ul class="list-unstyled">
+                    <li class="mb-2">
+                      <i class="fas fa-check-circle text-warning me-2"></i>Descuento aplicable en
+                      <strong>TODOS los planes</strong> (Básico, Estándar, Premium, Enterprise)
+                    </li>
+                    <li class="mb-2">
+                      <i class="fas fa-check-circle text-warning me-2"></i>Válido solo para tu
+                      <strong>primera compra</strong> (mensual o anual)
+                    </li>
+                    <li class="mb-2">
+                      <i class="fas fa-check-circle text-warning me-2"></i>Se aplica
+                      <strong>automáticamente</strong> al realizar tu primera compra
+                    </li>
+                    <li class="mb-2">
+                      <i class="fas fa-check-circle text-warning me-2"></i>Sin restricciones
+                      adicionales - aplica en planes mensuales y anuales
+                    </li>
+                  </ul>
+                  <div class="mt-3">
+                    <strong>Ejemplos de ahorro:</strong>
+                    <ul class="list-unstyled mt-2">
+                      <li class="mb-1">
+                        • Plan Básico: $1,999/mes → <strong>$1,599/mes</strong> (ahorro de $400/mes)
+                      </li>
+                      <li class="mb-1">
+                        • Plan Estándar: $4,999/mes → <strong>$3,999/mes</strong> (ahorro de
+                        $1,000/mes)
+                      </li>
+                      <li class="mb-1">
+                        • Plan Premium: $8,999/mes → <strong>$7,199/mes</strong> (ahorro de
+                        $1,800/mes)
+                      </li>
+                      <li class="mb-1">
+                        • Plan Enterprise: $14,999/mes → <strong>$11,999/mes</strong> (ahorro de
+                        $3,000/mes)
+                      </li>
+                    </ul>
+                    <small class="text-muted"
+                      >* Los mismos descuentos aplican en planes anuales</small
+                    >
+                  </div>
+                </div>
+                <div class="col-md-4 text-center">
+                  <div class="discount-badge">
+                    <div class="discount-percentage">20%</div>
+                    <div class="discount-text">OFF</div>
+                    <div class="discount-period">Primera Compra</div>
+                  </div>
+                  <button
+                    class="btn btn-warning btn-lg mt-3"
+                    onclick="document.getElementById('precios').scrollIntoView({ behavior: 'smooth' });"
+                  >
+                    <i class="fas fa-gift me-2"></i>Ver Todos los Planes
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Beneficios del Pago Anual -->
+        <div class="pricing-benefits mb-4">
+          <div class="row g-4">
+            <div class="col-md-4">
+              <div class="benefit-card text-center">
+                <div class="benefit-icon">
+                  <i class="fas fa-gift"></i>
+                </div>
+                <h5>Pago Anual</h5>
+                <p>
+                  Contrata el año completo y obtén <strong>1 mes gratis</strong>. En lugar de pagar
+                  12 meses, solo pagas 11.
+                </p>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="benefit-card text-center">
+                <div class="benefit-icon">
+                  <i class="fas fa-sync-alt"></i>
+                </div>
+                <h5>Flexibilidad</h5>
+                <p>
+                  Puedes cambiar de plan en cualquier momento según el crecimiento de tu empresa.
+                </p>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="benefit-card text-center">
+                <div class="benefit-icon">
+                  <i class="fas fa-headset"></i>
+                </div>
+                <h5>Soporte Incluido</h5>
+                <p>
+                  Todos los planes incluyen soporte técnico, actualizaciones y backup diario de
+                  datos.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Nota sobre precios -->
+        <div class="pricing-note">
+          <div class="alert alert-info">
+            <i class="fas fa-info-circle me-2"></i>
+            <strong>Nota importante:</strong> Los precios mostrados son en pesos mexicanos (MXN). Si
+            tu empresa supera el límite de registros de tu plan actual, puedes actualizar a un plan
+            superior en cualquier momento. Contáctanos para obtener una cotización personalizada o
+            para empresas con más de 10,000 registros mensuales.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Información del Demo -->
+    <div class="container my-5" id="info">
+      <div class="row">
+        <div class="col-lg-10 mx-auto">
+          <div class="card">
+            <div class="card-header bg-primary text-white">
+              <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i> Información del Demo</h5>
+            </div>
+            <div class="card-body">
+              <div class="row">
+                <div class="col-md-6">
+                  <ul class="list-unstyled">
+                    <li class="mb-3">
+                      <i
+                        class="fas fa-check-circle text-success me-2"
+                        style="font-size: 1.2rem"
+                      ></i>
+                      <strong>Acceso completo:</strong> Todas las funcionalidades disponibles sin
+                      restricciones
+                    </li>
+                    <li class="mb-3">
+                      <i
+                        class="fas fa-check-circle text-success me-2"
+                        style="font-size: 1.2rem"
+                      ></i>
+                      <strong>Datos de ejemplo:</strong> Sistema pre-cargado con información de
+                      muestra realista
+                    </li>
+                    <li class="mb-3">
+                      <i
+                        class="fas fa-check-circle text-success me-2"
+                        style="font-size: 1.2rem"
+                      ></i>
+                      <strong>Sin registro:</strong> No necesitas crear cuenta para probar el
+                      sistema
+                    </li>
+                  </ul>
+                </div>
+                <div class="col-md-6">
+                  <ul class="list-unstyled">
+                    <li class="mb-3">
+                      <i
+                        class="fas fa-check-circle text-success me-2"
+                        style="font-size: 1.2rem"
+                      ></i>
+                      <strong>Sin límite de tiempo:</strong> Prueba el tiempo que necesites sin
+                      restricciones
+                    </li>
+                    <li class="mb-3">
+                      <i
+                        class="fas fa-check-circle text-success me-2"
+                        style="font-size: 1.2rem"
+                      ></i>
+                      <strong>Datos privados:</strong> Tu sesión demo está completamente aislada y
+                      segura
+                    </li>
+                    <li class="mb-3">
+                      <i
+                        class="fas fa-check-circle text-success me-2"
+                        style="font-size: 1.2rem"
+                      ></i>
+                      <strong>Soporte incluido:</strong> Documentación completa y guías de uso
+                      disponibles
+                    </li>
+                  </ul>
+                </div>
+              </div>
+              <div class="alert alert-warning mt-4 mb-0">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                <strong>Nota importante:</strong> Los datos del demo son de ejemplo y se reinician
+                al cerrar la sesión. No se guardará información personal en el modo demo. Se
+                recomienda no usar dator reales, ya que cualqueir usuario puede entrar a la demo y
+                ver la información dentro de esta.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CTA Final -->
+    <div class="container my-5 text-center">
+      <div class="card bg-light">
+        <div class="card-body py-5">
+          <h3 class="mb-3">¿Listo para comenzar?</h3>
+          <p class="lead mb-4">
+            Prueba el sistema ahora mismo, sin compromiso y descubre todas sus capacidades
+          </p>
+          <button class="btn btn-primary btn-lg" onclick="window.iniciarDemo(); return false;">
+            <i class="fas fa-rocket me-2"></i> Iniciar Demo Ahora
+          </button>
+          <div class="mt-4">
+            <small class="text-muted">
+              <i class="fas fa-lock me-1"></i> Tu información está protegida y segura
+            </small>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal de Contratación -->
+    <div
+      class="modal fade"
+      id="contractModal"
+      tabindex="-1"
+      aria-labelledby="contractModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-dialog-scrollable modal-lg">
+        <div class="modal-content">
+          <div class="modal-header contract-modal-header">
+            <h5 class="modal-title" id="contractModalLabel">
+              <i class="fas fa-shopping-cart me-2"></i>Solicitar Contratación
+            </h5>
+            <button
+              type="button"
+              class="btn-close btn-close-white"
+              data-bs-dismiss="modal"
+              aria-label="Cerrar"
+            ></button>
+          </div>
+          <div class="modal-body contract-modal-body">
+            <!-- Resumen del Plan -->
+            <div class="contract-plan-summary mb-4">
+              <h6 class="mb-3"><i class="fas fa-info-circle me-2"></i>Plan Seleccionado</h6>
+              <div class="card bg-light">
+                <div class="card-body">
+                  <div id="contractPlanDetails">
+                    <!-- Se llenará dinámicamente -->
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Formulario de Contacto -->
+            <form id="contractForm">
+              <h6 class="mb-3"><i class="fas fa-user me-2"></i>Información de Contacto</h6>
+
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="contractName" class="form-label"
+                    >Nombre Completo <span class="text-danger">*</span></label
+                  >
+                  <input type="text" class="form-control" id="contractName" required />
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label for="contractEmail" class="form-label"
+                    >Email <span class="text-danger">*</span></label
+                  >
+                  <input type="email" class="form-control" id="contractEmail" required />
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="contractPhone" class="form-label"
+                    >Teléfono <span class="text-danger">*</span></label
+                  >
+                  <input type="tel" class="form-control" id="contractPhone" required />
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label for="contractCompany" class="form-label">Empresa</label>
+                  <input type="text" class="form-control" id="contractCompany" />
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label for="contractPaymentPeriod" class="form-label"
+                  >Periodo de Pago <span class="text-danger">*</span></label
+                >
+                <select
+                  class="form-select"
+                  id="contractPaymentPeriod"
+                  required
+                  onchange="updateContractPrice()"
+                >
+                  <option value="">Selecciona una opción</option>
+                  <option value="mensual">Mensual</option>
+                  <option value="anual">Anual (1 mes gratis)</option>
+                </select>
+                <small class="text-muted">El precio se ajustará según tu selección</small>
+                <div
+                  id="contractPriceDisplay"
+                  class="mt-3 p-3 bg-light rounded"
+                  style="display: none"
+                >
+                  <div class="d-flex align-items-center gap-2 mb-2">
+                    <i class="fas fa-tag text-success"></i>
+                    <strong class="text-primary">Precio con Descuento Primera Compra:</strong>
+                  </div>
+                  <div id="contractPriceValue"></div>
+                  <small class="text-muted d-block mt-2">
+                    <i class="fas fa-info-circle me-1"></i>El descuento del 20% se aplicará
+                    automáticamente si es tu primera compra
+                  </small>
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label for="contractPaymentMethod" class="form-label"
+                  >Método de Pago <span class="text-danger">*</span></label
+                >
+                <select
+                  class="form-select"
+                  id="contractPaymentMethod"
+                  required
+                  onchange="updatePaymentMethodInfo()"
+                >
+                  <option value="">Selecciona un método</option>
+                  <option value="tarjeta">Tarjeta de Crédito/Débito</option>
+                  <option value="transferencia">Transferencia Bancaria</option>
+                </select>
+                <div id="paymentMethodInfo" class="mt-2" style="display: none">
+                  <div id="tarjetaInfo" style="display: none">
+                    <div class="alert alert-info mb-0">
+                      <i class="fas fa-credit-card me-2"></i>
+                      <strong>Pago con Tarjeta:</strong> Serás redirigido a una página segura para
+                      completar tu pago. Aceptamos todas las tarjetas principales.
+                    </div>
+                  </div>
+                  <div id="transferenciaInfo" style="display: none">
+                    <div class="alert alert-warning mb-3">
+                      <i class="fas fa-university me-2"></i>
+                      <strong>Transferencia Bancaria:</strong> Una vez validado el pago, recibirás
+                      tu licencia por correo.
+                    </div>
+
+                    <!-- Datos Bancarios -->
+                    <div class="card bg-light mb-3">
+                      <div class="card-body">
+                        <h6 class="card-title mb-3">
+                          <i class="fas fa-info-circle me-2"></i>Datos para la Transferencia
+                        </h6>
+                        <div class="row">
+                          <div class="col-md-6 mb-2">
+                            <strong>CLABE:</strong>
+                            <div class="input-group">
+                              <input
+                                type="text"
+                                class="form-control form-control-sm"
+                                id="bankCLABE"
+                                value="722969010652631485"
+                                readonly
+                              />
+                              <button
+                                class="btn btn-outline-secondary btn-sm"
+                                type="button"
+                                onclick="copyToClipboard('bankCLABE')"
+                                title="Copiar"
+                              >
+                                <i class="fas fa-copy"></i>
+                              </button>
+                            </div>
+                          </div>
+                          <div class="col-md-6 mb-2">
+                            <strong>Beneficiario:</strong>
+                            <div class="input-group">
+                              <input
+                                type="text"
+                                class="form-control form-control-sm"
+                                id="bankBeneficiary"
+                                value="Karen Minerva Castañeda Guzman"
+                                readonly
+                              />
+                              <button
+                                class="btn btn-outline-secondary btn-sm"
+                                type="button"
+                                onclick="copyToClipboard('bankBeneficiary')"
+                                title="Copiar"
+                              >
+                                <i class="fas fa-copy"></i>
+                              </button>
+                            </div>
+                          </div>
+                          <div class="col-md-12 mb-0">
+                            <strong>Institución:</strong>
+                            <div class="input-group">
+                              <input
+                                type="text"
+                                class="form-control form-control-sm"
+                                id="bankInstitution"
+                                value="Mercado Pago W"
+                                readonly
+                              />
+                              <button
+                                class="btn btn-outline-secondary btn-sm"
+                                type="button"
+                                onclick="copyToClipboard('bankInstitution')"
+                                title="Copiar"
+                              >
+                                <i class="fas fa-copy"></i>
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Campo para comprobante -->
+                    <div class="mb-3">
+                      <label for="paymentReceipt" class="form-label">
+                        <i class="fas fa-file-upload me-2"></i>Comprobante de Pago
+                        <span class="text-danger">*</span>
+                      </label>
+                      <input
+                        type="file"
+                        class="form-control"
+                        id="paymentReceipt"
+                        accept=".pdf,.jpg,.jpeg,.png,.gif"
+                        required
+                      />
+                      <small class="text-muted"
+                        >Adjunta el comprobante de transferencia (PDF, JPG, PNG)</small
+                      >
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label for="contractMessage" class="form-label">Mensaje Adicional</label>
+                <textarea
+                  class="form-control"
+                  id="contractMessage"
+                  rows="3"
+                  placeholder="Cuéntanos sobre las necesidades de tu empresa, número de usuarios, etc."
+                ></textarea>
+              </div>
+
+              <div class="alert alert-info" id="contractInfoAlert">
+                <i class="fas fa-info-circle me-2"></i>
+                <strong>Próximos pasos:</strong> Te contactaremos en un plazo máximo de 24 horas
+                para confirmar tu solicitud y proporcionarte la información de pago.
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+              <i class="fas fa-times me-2"></i>Cancelar
+            </button>
+            <button
+              type="button"
+              class="btn btn-primary"
+              id="btnSubmitContract"
+              onclick="submitContractRequest()"
+            >
+              <i class="fas fa-paper-plane me-2"></i>Enviar Solicitud
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Aviso de Privacidad Modal -->
+    <div
+      class="modal fade"
+      id="privacyModal"
+      tabindex="-1"
+      aria-labelledby="privacyModalLabel"
+      aria-hidden="true"
+      data-bs-backdrop="static"
+      data-bs-keyboard="false"
+    >
+      <div class="modal-dialog modal-dialog-scrollable modal-lg">
+        <div class="modal-content">
+          <div class="modal-header privacy-modal-header">
+            <h5 class="modal-title" id="privacyModalLabel">
+              <i class="fas fa-shield-alt me-2"></i>Aviso de Privacidad
+            </h5>
+          </div>
+          <div class="modal-body privacy-modal-body">
+            <div class="alert alert-info">
+              <i class="fas fa-info-circle me-2"></i>
+              <strong>Importante:</strong> Al acceder y utilizar este sistema, usted acepta el
+              tratamiento de sus datos personales conforme a lo establecido en este aviso.
+            </div>
+
+            <h6 class="mt-4 mb-3 privacy-section-title">
+              <i class="fas fa-database me-2"></i>Datos que Recopilamos:
+            </h6>
+            <ul class="list-unstyled ms-3">
+              <li>
+                <i class="fas fa-check text-success me-2"></i
+                ><strong>Datos de Clientes:</strong> Nombres, RFC, direcciones, teléfonos, emails,
+                información fiscal
+              </li>
+              <li>
+                <i class="fas fa-check text-success me-2"></i
+                ><strong>Datos de Operadores:</strong> Nombres, licencias, números de seguro social,
+                información laboral
+              </li>
+              <li>
+                <i class="fas fa-check text-success me-2"></i
+                ><strong>Datos Financieros:</strong> Facturas, transacciones, cuentas por
+                cobrar/pagar, movimientos de tesorería
+              </li>
+              <li>
+                <i class="fas fa-check text-success me-2"></i
+                ><strong>Datos Operativos:</strong> Rutas, carga, números de registro, información
+                de vehículos
+              </li>
+              <li>
+                <i class="fas fa-check text-success me-2"></i
+                ><strong>Datos de Usuarios:</strong> Información de acceso y permisos en el sistema
+              </li>
+            </ul>
+
+            <h6 class="mt-4 mb-3 privacy-section-title">
+              <i class="fas fa-bullseye me-2"></i>Finalidades:
+            </h6>
+            <p>
+              Los datos se utilizan para gestión de operaciones logísticas, facturación, control
+              financiero, administración de recursos humanos, control de inventario y cumplimiento
+              de obligaciones fiscales y legales.
+            </p>
+
+            <h6 class="mt-4 mb-3 privacy-section-title">
+              <i class="fas fa-lock me-2"></i>Seguridad:
+            </h6>
+            <p>
+              Sus datos se almacenan en servidores seguros (Firebase/Google Cloud) con medidas de
+              encriptación y control de acceso. Solo personal autorizado tiene acceso a la
+              información.
+            </p>
+
+            <h6 class="mt-4 mb-3 privacy-section-title">
+              <i class="fas fa-globe me-2"></i>Transferencia de Datos:
+            </h6>
+            <p>
+              Sus datos pueden ser almacenados en servidores ubicados fuera de México a través de
+              servicios en la nube (Firebase/Google Cloud Platform), siempre bajo estrictas medidas
+              de seguridad.
+            </p>
+
+            <div class="alert alert-warning mt-4">
+              <i class="fas fa-exclamation-triangle me-2"></i>
+              <strong>MODO DEMO:</strong> En modo demo, los datos ingresados son únicamente para
+              pruebas. Se recomienda <strong>NO ingresar información personal real</strong>. Los
+              datos de prueba pueden ser eliminados periódicamente.
+            </div>
+
+            <h6 class="mt-4 mb-3 privacy-section-title">
+              <i class="fas fa-user-shield me-2"></i>Sus Derechos (ARCO):
+            </h6>
+            <p>
+              Usted tiene derecho a <strong>Acceder</strong>, <strong>Rectificar</strong>,
+              <strong>Cancelar</strong> u <strong>Oponerse</strong> al tratamiento de sus datos
+              personales.
+            </p>
+
+            <h6 class="mt-4 mb-3 privacy-section-title">
+              <i class="fas fa-envelope me-2"></i>Contacto:
+            </h6>
+            <p>
+              Para ejercer sus derechos o dudas sobre el tratamiento de sus datos, contáctenos en:
+              <strong>samuelayalasandoval@gmail.com</strong>
+            </p>
+
+            <div class="mt-4 p-3 bg-light rounded">
+              <small class="text-muted">
+                <i class="fas fa-file-alt me-2"></i>
+                Puede consultar el aviso de privacidad completo en:
+                <a href="AVISO_DE_PRIVACIDAD.md" target="_blank">Aviso Completo</a>
+              </small>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <div class="form-check mb-3 w-100">
+              <input class="form-check-input" type="checkbox" id="privacyAcceptCheck" required />
+              <label class="form-check-label" for="privacyAcceptCheck">
+                He leído, entendido y acepto este aviso de privacidad y el tratamiento de mis datos
+                personales conforme a la
+                <strong
+                  >Ley Federal de Protección de Datos Personales en Posesión de los
+                  Particulares</strong
+                >.
+              </label>
+            </div>
+            <button type="button" class="btn btn-secondary" data-action="rechazarAvisoPrivacidad">
+              <i class="fas fa-times me-2"></i>No Acepto
+            </button>
+            <button
+              type="button"
+              class="btn btn-primary"
+              id="btnAceptarPrivacidad"
+              data-action="aceptarAvisoPrivacidad"
+              disabled
+            >
+              <i class="fas fa-check me-2"></i>Aceptar y Continuar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sistema de Event Handlers (reemplaza onclick inline) -->
+    <script src="../assets/scripts/shared/event-handlers.js"></script>
+    <script src="../assets/scripts/demo/event-handlers.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../assets/scripts/error-handler.js"></script>
+    <script src="../assets/scripts/error-utils.js"></script>
+    <script type="module" src="../assets/scripts/firebase-init.js"></script>
+    <script src="../assets/scripts/demo-data-loader.js"></script>
+
+    <!-- Scripts específicos de demo.html (extraídos de inline) -->
+    <script src="../assets/scripts/demo-config.js"></script>
+    <script src="../assets/scripts/license-manager.js"></script>
+    <script src="../assets/scripts/index-activation-flow.js"></script>
+    <script src="../assets/scripts/stripe-config.js"></script>
+    <script src="../assets/scripts/stripe-integration.js"></script>
+    <script src="../assets/scripts/demo/privacy-handler.js"></script>
+    <script src="../assets/scripts/demo/demo-starter.js"></script>
+    <script src="../assets/scripts/demo/demo-auto-init.js"></script>
+    <script src="../assets/scripts/demo/demo-utils.js"></script>
+
+    <!-- Script para copiar al portapapeles -->
+    <script>
+      // Función para copiar al portapapeles
+      window.copyToClipboard = function (elementId) {
+        const element = document.getElementById(elementId);
+        if (element) {
+          element.select();
+          element.setSelectionRange(0, 99999); // Para móviles
+          try {
+            document.execCommand('copy');
+            // Mostrar feedback visual
+            const btn = event.target.closest('button');
+            if (btn) {
+              const originalHTML = btn.innerHTML;
+              btn.innerHTML = '<i class="fas fa-check"></i>';
+              btn.classList.add('btn-success');
+              btn.classList.remove('btn-outline-secondary');
+              setTimeout(() => {
+                btn.innerHTML = originalHTML;
+                btn.classList.remove('btn-success');
+                btn.classList.add('btn-outline-secondary');
+              }, 2000);
+            }
+          } catch (err) {
+            console.error('Error al copiar:', err);
+            // Fallback: usar Clipboard API si está disponible
+            if (navigator.clipboard) {
+              navigator.clipboard.writeText(element.value).then(() => {
+                const btn = event.target.closest('button');
+                if (btn) {
+                  const originalHTML = btn.innerHTML;
+                  btn.innerHTML = '<i class="fas fa-check"></i>';
+                  btn.classList.add('btn-success');
+                  btn.classList.remove('btn-outline-secondary');
+                  setTimeout(() => {
+                    btn.innerHTML = originalHTML;
+                    btn.classList.remove('btn-success');
+                    btn.classList.add('btn-outline-secondary');
+                  }, 2000);
+                }
+              });
+            }
+          }
+        }
+      };
+    </script>
+  </body>
+</html>
