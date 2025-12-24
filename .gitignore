@@ -1,6 +1,6 @@
 # Dependencias
 node_modules/
-package-lock.json
+# package-lock.json - NO ignorar, necesario para npm ci en CI/CD
 
 # Build outputs
 dist/
