@@ -202,10 +202,11 @@ class KPICard {
  */
 class KPICardGroup {
   constructor(options = {}) {
+    const DEFAULT_COLUMNS = 4; // Default number of columns (Bootstrap grid)
     this.options = {
       containerId: options.containerId || 'kpiContainer',
       cards: options.cards || [],
-      columns: options.columns || 4, // Número de columnas (Bootstrap)
+      columns: options.columns || DEFAULT_COLUMNS, // Número de columnas (Bootstrap)
       ...options
     };
 
@@ -228,7 +229,8 @@ class KPICardGroup {
    * Renderiza todas las tarjetas
    */
   _render() {
-    const colClass = `col-lg-${12 / this.options.columns} col-md-6 col-sm-6 mb-3`;
+    const BOOTSTRAP_GRID_COLUMNS = 12; // Bootstrap grid has 12 columns
+    const colClass = `col-lg-${BOOTSTRAP_GRID_COLUMNS / this.options.columns} col-md-6 col-sm-6 mb-3`;
 
     this.options.cards.forEach((cardOptions, index) => {
       const cardContainer = document.createElement('div');

@@ -1,0 +1,33 @@
+# SonarCloud Configuration for TitanFleet ERP
+# https://sonarcloud.io
+
+# Project identification
+sonar.projectKey=TitanFleet
+sonar.organization=samuelayalasandoval-pixel
+sonar.projectName=TitanFleet ERP
+
+# Source code location - Solo analizar módulos principales más pequeños
+# Excluir archivos grandes para cumplir límite de 50k líneas (repositorio privado)
+sonar.sources=assets/scripts
+sonar.sourceEncoding=UTF-8
+
+# Exclusions - Excluir archivos grandes y no esenciales
+# Archivos grandes excluidos: reportes.js (7.7k), cxp.js (6.6k), configuracion.js (6.1k), cxc.js (5.3k), operadores.js (5k), inventario.js (4.4k)
+sonar.exclusions=**/node_modules/**,**/dist/**,**/build/**,**/*.min.js,**/vendor/**,**/lib/**,**/test*.js,**/*.test.js,**/*.spec.js,**/tests/**,**/docs/**,**/backend-example/**,**/*.html,**/pages/**,**/scripts/**,**/*.config.js,**/vitest.config.js,**/playwright.config.js,**/firebase*.js,**/error-handler.js,**/demo/**,**/archive/**,**/*.map.js,**/components/**,**/layouts/**,**/*.bat,**/*.ps1,**/*.py,**/*.sh,**/reportes.js,**/cxp.js,**/configuracion.js,**/cxc.js,**/operadores.js,**/inventario.js,**/configuracion-firebase.js,**/data-persistence.js,**/diesel.js,**/mantenimiento.js,**/tesoreria.js,**/main.js,**/reportes-inline.js
+
+# Test exclusions (if you want to analyze tests separately)
+sonar.test.exclusions=**/node_modules/**,**/dist/**,**/build/**
+
+# JavaScript/TypeScript settings
+sonar.javascript.lcov.reportPaths=coverage/lcov.info
+sonar.javascript.eslint.configPath=.eslintrc.json
+
+# Language
+sonar.language=js
+
+# Coverage (if you have coverage reports)
+# sonar.coverage.exclusions=**/*.test.js,**/*.spec.js,**/tests/**,**/node_modules/**
+
+# Additional settings
+sonar.host.url=https://sonarcloud.io
+

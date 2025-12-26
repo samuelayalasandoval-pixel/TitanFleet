@@ -931,16 +931,16 @@ function seleccionarEconomicoMantenimiento(economico, valor) {
 
   // Establecer el valor inmediatamente y también después de un pequeño delay para asegurar que se establezca
   input.value = texto;
-  if (hiddenInput) {
-    hiddenInput.value = numero;
+  if (_hiddenInput) {
+    _hiddenInput.value = numero;
     console.log('✅ [seleccionarEconomicoMantenimiento] Hidden input establecido:', numero);
   }
 
   // Usar setTimeout para asegurar que el valor se establezca incluso si hay un blur pendiente
   setTimeout(() => {
     input.value = texto;
-    if (hiddenInput) {
-      hiddenInput.value = numero;
+    if (_hiddenInput) {
+      _hiddenInput.value = numero;
     }
     console.log('✅ [seleccionarEconomicoMantenimiento] Valor confirmado después del delay');
 

@@ -162,7 +162,7 @@ describe('DataPersistence', () => {
   });
 
   describe('Guardar datos de logística', () => {
-    it('debe guardar datos de logística correctamente', () => {
+    it('debe guardar datos de logística correctamente', async () => {
       const testId = 'TEST-001';
       const testData = {
         cliente: 'Cliente Test',
@@ -173,8 +173,9 @@ describe('DataPersistence', () => {
       const resultado = persistence.saveLogisticaData(testId, testData);
       
       expect(resultado).toBe(true);
-      const saved = persistence.getLogisticaData(testId);
+      const saved = await persistence.getLogisticaData(testId);
       expect(saved).toBeDefined();
+      expect(saved).not.toBeNull();
     });
 
     it('debe recuperar datos guardados correctamente', async () => {

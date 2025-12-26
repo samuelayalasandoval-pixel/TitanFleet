@@ -1511,7 +1511,7 @@ function renderizarFilaFacturaCXP(factura, tbody) {
   const puedeSolicitarPago = montoPendiente > 0;
 
   // Respetar el estado de la factura - no sobrescribir estados importantes como 'en tesoreria'
-  let _estadoFinal = factura.estado;
+  const _estadoFinal = factura.estado;
   let estadoClassFinal = estadoClass;
   let estadoTextFinal = estadoText;
 
@@ -1519,7 +1519,7 @@ function renderizarFilaFacturaCXP(factura, tbody) {
   // No sobrescribir estados como 'en tesoreria', 'pagada', 'parcial pagado', etc.
   if (factura.estado === 'aceptada' && montoPendiente > 0) {
     // Compatibilidad: si está en estado antiguo 'aceptada' y tiene pendiente, cambiar a pendiente
-    const _estadoFinal = 'pendiente';
+    // _estadoFinal no se modifica aquí porque es const
     estadoClassFinal = 'status-pendiente';
     estadoTextFinal = 'Pendiente';
   } else if (
@@ -1602,66 +1602,8 @@ function renderizarFilaFacturaCXP(factura, tbody) {
   tbody.appendChild(row);
 }
 
-// Abrir modal nueva factura (versión completa)
-window.abrirModalNuevaFactura = function abrirModalNuevaFactura() {
-  // Marcar que la función completa está lista
-  window.__CXP_MODAL_FUNCTION_READY__ = true;
-  console.log('🔓 abrirModalNuevaFactura llamada');
-
-  // Verificar que los elementos estén disponibles
-  const form = document.getElementById('formNuevaFactura');
-  const modalElement = document.getElementById('modalNuevaFactura');
-
-  if (!form) {
-    console.error('❌ Formulario formNuevaFactura no encontrado');
-    alert('Error: El formulario no está disponible. Por favor, recarga la página.');
-    return;
-  }
-
-  if (!modalElement) {
-    console.error('❌ Modal modalNuevaFactura no encontrado');
-    alert('Error: El modal no está disponible. Por favor, recarga la página.');
-    return;
-  }
-
-  try {
-    // Limpiar formulario
-    form.reset();
-    editingFacturaId = null;
-
-    // Establecer fecha actual
-    const fechaInput = document.getElementById('fechaEmisionFactura');
-    if (fechaInput) {
-      fechaInput.value = new Date().toISOString().split('T')[0];
-    }
-
-    // Reset y evaluar tipo de cambio según moneda por defecto
-    const tipoCambioInput = document.getElementById('tipoCambioFactura');
-    if (tipoCambioInput) {
-      tipoCambioInput.value = '';
-    }
-
-    if (typeof toggleTipoCambioFactura === 'function') {
-      toggleTipoCambioFactura();
-    }
-
-    // Inicializar display del monto total
-    const montoTotalInput = document.getElementById('montoFacturaProveedor');
-    const montoTotalDisplay = document.getElementById('montoFacturaProveedorDisplay');
-    if (montoTotalInput) {
-      montoTotalInput.value = '0.00';
-    }
-    if (montoTotalDisplay) {
-      montoTotalDisplay.textContent = formatCurrency(0);
-    }
-
-    // Mostrar modal
-    const modal = new bootstrap.Modal(modalElement);
-
-    // Cargar proveedores cuando el modal esté completamente visible
-    modalElement.addEventListener(
-      'shown.bs.modal',
-      async function onModalShown() {
+// Función helper para cargar proveedores cuando el modal esté visible
+async function onModalShownCXP() {
         console.log('📋 Modal de factura completamente visible, cargando proveedores...');
 
         // Verificar que el select existe
@@ -1726,12 +1668,66 @@ window.abrirModalNuevaFactura = function abrirModalNuevaFactura() {
         } else {
           console.warn('⚠️ loadProveedoresSelect no está disponible');
         }
+}
 
-        // Remover el listener después de usarlo para evitar duplicados
-        modalElement.removeEventListener('shown.bs.modal', onModalShown);
-      },
-      { once: true }
-    );
+// Abrir modal nueva factura (versión completa)
+window.abrirModalNuevaFactura = function abrirModalNuevaFactura() {
+  // Marcar que la función completa está lista
+  window.__CXP_MODAL_FUNCTION_READY__ = true;
+  console.log('🔓 abrirModalNuevaFactura llamada');
+
+  // Verificar que los elementos estén disponibles
+  const form = document.getElementById('formNuevaFactura');
+  const modalElement = document.getElementById('modalNuevaFactura');
+
+  if (!form) {
+    console.error('❌ Formulario formNuevaFactura no encontrado');
+    alert('Error: El formulario no está disponible. Por favor, recarga la página.');
+    return;
+  }
+
+  if (!modalElement) {
+    console.error('❌ Modal modalNuevaFactura no encontrado');
+    alert('Error: El modal no está disponible. Por favor, recarga la página.');
+    return;
+  }
+
+  try {
+    // Limpiar formulario
+    form.reset();
+    editingFacturaId = null;
+
+    // Establecer fecha actual
+    const fechaInput = document.getElementById('fechaEmisionFactura');
+    if (fechaInput) {
+      fechaInput.value = new Date().toISOString().split('T')[0];
+    }
+
+    // Reset y evaluar tipo de cambio según moneda por defecto
+    const tipoCambioInput = document.getElementById('tipoCambioFactura');
+    if (tipoCambioInput) {
+      tipoCambioInput.value = '';
+    }
+
+    if (typeof toggleTipoCambioFactura === 'function') {
+      toggleTipoCambioFactura();
+    }
+
+    // Inicializar display del monto total
+    const montoTotalInput = document.getElementById('montoFacturaProveedor');
+    const montoTotalDisplay = document.getElementById('montoFacturaProveedorDisplay');
+    if (montoTotalInput) {
+      montoTotalInput.value = '0.00';
+    }
+    if (montoTotalDisplay) {
+      montoTotalDisplay.textContent = formatCurrency(0);
+    }
+
+    // Mostrar modal
+    const modal = new bootstrap.Modal(modalElement);
+
+    // Cargar proveedores cuando el modal esté completamente visible
+    modalElement.addEventListener('shown.bs.modal', onModalShownCXP, { once: true });
 
     modal.show();
     console.log('✅ Modal abierto');
@@ -2224,18 +2220,6 @@ async function _guardarNuevaFactura() {
     // Recargar la página completa - el flag se reseteará cuando la página se recargue
     // Esto evita cualquier renderizado intermedio del listener
     window.location.reload();
-
-    // El código después de esto no se ejecutará porque la página se recarga
-    return;
-
-    // Mostrar notificación (esto no se ejecutará debido al reload)
-    showNotification('✅ Factura registrada exitosamente', 'success');
-
-    // Recargar página después de guardar
-    setTimeout(() => {
-      procesandoFactura = false; // Resetear bandera antes de recargar
-      window.location.reload();
-    }, 500);
   } catch (error) {
     // En caso de error, restaurar el botón y mostrar mensaje
     console.error('❌ Error guardando factura:', error);
@@ -5718,7 +5702,7 @@ async function _aprobarSolicitudesSeleccionadas() {
 
   // Obtener contraseña configurada
   const correctPassword = window.getPasswordAprobacion ? window.getPasswordAprobacion() : null;
-  
+
   if (!correctPassword) {
     alert('Error: Contraseña de aprobación no configurada. Por favor, configúrala en Configuración > Sistema.');
     console.error('❌ Password de aprobación no configurado');
@@ -5938,6 +5922,118 @@ function ensureXLSX(then) {
   document.head.appendChild(s);
 }
 
+// ===== FUNCIONES AUXILIARES PARA EXPORTACIÓN =====
+// Función auxiliar para formatear fechas en exportaciones
+function formatearFechaCXPExport(fechaStr) {
+    if (!fechaStr) {
+      return '';
+    }
+    try {
+      if (typeof fechaStr === 'string') {
+        if (fechaStr.includes('T')) {
+          const fecha = new Date(fechaStr);
+          return fecha.toLocaleDateString('es-MX', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit'
+          });
+        }
+        const fecha = new Date(`${fechaStr}T00:00:00`);
+        return fecha.toLocaleDateString('es-MX', {
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit'
+        });
+      }
+      const fecha = new Date(fechaStr);
+      return fecha.toLocaleDateString('es-MX', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+      });
+    } catch (error) {
+      return String(fechaStr);
+    }
+  }
+
+// Función auxiliar para formatear estado de facturas en exportaciones
+function formatearEstadoFacturaCXPExport(estado) {
+    const estados = {
+      pendiente: 'Pendiente',
+      solicitud: 'En Solicitud',
+      aprobada: 'En Solicitud',
+      'SR-Pendiente': 'SR-Pendiente',
+      'en tesoreria': 'En Tesorería',
+      'parcial pagado': 'P-Pagado',
+      pagada: 'Pagada',
+      validada: 'Validada',
+      aceptada: 'En Tesorería',
+      rechazada: 'Rechazada'
+    };
+    return estados[estado] || estado || 'Pendiente';
+  }
+
+// Función auxiliar para formatear estado de solicitudes en exportaciones
+function formatearEstadoSolicitudCXPExport(estado) {
+  const estados = {
+    pendiente: 'Pendiente',
+    solicitud: 'En Solicitud',
+    validada: 'Validada',
+    aceptada: 'Aceptada',
+    rechazada: 'Rechazada'
+  };
+  return estados[estado] || estado || '';
+}
+
+// Función auxiliar para calcular días vencidos en exportaciones
+  function calcularDiasVencidosExport(fechaVencimiento, estado) {
+    // Usar la función global calcularDiasVencidos si está disponible
+    if (typeof calcularDiasVencidos === 'function') {
+      return calcularDiasVencidos(fechaVencimiento, estado);
+    }
+    // Fallback si la función global no existe
+    if (!fechaVencimiento || estado === 'pagada' || estado === 'Pagada') {
+      return null;
+    }
+    try {
+      const fechaVenc = new Date(fechaVencimiento);
+      const hoy = new Date();
+      hoy.setHours(0, 0, 0, 0);
+      fechaVenc.setHours(0, 0, 0, 0);
+      const diffTime = fechaVenc - hoy;
+      let diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+      if (diffDays < 0) {
+        diffDays = diffDays + 1;
+      }
+      return diffDays;
+    } catch (e) {
+      return null;
+    }
+}
+
+// Funciones auxiliares para generar PDFs - aceptan doc como parámetro
+function addTextPDF(doc, text, x, y, options = {}) {
+  doc.setFontSize(options.fontSize || 12);
+
+  // Manejar colores correctamente
+  if (options.color) {
+    if (Array.isArray(options.color)) {
+      doc.setTextColor(options.color[0], options.color[1], options.color[2]);
+    } else {
+      doc.setTextColor(options.color);
+    }
+  } else {
+    doc.setTextColor(0, 0, 0); // Negro por defecto
+  }
+
+  doc.text(text, x, y);
+}
+
+function addLinePDF(doc, x1, y1, x2, y2) {
+  doc.setDrawColor(0, 0, 0);
+  doc.line(x1, y1, x2, y2);
+}
+
 // ===== FUNCIÓN PARA EXPORTAR A EXCEL =====
 window.exportarCXPExcel = async function () {
   // Cargar facturas desde Firebase primero, luego localStorage
@@ -5978,85 +6074,9 @@ window.exportarCXPExcel = async function () {
     return;
   }
 
-  // Función auxiliar para formatear fechas
-  function formatearFecha(fechaStr) {
-    if (!fechaStr) {
-      return '';
-    }
-    try {
-      if (typeof fechaStr === 'string') {
-        if (fechaStr.includes('T')) {
-          const fecha = new Date(fechaStr);
-          return fecha.toLocaleDateString('es-MX', {
-            year: 'numeric',
-            month: '2-digit',
-            day: '2-digit'
-          });
-        }
-        const fecha = new Date(`${fechaStr}T00:00:00`);
-        return fecha.toLocaleDateString('es-MX', {
-          year: 'numeric',
-          month: '2-digit',
-          day: '2-digit'
-        });
-      }
-      const fecha = new Date(fechaStr);
-      return fecha.toLocaleDateString('es-MX', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit'
-      });
-    } catch (error) {
-      return String(fechaStr);
-    }
-  }
-
-  // Función auxiliar para formatear estado
-  function formatearEstado(estado) {
-    const estados = {
-      pendiente: 'Pendiente',
-      solicitud: 'En Solicitud',
-      aprobada: 'En Solicitud',
-      'SR-Pendiente': 'SR-Pendiente',
-      'en tesoreria': 'En Tesorería',
-      'parcial pagado': 'P-Pagado',
-      pagada: 'Pagada',
-      validada: 'Validada',
-      aceptada: 'En Tesorería',
-      rechazada: 'Rechazada'
-    };
-    return estados[estado] || estado || 'Pendiente';
-  }
-
-  // Función auxiliar para calcular días vencidos (usar función global si existe)
-  function calcularDiasVencidosExport(fechaVencimiento, estado) {
-    // Usar la función global calcularDiasVencidos si está disponible
-    if (typeof calcularDiasVencidos === 'function') {
-      return calcularDiasVencidos(fechaVencimiento, estado);
-    }
-    // Fallback si la función global no existe
-    if (!fechaVencimiento || estado === 'pagada' || estado === 'Pagada') {
-      return null;
-    }
-    try {
-      const fechaVenc = new Date(fechaVencimiento);
-      const hoy = new Date();
-      hoy.setHours(0, 0, 0, 0);
-      fechaVenc.setHours(0, 0, 0, 0);
-      const diffTime = fechaVenc - hoy;
-      let diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-      if (diffDays < 0) {
-        diffDays = diffDays + 1;
-      }
-      return diffDays;
-    } catch (e) {
-      return null;
-    }
-  }
-
   // Hoja 1: Registro de Facturas (mantener como está)
   const rowsFacturas = facturas.map(factura => ({
-    'Fecha de Emisión': formatearFecha(factura.fechaEmision),
+    'Fecha de Emisión': formatearFechaCXPExport(factura.fechaEmision),
     Proveedor: factura.proveedor || '',
     'Folio Fiscal': factura.folioFiscal || '',
     'Número de Factura': factura.numeroFactura || '',
@@ -6090,7 +6110,7 @@ window.exportarCXPExcel = async function () {
       factura.montoPendiente !== undefined
         ? parseSafe(factura.montoPendiente)
         : montoTotal - montoPagado;
-    const estado = formatearEstado(factura.estado);
+    const estado = formatearEstadoFacturaCXPExport(factura.estado);
 
     // Calcular días vencidos usando la función auxiliar
     const diasVencidos = calcularDiasVencidosExport(factura.fechaVencimiento, factura.estado);
@@ -6114,8 +6134,8 @@ window.exportarCXPExcel = async function () {
       'Monto Total': montoTotal.toFixed(2),
       'Monto Pagado': montoPagado.toFixed(2),
       'Monto Pendiente': montoPendiente.toFixed(2),
-      'Fecha de Emisión': formatearFecha(factura.fechaEmision),
-      'Fecha de Vencimiento': formatearFecha(factura.fechaVencimiento),
+      'Fecha de Emisión': formatearFechaCXPExport(factura.fechaEmision),
+      'Fecha de Vencimiento': formatearFechaCXPExport(factura.fechaVencimiento),
       'Días Vencidos': diasVencidosTexto,
       'Tipo de Moneda': factura.tipoMoneda || 'MXN',
       Prioridad: factura.prioridad || 'Normal'
@@ -6168,51 +6188,6 @@ window.exportarSolicitudesCXPExcel = async function () {
     return;
   }
 
-  // Función auxiliar para formatear fechas
-  function formatearFecha(fechaStr) {
-    if (!fechaStr) {
-      return '';
-    }
-    try {
-      if (typeof fechaStr === 'string') {
-        if (fechaStr.includes('T')) {
-          const fecha = new Date(fechaStr);
-          return fecha.toLocaleDateString('es-MX', {
-            year: 'numeric',
-            month: '2-digit',
-            day: '2-digit'
-          });
-        }
-        const fecha = new Date(`${fechaStr}T00:00:00`);
-        return fecha.toLocaleDateString('es-MX', {
-          year: 'numeric',
-          month: '2-digit',
-          day: '2-digit'
-        });
-      }
-      const fecha = new Date(fechaStr);
-      return fecha.toLocaleDateString('es-MX', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit'
-      });
-    } catch (error) {
-      return String(fechaStr);
-    }
-  }
-
-  // Función auxiliar para formatear estado
-  function formatearEstado(estado) {
-    const estados = {
-      pendiente: 'Pendiente',
-      solicitud: 'En Solicitud',
-      validada: 'Validada',
-      aceptada: 'Aceptada',
-      rechazada: 'Rechazada'
-    };
-    return estados[estado] || estado || '';
-  }
-
   // Cargar facturas para obtener información de facturas incluidas
   let facturas = [];
   if (window.firebaseRepos && window.firebaseRepos.cxp) {
@@ -6252,9 +6227,9 @@ window.exportarSolicitudesCXPExcel = async function () {
 
     return {
       'ID Solicitud': `SOL-${solicitud.id.toString().padStart(4, '0')}`,
-      'Fecha Solicitud': formatearFecha(solicitud.fechaSolicitud),
+      'Fecha Solicitud': formatearFechaCXPExport(solicitud.fechaSolicitud),
       Proveedor: solicitud.proveedor || '',
-      Estado: formatearEstado(solicitud.estado),
+      Estado: formatearEstadoSolicitudCXPExport(solicitud.estado),
       Prioridad: solicitud.prioridad || '',
       Monto: solicitud.monto ? parseFloat(solicitud.monto).toFixed(2) : '',
       'Facturas Incluidas': facturasIncluidasTexto,
@@ -6312,6 +6287,61 @@ window.exportarSolicitudesCXPExcel = async function () {
     }
   });
 };
+
+// Funciones auxiliares para generar PDFs de CXP
+function formatearFechaCXP(fechaStr) {
+  if (!fechaStr) {
+    return 'N/A';
+  }
+  try {
+    if (typeof fechaStr === 'string') {
+      if (fechaStr.includes('T')) {
+        const fecha = new Date(fechaStr);
+        return fecha.toLocaleDateString('es-MX', {
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit'
+        });
+      }
+      const fecha = new Date(`${fechaStr}T00:00:00`);
+      return fecha.toLocaleDateString('es-MX', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+      });
+    }
+    const fecha = new Date(fechaStr);
+    return fecha.toLocaleDateString('es-MX', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit'
+    });
+  } catch (error) {
+    return String(fechaStr);
+  }
+}
+
+function obtenerValorCXP(valor) {
+  return valor !== undefined && valor !== null && valor !== '' ? valor : 'N/A';
+}
+
+function formatearMontoCXP(monto) {
+  return new Intl.NumberFormat('es-MX', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  }).format(parseFloat(monto || 0));
+}
+
+function formatearEstadoCXP(estado) {
+  const estados = {
+    pendiente: 'Pendiente',
+    solicitud: 'En Solicitud',
+    validada: 'Validada',
+    aceptada: 'Aceptada',
+    rechazada: 'Rechazada'
+  };
+  return estados[estado] || estado || 'N/A';
+}
 
 // ===== FUNCIÓN PARA DESCARGAR PDF DE SOLICITUD CXP =====
 window.descargarPDFSolicitudCXP = async function (solicitudId) {
@@ -6371,63 +6401,11 @@ window.descargarPDFSolicitudCXP = async function (solicitudId) {
     const pageWidth = doc.internal.pageSize.width;
     const col1X = margin + 5;
 
-    // Función auxiliar para formatear fechas
-    function formatearFecha(fechaStr) {
-      if (!fechaStr) {
-        return 'N/A';
-      }
-      try {
-        if (typeof fechaStr === 'string') {
-          if (fechaStr.includes('T')) {
-            const fecha = new Date(fechaStr);
-            return fecha.toLocaleDateString('es-MX', {
-              year: 'numeric',
-              month: '2-digit',
-              day: '2-digit'
-            });
-          }
-          const fecha = new Date(`${fechaStr}T00:00:00`);
-          return fecha.toLocaleDateString('es-MX', {
-            year: 'numeric',
-            month: '2-digit',
-            day: '2-digit'
-          });
-        }
-        const fecha = new Date(fechaStr);
-        return fecha.toLocaleDateString('es-MX', {
-          year: 'numeric',
-          month: '2-digit',
-          day: '2-digit'
-        });
-      } catch (error) {
-        return String(fechaStr);
-      }
-    }
-
-    // Función auxiliar para obtener valor o 'N/A'
-    function obtenerValor(valor) {
-      return valor !== undefined && valor !== null && valor !== '' ? valor : 'N/A';
-    }
-
-    // Función auxiliar para formatear montos con separadores de miles
-    function formatearMonto(monto) {
-      return new Intl.NumberFormat('es-MX', {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
-      }).format(parseFloat(monto || 0));
-    }
-
-    // Función auxiliar para formatear estado
-    function formatearEstado(estado) {
-      const estados = {
-        pendiente: 'Pendiente',
-        solicitud: 'En Solicitud',
-        validada: 'Validada',
-        aceptada: 'Aceptada',
-        rechazada: 'Rechazada'
-      };
-      return estados[estado] || estado || 'N/A';
-    }
+    // Usar funciones auxiliares definidas arriba
+    const formatearFecha = formatearFechaCXP;
+    const obtenerValor = obtenerValorCXP;
+    const formatearMonto = formatearMontoCXP;
+    const formatearEstado = formatearEstadoCXP;
 
     // Título
     doc.setFontSize(18);
@@ -6612,51 +6590,10 @@ window.descargarPDFFacturaCXP = async function (facturaId) {
     const col1X = margin + 5;
     const _col2X = pageWidth / 2 + 10;
 
-    // Función auxiliar para formatear fechas
-    function formatearFecha(fechaStr) {
-      if (!fechaStr) {
-        return 'N/A';
-      }
-      try {
-        if (typeof fechaStr === 'string') {
-          if (fechaStr.includes('T')) {
-            const fecha = new Date(fechaStr);
-            return fecha.toLocaleDateString('es-MX', {
-              year: 'numeric',
-              month: '2-digit',
-              day: '2-digit'
-            });
-          }
-          const fecha = new Date(`${fechaStr}T00:00:00`);
-          return fecha.toLocaleDateString('es-MX', {
-            year: 'numeric',
-            month: '2-digit',
-            day: '2-digit'
-          });
-        }
-        const fecha = new Date(fechaStr);
-        return fecha.toLocaleDateString('es-MX', {
-          year: 'numeric',
-          month: '2-digit',
-          day: '2-digit'
-        });
-      } catch (error) {
-        return String(fechaStr);
-      }
-    }
-
-    // Función auxiliar para obtener valor o 'N/A'
-    function obtenerValor(valor) {
-      return valor !== undefined && valor !== null && valor !== '' ? valor : 'N/A';
-    }
-
-    // Función auxiliar para formatear montos con separadores de miles
-    function formatearMonto(monto) {
-      return new Intl.NumberFormat('es-MX', {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
-      }).format(parseFloat(monto || 0));
-    }
+    // Usar funciones auxiliares definidas arriba
+    const formatearFecha = formatearFechaCXP;
+    const obtenerValor = obtenerValorCXP;
+    const formatearMonto = formatearMontoCXP;
 
     // Título
     doc.setFontSize(18);
@@ -7355,70 +7292,47 @@ window.generarPDFEstadoCuentaProveedor = async function () {
   const margin = 20;
   let yPosition = 20;
 
-  // Función para agregar texto con estilo
-  function addText(text, x, y, options = {}) {
-    doc.setFontSize(options.fontSize || 12);
-
-    // Manejar colores correctamente
-    if (options.color) {
-      if (Array.isArray(options.color)) {
-        doc.setTextColor(options.color[0], options.color[1], options.color[2]);
-      } else {
-        doc.setTextColor(options.color);
-      }
-    } else {
-      doc.setTextColor(0, 0, 0); // Negro por defecto
-    }
-
-    doc.text(text, x, y);
-  }
-
-  // Función para agregar línea
-  function addLine(x1, y1, x2, y2) {
-    doc.setDrawColor(0, 0, 0);
-    doc.line(x1, y1, x2, y2);
-  }
-
   // Encabezado
-  addText('ESTADO DE CUENTA', pageWidth / 2, yPosition, { fontSize: 18, color: [0, 0, 139] });
+  addTextPDF(doc, 'ESTADO DE CUENTA', pageWidth / 2, yPosition, { fontSize: 18, color: [0, 0, 139] });
   yPosition += 15;
 
-  addText(`Proveedor: ${proveedor}`, margin, yPosition, { fontSize: 14 });
+  addTextPDF(doc, `Proveedor: ${proveedor}`, margin, yPosition, { fontSize: 14 });
   yPosition += 10;
 
-  addText(`Período: ${fechaDesde || 'Inicio'} - ${fechaHasta || 'Hoy'}`, margin, yPosition);
+  addTextPDF(doc, `Período: ${fechaDesde || 'Inicio'} - ${fechaHasta || 'Hoy'}`, margin, yPosition);
   yPosition += 10;
 
-  addText(`Fecha de emisión: ${new Date().toLocaleDateString('es-MX')}`, margin, yPosition);
+  addTextPDF(doc, `Fecha de emisión: ${new Date().toLocaleDateString('es-MX')}`, margin, yPosition);
   yPosition += 20;
 
   // Resumen
-  addText('RESUMEN', margin, yPosition, { fontSize: 14, color: [0, 0, 139] });
+  addTextPDF(doc, 'RESUMEN', margin, yPosition, { fontSize: 14, color: [0, 0, 139] });
   yPosition += 10;
 
-  addText(`Total de facturas: ${facturasProveedor.length}`, margin, yPosition);
+  addTextPDF(doc, `Total de facturas: ${facturasProveedor.length}`, margin, yPosition);
   yPosition += 8;
 
-  addText(`Monto total facturado: $${formatCurrency(totalGeneral)}`, margin, yPosition, {
+  addTextPDF(doc, `Monto total facturado: $${formatCurrency(totalGeneral)}`, margin, yPosition, {
     fontSize: 12,
     color: [0, 0, 139]
   });
   yPosition += 8;
 
-  addText(`Monto total pagado: $${formatCurrency(totalPagado)}`, margin, yPosition, {
+  addTextPDF(doc, `Monto total pagado: $${formatCurrency(totalPagado)}`, margin, yPosition, {
     color: [0, 128, 0]
   });
   yPosition += 8;
 
-  addText(`Monto total pendiente: $${formatCurrency(totalPendiente)}`, margin, yPosition, {
+  addTextPDF(doc, `Monto total pendiente: $${formatCurrency(totalPendiente)}`, margin, yPosition, {
     color: [220, 20, 60]
   });
   yPosition += 8;
 
-  addText(`Facturas pendientes: ${facturasPendientes.length}`, margin, yPosition);
+  addTextPDF(doc, `Facturas pendientes: ${facturasPendientes.length}`, margin, yPosition);
   yPosition += 8;
 
-  addText(
+  addTextPDF(
+    doc,
     `Facturas vencidas: ${facturasVencidas.length} - $${formatCurrency(totalVencido)}`,
     margin,
     yPosition,
@@ -7426,19 +7340,19 @@ window.generarPDFEstadoCuentaProveedor = async function () {
   );
   yPosition += 8;
 
-  addText(`Facturas pagadas: ${facturasPagadas.length}`, margin, yPosition, { color: [0, 128, 0] });
+  addTextPDF(doc, `Facturas pagadas: ${facturasPagadas.length}`, margin, yPosition, { color: [0, 128, 0] });
   yPosition += 8;
 
   // Calcular porcentaje de pago
   const porcentajePago = totalGeneral > 0 ? Math.round((totalPagado / totalGeneral) * 100) : 0;
-  addText(`Porcentaje de pago: ${porcentajePago}%`, margin, yPosition, {
+  addTextPDF(doc, `Porcentaje de pago: ${porcentajePago}%`, margin, yPosition, {
     fontSize: 12,
     color: [0, 0, 139]
   });
   yPosition += 20;
 
   // Tabla de facturas
-  addText('DETALLE DE FACTURAS', margin, yPosition, { fontSize: 14, color: [0, 0, 139] });
+  addTextPDF(doc, 'DETALLE DE FACTURAS', margin, yPosition, { fontSize: 14, color: [0, 0, 139] });
   yPosition += 10;
 
   // Encabezados de tabla (sin columna de Estado)
@@ -7452,16 +7366,16 @@ window.generarPDFEstadoCuentaProveedor = async function () {
     margin + 135
   ];
 
-  addText('Número', colPositions[0], yPosition, { fontSize: 9 });
-  addText('Fecha Emisión', colPositions[1], yPosition, { fontSize: 9 });
-  addText('Fecha Venc.', colPositions[2], yPosition, { fontSize: 9 });
-  addText('Días Venc.', colPositions[3], yPosition, { fontSize: 9 });
-  addText('Monto Total', colPositions[4], yPosition, { fontSize: 9 });
-  addText('Monto Pagado', colPositions[5], yPosition, { fontSize: 9 });
-  addText('Monto Pend.', colPositions[6], yPosition, { fontSize: 9 });
+  addTextPDF(doc, 'Número', colPositions[0], yPosition, { fontSize: 9 });
+  addTextPDF(doc, 'Fecha Emisión', colPositions[1], yPosition, { fontSize: 9 });
+  addTextPDF(doc, 'Fecha Venc.', colPositions[2], yPosition, { fontSize: 9 });
+  addTextPDF(doc, 'Días Venc.', colPositions[3], yPosition, { fontSize: 9 });
+  addTextPDF(doc, 'Monto Total', colPositions[4], yPosition, { fontSize: 9 });
+  addTextPDF(doc, 'Monto Pagado', colPositions[5], yPosition, { fontSize: 9 });
+  addTextPDF(doc, 'Monto Pend.', colPositions[6], yPosition, { fontSize: 9 });
 
   yPosition += 5;
-  addLine(margin, yPosition, pageWidth - margin, yPosition);
+  addLinePDF(doc, margin, yPosition, pageWidth - margin, yPosition);
   yPosition += 10;
 
   // Filas de facturas
@@ -7488,16 +7402,16 @@ window.generarPDFEstadoCuentaProveedor = async function () {
     const montoPagadoStr = `$${formatCurrency(montoPagado)}`;
     const montoPendienteStr = `$${formatCurrency(montoPendiente)}`;
 
-    addText(numeroFactura, colPositions[0], yPosition, { fontSize: 8 });
-    addText(fechaEmision, colPositions[1], yPosition, { fontSize: 8 });
-    addText(fechaVenc, colPositions[2], yPosition, { fontSize: 8 });
-    addText(diasVencStr, colPositions[3], yPosition, {
+    addTextPDF(doc, numeroFactura, colPositions[0], yPosition, { fontSize: 8 });
+    addTextPDF(doc, fechaEmision, colPositions[1], yPosition, { fontSize: 8 });
+    addTextPDF(doc, fechaVenc, colPositions[2], yPosition, { fontSize: 8 });
+    addTextPDF(doc, diasVencStr, colPositions[3], yPosition, {
       fontSize: 8,
       color: diasVenc !== null && diasVenc < 0 ? [220, 20, 60] : [0, 0, 0]
     });
-    addText(montoTotalStr, colPositions[4], yPosition, { fontSize: 8 });
-    addText(montoPagadoStr, colPositions[5], yPosition, { fontSize: 8, color: [0, 128, 0] });
-    addText(montoPendienteStr, colPositions[6], yPosition, {
+    addTextPDF(doc, montoTotalStr, colPositions[4], yPosition, { fontSize: 8 });
+    addTextPDF(doc, montoPagadoStr, colPositions[5], yPosition, { fontSize: 8, color: [0, 128, 0] });
+    addTextPDF(doc, montoPendienteStr, colPositions[6], yPosition, {
       fontSize: 8,
       color: montoPendiente > 0 ? [220, 20, 60] : [0, 128, 0]
     });
@@ -7507,17 +7421,18 @@ window.generarPDFEstadoCuentaProveedor = async function () {
 
   // Pie de página
   yPosition += 20;
-  addLine(margin, yPosition, pageWidth - margin, yPosition);
+  addLinePDF(doc, margin, yPosition, pageWidth - margin, yPosition);
   yPosition += 10;
 
-  addText(
+  addTextPDF(
+    doc,
     'Este estado de cuenta es generado automáticamente por el sistema ERP.',
     margin,
     yPosition,
     { fontSize: 8, color: [128, 128, 128] }
   );
   yPosition += 5;
-  addText('Para aclaraciones, contactar al departamento de cuentas por pagar.', margin, yPosition, {
+  addTextPDF(doc, 'Para aclaraciones, contactar al departamento de cuentas por pagar.', margin, yPosition, {
     fontSize: 8,
     color: [128, 128, 128]
   });

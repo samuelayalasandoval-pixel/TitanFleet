@@ -175,6 +175,17 @@ class ERPForm {
       return true;
     }
 
+    const validationResult = this._validateFieldValue(field, fieldElement, fieldId);
+    this._applyValidationFeedback(fieldElement, validationResult.isValid, validationResult.errorMessage);
+
+    return validationResult.isValid;
+  }
+
+  /**
+   * Valida el valor de un campo
+   * @private
+   */
+  _validateFieldValue(field, fieldElement, fieldId) {
     let isValid = true;
     let errorMessage = '';
 
@@ -182,19 +193,21 @@ class ERPForm {
     if (field.required && !fieldElement.value.trim()) {
       isValid = false;
       errorMessage = field.errorMessage || `${field.label || fieldId} es requerido`;
+      return { isValid, errorMessage };
     }
 
     // Validación de tipo
-    if (isValid && field.type === 'email' && fieldElement.value) {
+    if (field.type === 'email' && fieldElement.value) {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(fieldElement.value)) {
         isValid = false;
         errorMessage = field.errorMessage || 'Ingrese un email válido';
+        return { isValid, errorMessage };
       }
     }
 
     // Validación personalizada
-    if (isValid && this.fieldValidators.has(fieldId)) {
+    if (this.fieldValidators.has(fieldId)) {
       const validator = this.fieldValidators.get(fieldId);
       const validationResult = validator(fieldElement.value, fieldElement);
       if (validationResult !== true) {
@@ -206,20 +219,27 @@ class ERPForm {
       }
     }
 
-    // Aplicar feedback visual
-    if (this.options.showValidationFeedback) {
-      if (isValid) {
-        fieldElement.classList.remove('is-invalid');
-        fieldElement.classList.add('is-valid');
-        this._removeFeedback(fieldElement);
-      } else {
-        fieldElement.classList.remove('is-valid');
-        fieldElement.classList.add('is-invalid');
-        this._setFeedback(fieldElement, errorMessage);
-      }
+    return { isValid, errorMessage };
+  }
+
+  /**
+   * Aplica el feedback visual de validación
+   * @private
+   */
+  _applyValidationFeedback(fieldElement, isValid, errorMessage) {
+    if (!this.options.showValidationFeedback) {
+      return;
     }
 
-    return isValid;
+    if (isValid) {
+      fieldElement.classList.remove('is-invalid');
+      fieldElement.classList.add('is-valid');
+      this._removeFeedback(fieldElement);
+    } else {
+      fieldElement.classList.remove('is-valid');
+      fieldElement.classList.add('is-invalid');
+      this._setFeedback(fieldElement, errorMessage);
+    }
   }
 
   /**
@@ -369,12 +389,13 @@ class ERPForm {
     successAlert.querySelector('span').textContent = message;
 
     // Auto-ocultar después de 3 segundos
+    const AUTO_HIDE_DELAY_MS = 3000; // Delay in milliseconds to auto-hide success alert
     setTimeout(() => {
       if (successAlert) {
         const bsAlert = new bootstrap.Alert(successAlert);
         bsAlert.close();
       }
-    }, 3000);
+    }, AUTO_HIDE_DELAY_MS);
   }
 
   /**

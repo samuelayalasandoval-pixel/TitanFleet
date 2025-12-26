@@ -3425,9 +3425,8 @@
                       console.log(
                         `✅ Documento users/${nuevoUsuarioUid} creado con tenantId: ${tenantId} (Firebase v10)`
                       );
-                    }
+                    } else if (db && doc && setDoc) {
                     // PRIORIDAD 2: Fallback usando Firebase v10 (si no está disponible de otra manera)
-                    else if (db && doc && setDoc) {
                       const userDocRef = doc(db, 'users', nuevoUsuarioUid);
                       await setDoc(
                         userDocRef,

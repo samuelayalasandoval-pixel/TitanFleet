@@ -203,7 +203,7 @@
         registro['Folio Fiscal'] || registro.folioFiscal || registro.folioFiscalUUID || 'N/A';
 
       // Obtener información del cliente
-      let clienteNombre = registro.cliente || registro.Cliente || 'N/A';
+      const clienteNombre = registro.cliente || registro.Cliente || 'N/A';
       let rfcCliente = registro.rfcCliente || registro.RFC || registro.rfc || 'N/A';
       const referenciaCliente =
         registro.referenciaCliente ||
@@ -445,16 +445,14 @@
                   innerHTML.includes('Referencia Cliente:')
                 ) {
                   p.innerHTML = `<strong>Referencia Cliente:</strong><br>${referenciaFinal}`;
-                }
-                // Luego verificar "RFC:" (más específico que "Cliente:")
-                else if (
+                } else if (
+                  // Luego verificar "RFC:" (más específico que "Cliente:")
                   texto.trim().startsWith('RFC:') ||
                   innerHTML.includes('<strong>RFC:</strong>')
                 ) {
                   p.innerHTML = `<strong>RFC:</strong><br>${rfcFinal}`;
-                }
-                // Finalmente verificar "Cliente:" (debe ser exacto, no "Referencia Cliente:")
-                else if (
+                } else if (
+                  // Finalmente verificar "Cliente:" (debe ser exacto, no "Referencia Cliente:")
                   (texto.trim().startsWith('Cliente:') && !texto.includes('Referencia')) ||
                   (innerHTML.includes('<strong>Cliente:</strong>') &&
                     !innerHTML.includes('Referencia'))

@@ -1655,6 +1655,9 @@ window.saveLogisticaData = async function () {
 
   // Fallback a DataPersistence si Firebase falla o no está disponible
   // SIEMPRE guardar en DataPersistence/localStorage como respaldo
+  // Nota: Este bloque nunca se ejecutará si DataPersistence está definido arriba
+  // Se mantiene por compatibilidad pero es código inalcanzable en el flujo normal
+  /* eslint-disable-next-line no-unreachable */
   if (typeof window.DataPersistence === 'undefined') {
     console.error('❌ DataPersistence no está disponible en saveLogisticaData');
     // Intentar guardar directamente en localStorage

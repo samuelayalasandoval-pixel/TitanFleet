@@ -23,7 +23,7 @@ class ERPTable {
       filteredData: [],
       pagination: {
         enabled: options.pagination?.enabled !== false,
-        itemsPerPage: options.pagination?.itemsPerPage || 10,
+        itemsPerPage: options.pagination?.itemsPerPage || 10, // Default items per page
         ...options.pagination
       },
       filters: options.filters || [],

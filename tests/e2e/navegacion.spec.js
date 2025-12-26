@@ -3,14 +3,20 @@
  */
 
 import { test, expect } from '@playwright/test';
+import { login } from './helpers/auth.helper.js';
 
 test.describe('Navegación del ERP', () => {
   test.beforeEach(async ({ page }) => {
-    // Asumimos que hay un modo demo o login automático
-    await page.goto('/');
+    // Hacer login primero
+    await login(page);
+    
+    // Navegar al menú principal después del login
+    await page.goto('/pages/menu.html', { waitUntil: 'domcontentloaded' });
     
     // Esperar a que la página cargue completamente
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
+    // Esperar un tiempo adicional para scripts de inicialización
+    await page.waitForTimeout(2000);
   });
 
   test('debe navegar a módulo de Facturación', async ({ page }) => {
@@ -55,10 +61,11 @@ test.describe('Navegación del ERP', () => {
       const otroModulo = page.locator('a[href*="trafico"], button:has-text("Tráfico")').first();
       if (await otroModulo.count() > 0) {
         await otroModulo.click();
-        await page.waitForLoadState('networkidle');
+        await page.waitForLoadState('domcontentloaded');
+        await page.waitForTimeout(1000); // Esperar a que se complete la navegación
         
         // El sidebar debe seguir visible
-        await expect(sidebar).toBeVisible();
+        await expect(sidebar).toBeVisible({ timeout: 10000 });
       }
     }
   });

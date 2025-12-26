@@ -1,12 +1,6 @@
 // Script crítico: Restaurar estado del sidebar ANTES de renderizar para evitar parpadeo
 (function () {
   'use strict';
-  // Leer estado del sidebar inmediatamente
-  try {
-    const savedState = localStorage.getItem('sidebarCollapsed');
-    if (savedState === 'true') {
-      // Aplicar estilo inline directamente al body para que se ejecute antes del render
-      document.documentElement.style.setProperty('--sidebar-initial-state', 'collapsed');
 
       // Función para aplicar clases inmediatamente cuando el DOM esté disponible
       function applySidebarState() {
@@ -19,6 +13,13 @@
         }
         return false;
       }
+
+  // Leer estado del sidebar inmediatamente
+  try {
+    const savedState = localStorage.getItem('sidebarCollapsed');
+    if (savedState === 'true') {
+      // Aplicar estilo inline directamente al body para que se ejecute antes del render
+      document.documentElement.style.setProperty('--sidebar-initial-state', 'collapsed');
 
       // Intentar aplicar inmediatamente si el DOM ya está disponible
       if (document.body) {

@@ -679,7 +679,7 @@ class ConfiguracionManager {
 
   async saveProveedor(proveedor) {
     try {
-      const proveedores = this.getProveedores() || [];
+      let proveedores = this.getProveedores() || [];
 
       // Verificar si ya existe un proveedor con el mismo RFC
       const existingIndex = proveedores.findIndex(p => p.rfc === proveedor.rfc);
@@ -1617,7 +1617,7 @@ window.getOperador = rfc => window.configuracionManager.getOperador(rfc);
 window.deleteOperador = rfc => window.configuracionManager.deleteOperador(rfc);
 
 // Funciones para clientes
-window.getClientes = async () => await window.configuracionManager.getAllClientes();
+window.getClientes = async () => window.configuracionManager.getAllClientes();
 
 window.saveCliente = async function () {
   try {
@@ -1811,7 +1811,7 @@ window.confirmDeleteClienteFromModal = function () {
     console.log('✅ Cliente eliminado exitosamente');
     alert('Cliente eliminado exitosamente');
     window.loadClientes();
-    (async () => await window.loadClientesTable())();
+    (async () => window.loadClientesTable())();
 
     const modal = bootstrap.Modal.getInstance(document.getElementById('deleteClienteModal'));
     modal.hide();
@@ -2037,7 +2037,7 @@ window.filterClientes = function () {
 window.getProveedores = () => window.configuracionManager.getProveedores();
 window.setProveedores = proveedores => window.configuracionManager.setProveedores(proveedores);
 window.saveProveedor = async proveedor =>
-  await window.configuracionManager.saveProveedor(proveedor);
+  window.configuracionManager.saveProveedor(proveedor);
 window.getProveedor = rfc => window.configuracionManager.getProveedor(rfc);
 window.deleteProveedor = rfc => window.configuracionManager.deleteProveedor(rfc);
 window.getProveedoresList = () => window.configuracionManager.getProveedoresList();
@@ -4678,7 +4678,7 @@ window.deleteProveedorFromTable = async function (rfc) {
     // Eliminar de Firebase primero
     if (window.firebaseDb && window.fs) {
       try {
-        const _tenantId = 'demo_tenant';
+        const tenantId = 'demo_tenant';
         const proveedoresDocRef = window.fs.doc(window.firebaseDb, 'configuracion', 'proveedores');
         const proveedoresDoc = await window.fs.getDoc(proveedoresDocRef);
 

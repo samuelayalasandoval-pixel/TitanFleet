@@ -3180,39 +3180,8 @@ function _imprimirFactura(facturaId) {
 }
 
 // Descargar PDF de factura CXC
-async function _descargarPDFFacturaCXC(facturaId) {
-  console.log(`📄 Descargando PDF de la factura CXC: ${facturaId}`);
-
-  const factura = facturasData.find(f => f.id === facturaId);
-  if (!factura) {
-    alert('Factura no encontrada');
-    return;
-  }
-
-  try {
-    // Cargar jsPDF si no está disponible
-    if (!window.jspdf) {
-      const script = document.createElement('script');
-      script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
-      await new Promise((resolve, reject) => {
-        script.onload = resolve;
-        script.onerror = reject;
-        document.head.appendChild(script);
-      });
-    }
-
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
-
-    // Configuración
-    const margin = 20;
-    let yPosition = 20;
-    const pageWidth = doc.internal.pageSize.width;
-    const col1X = margin + 5;
-    const col2X = pageWidth / 2 + 10;
-
-    // Función auxiliar para formatear fechas
-    function formatearFecha(fechaStr) {
+// Funciones auxiliares para generar PDFs
+function formatearFechaPDF(fechaStr) {
       if (!fechaStr) {
         return 'N/A';
       }
@@ -3244,18 +3213,74 @@ async function _descargarPDFFacturaCXC(facturaId) {
       }
     }
 
-    // Función auxiliar para obtener valor o 'N/A'
-    function obtenerValor(valor) {
+function obtenerValorPDF(valor) {
       return valor !== undefined && valor !== null && valor !== '' ? valor : 'N/A';
     }
 
-    // Función auxiliar para formatear montos con separadores de miles
-    function formatearMonto(monto) {
+function formatearMontoPDF(monto) {
       return new Intl.NumberFormat('es-MX', {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2
       }).format(parseFloat(monto || 0));
     }
+
+function obtenerMetodoPagoPDF(metodo) {
+  const metodos = {
+    transferencia: 'Transferencia',
+    cheque: 'Cheque',
+    efectivo: 'Efectivo',
+    tarjeta: 'Tarjeta',
+    otro: 'Otro'
+  };
+  return metodos[metodo] || metodo || '-';
+}
+
+function obtenerMetodoPagoTextoPDF(metodo) {
+  const metodos = {
+    transferencia: 'Transferencia Bancaria',
+    cheque: 'Cheque',
+    efectivo: 'Efectivo',
+    tarjeta: 'Tarjeta de Crédito',
+    otro: 'Otro'
+  };
+  return metodos[metodo] || metodo || 'N/A';
+}
+
+async function _descargarPDFFacturaCXC(facturaId) {
+  console.log(`📄 Descargando PDF de la factura CXC: ${facturaId}`);
+
+  const factura = facturasData.find(f => f.id === facturaId);
+  if (!factura) {
+    alert('Factura no encontrada');
+    return;
+  }
+
+  try {
+    // Cargar jsPDF si no está disponible
+    if (!window.jspdf) {
+      const script = document.createElement('script');
+      script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+      await new Promise((resolve, reject) => {
+        script.onload = resolve;
+        script.onerror = reject;
+        document.head.appendChild(script);
+      });
+    }
+
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+    // Configuración
+    const margin = 20;
+    let yPosition = 20;
+    const pageWidth = doc.internal.pageSize.width;
+    const col1X = margin + 5;
+    const col2X = pageWidth / 2 + 10;
+
+    // Usar funciones auxiliares definidas arriba
+    const formatearFecha = formatearFechaPDF;
+    const obtenerValor = obtenerValorPDF;
+    const formatearMonto = formatearMontoPDF;
 
     // Título
     doc.setFontSize(18);
@@ -3355,9 +3380,9 @@ async function _descargarPDFFacturaCXC(facturaId) {
       leftY += 6;
     }
 
-    doc.text(`Fecha de Emisión: ${formatearFecha(factura.fechaEmision)}`, col1X, leftY);
+    doc.text(`Fecha de Emisión: ${formatearFechaCXCExport(factura.fechaEmision)}`, col1X, leftY);
     leftY += 6;
-    doc.text(`Fecha de Vencimiento: ${formatearFecha(factura.fechaVencimiento)}`, col1X, leftY);
+    doc.text(`Fecha de Vencimiento: ${formatearFechaCXCExport(factura.fechaVencimiento)}`, col1X, leftY);
     leftY += 6;
 
     // Columna derecha
@@ -3432,17 +3457,8 @@ async function _descargarPDFFacturaCXC(facturaId) {
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(9);
 
-      // Función auxiliar para obtener texto del método de pago
-      function obtenerMetodoPago(metodo) {
-        const metodos = {
-          transferencia: 'Transferencia',
-          cheque: 'Cheque',
-          efectivo: 'Efectivo',
-          tarjeta: 'Tarjeta',
-          otro: 'Otro'
-        };
-        return metodos[metodo] || metodo || '-';
-      }
+      // Usar función auxiliar definida arriba
+      const obtenerMetodoPago = obtenerMetodoPagoPDF;
 
       pagos.forEach(pago => {
         if (yPosition > 270) {
@@ -3450,7 +3466,7 @@ async function _descargarPDFFacturaCXC(facturaId) {
           yPosition = 20;
         }
 
-        const fechaPago = formatearFecha(pago.fecha);
+        const fechaPago = formatearFechaCXCExport(pago.fecha);
         const montoPago = formatearMonto(pago.monto);
         const metodoPago = obtenerMetodoPago(pago.metodo);
         const referenciaPago = pago.referencia || '-';
@@ -3536,21 +3552,12 @@ async function _descargarPDFFacturaCXC(facturaId) {
       let leftYPago = startYPago;
       let rightYPago = startYPago;
 
-      // Función auxiliar para obtener texto del método de pago
-      function obtenerMetodoPagoTexto(metodo) {
-        const metodos = {
-          transferencia: 'Transferencia Bancaria',
-          cheque: 'Cheque',
-          efectivo: 'Efectivo',
-          tarjeta: 'Tarjeta de Crédito',
-          otro: 'Otro'
-        };
-        return metodos[metodo] || metodo || 'N/A';
-      }
+      // Usar función auxiliar definida arriba
+      const obtenerMetodoPagoTexto = obtenerMetodoPagoTextoPDF;
 
       // Columna izquierda
       if (factura.fechaPago) {
-        doc.text(`Fecha de Pago: ${formatearFecha(factura.fechaPago)}`, col1X, leftYPago);
+        doc.text(`Fecha de Pago: ${formatearFechaCXCExport(factura.fechaPago)}`, col1X, leftYPago);
         leftYPago += 6;
       }
 
@@ -3633,15 +3640,9 @@ function ensureXLSX(then) {
   document.head.appendChild(s);
 }
 
-// Exportar datos de CXC a Excel
-async function _exportCXCData() {
-  if (!facturasFiltradas || facturasFiltradas.length === 0) {
-    alert('No hay facturas para exportar.');
-    return;
-  }
-
-  // Función auxiliar para formatear fechas
-  function formatearFecha(fechaStr) {
+// ===== FUNCIONES AUXILIARES PARA EXPORTACIÓN CXC =====
+// Función auxiliar para formatear fechas en exportaciones CXC
+function formatearFechaCXCExport(fechaStr) {
     if (!fechaStr) {
       return '';
     }
@@ -3673,8 +3674,8 @@ async function _exportCXCData() {
     }
   }
 
-  // Función auxiliar para formatear estado
-  function formatearEstado(estado) {
+// Función auxiliar para formatear estado en exportaciones CXC
+function formatearEstadoCXCExport(estado) {
     const estados = {
       pendiente: 'Pendiente',
       pagado: 'Pagado',
@@ -3684,8 +3685,8 @@ async function _exportCXCData() {
     return estados[estado] || estado || '';
   }
 
-  // Función auxiliar para calcular montos
-  function calcularMontos(factura) {
+// Función auxiliar para calcular montos en exportaciones CXC
+function calcularMontosCXCExport(factura) {
     const montoTotal = factura.monto || 0;
     const montoPagado = factura.montoPagado || 0;
     const montoPendiente =
@@ -3697,8 +3698,8 @@ async function _exportCXCData() {
     };
   }
 
-  // Función auxiliar para formatear UUID (si no está disponible globalmente)
-  function formatearUUIDLocal(uuid) {
+// Función auxiliar para formatear UUID en exportaciones CXC
+function formatearUUIDCXCExport(uuid) {
     if (!uuid) {
       return '';
     }
@@ -3714,8 +3715,31 @@ async function _exportCXCData() {
     return uuid;
   }
 
-  // Función auxiliar para obtener número de registro y folio fiscal
-  async function obtenerDatosFacturacion(factura) {
+// Funciones auxiliares para generar PDFs CXC - aceptan doc como parámetro
+function addTextPDFCXC(doc, text, x, y, options = {}) {
+  doc.setFontSize(options.fontSize || 12);
+
+  // Manejar colores correctamente
+  if (options.color) {
+    if (Array.isArray(options.color)) {
+      doc.setTextColor(options.color[0], options.color[1], options.color[2]);
+    } else {
+      doc.setTextColor(options.color);
+    }
+  } else {
+    doc.setTextColor(0, 0, 0); // Negro por defecto
+  }
+
+  doc.text(text, x, y);
+}
+
+function addLinePDFCXC(doc, x1, y1, x2, y2) {
+  doc.setDrawColor(0, 0, 0);
+  doc.line(x1, y1, x2, y2);
+}
+
+// Función auxiliar para obtener número de registro y folio fiscal en exportaciones CXC
+async function obtenerDatosFacturacionCXCExport(factura) {
     let numeroRegistro = '';
     let folioFiscal = '';
 
@@ -3846,7 +3870,7 @@ async function _exportCXCData() {
       if (typeof formatearUUID === 'function') {
         folioFiscal = formatearUUID(folioFiscal);
       } else {
-        folioFiscal = formatearUUIDLocal(folioFiscal);
+        folioFiscal = formatearUUIDCXCExport(folioFiscal);
       }
     }
 
@@ -3858,12 +3882,12 @@ async function _exportCXCData() {
 
   // Obtener datos de facturación de forma asíncrona para todas las facturas
   const datosFacturacionPromises = facturasFiltradas.map(factura =>
-    obtenerDatosFacturacion(factura)
+    obtenerDatosFacturacionCXCExport(factura)
   );
   const datosFacturacionArray = await Promise.all(datosFacturacionPromises);
 
   const rows = facturasFiltradas.map((factura, index) => {
-    const montos = calcularMontos(factura);
+    const montos = calcularMontosCXCExport(factura);
     const datosFacturacion = datosFacturacionArray[index];
 
     // Obtener observaciones: primero del nivel superior, si no del último pago
@@ -3877,13 +3901,13 @@ async function _exportCXCData() {
 
     return {
       'N° Registro': datosFacturacion.numeroRegistro,
-      'Fecha de Emisión': formatearFecha(factura.fechaEmision),
+      'Fecha de Emisión': formatearFechaCXCExport(factura.fechaEmision),
       'Folio Fiscal': datosFacturacion.folioFiscal,
       Serie: factura.serie || '',
       Folio: factura.folio || factura.numeroFactura || '',
       Cliente: factura.cliente || '',
-      'Fecha de Vencimiento': formatearFecha(factura.fechaVencimiento),
-      Estado: formatearEstado(factura.estado),
+      'Fecha de Vencimiento': formatearFechaCXCExport(factura.fechaVencimiento),
+      Estado: formatearEstadoCXCExport(factura.estado),
       'Monto Total': montos.montoTotal,
       'Monto Pagado': montos.montoPagado,
       'Monto Pendiente': montos.montoPendiente,
@@ -4605,9 +4629,8 @@ function formatDate(dateString) {
   if (typeof dateString === 'string' && /^\d{4}-\d{2}-\d{2}/.test(dateString)) {
     const [year, month, day] = dateString.split('T')[0].split('-');
     date = new Date(parseInt(year, 10), parseInt(month, 10) - 1, parseInt(day, 10));
-  }
+  } else if (typeof dateString === 'string' && dateString.includes('/')) {
   // Si es string en formato DD/MM/YYYY, parsearlo correctamente
-  else if (typeof dateString === 'string' && dateString.includes('/')) {
     const partes = dateString.split('/');
     if (partes.length === 3) {
       const dia = parseInt(partes[0], 10);
@@ -5472,70 +5495,47 @@ function _generarPDFEstadoCuenta() {
   const margin = 20;
   let yPosition = 20;
 
-  // Función para agregar texto con estilo
-  function addText(text, x, y, options = {}) {
-    doc.setFontSize(options.fontSize || 12);
-
-    // Manejar colores correctamente
-    if (options.color) {
-      if (Array.isArray(options.color)) {
-        doc.setTextColor(options.color[0], options.color[1], options.color[2]);
-      } else {
-        doc.setTextColor(options.color);
-      }
-    } else {
-      doc.setTextColor(0, 0, 0); // Negro por defecto
-    }
-
-    doc.text(text, x, y);
-  }
-
-  // Función para agregar línea
-  function addLine(x1, y1, x2, y2) {
-    doc.setDrawColor(0, 0, 0);
-    doc.line(x1, y1, x2, y2);
-  }
-
   // Encabezado
-  addText('ESTADO DE CUENTA', pageWidth / 2, yPosition, { fontSize: 18, color: [0, 0, 139] });
+  addTextPDFCXC(doc, 'ESTADO DE CUENTA', pageWidth / 2, yPosition, { fontSize: 18, color: [0, 0, 139] });
   yPosition += 15;
 
-  addText(`Cliente: ${cliente}`, margin, yPosition, { fontSize: 14 });
+  addTextPDFCXC(doc, `Cliente: ${cliente}`, margin, yPosition, { fontSize: 14 });
   yPosition += 10;
 
-  addText(`Período: ${fechaDesde || 'Inicio'} - ${fechaHasta || 'Hoy'}`, margin, yPosition);
+  addTextPDFCXC(doc, `Período: ${fechaDesde || 'Inicio'} - ${fechaHasta || 'Hoy'}`, margin, yPosition);
   yPosition += 10;
 
-  addText(`Fecha de emisión: ${new Date().toLocaleDateString('es-MX')}`, margin, yPosition);
+  addTextPDFCXC(doc, `Fecha de emisión: ${new Date().toLocaleDateString('es-MX')}`, margin, yPosition);
   yPosition += 20;
 
   // Resumen
-  addText('RESUMEN', margin, yPosition, { fontSize: 14, color: [0, 0, 139] });
+  addTextPDFCXC(doc, 'RESUMEN', margin, yPosition, { fontSize: 14, color: [0, 0, 139] });
   yPosition += 10;
 
-  addText(`Total de facturas: ${facturasCliente.length}`, margin, yPosition);
+  addTextPDFCXC(doc, `Total de facturas: ${facturasCliente.length}`, margin, yPosition);
   yPosition += 8;
 
-  addText(`Monto total facturado: $${formatCurrency(totalGeneral)}`, margin, yPosition, {
+  addTextPDFCXC(doc, `Monto total facturado: $${formatCurrency(totalGeneral)}`, margin, yPosition, {
     fontSize: 12,
     color: [0, 0, 139]
   });
   yPosition += 8;
 
-  addText(`Monto total pagado: $${formatCurrency(totalPagado)}`, margin, yPosition, {
+  addTextPDFCXC(doc, `Monto total pagado: $${formatCurrency(totalPagado)}`, margin, yPosition, {
     color: [0, 128, 0]
   });
   yPosition += 8;
 
-  addText(`Monto total pendiente: $${formatCurrency(totalPendiente)}`, margin, yPosition, {
+  addTextPDFCXC(doc, `Monto total pendiente: $${formatCurrency(totalPendiente)}`, margin, yPosition, {
     color: [220, 20, 60]
   });
   yPosition += 8;
 
-  addText(`Facturas pendientes: ${facturasPendientes.length}`, margin, yPosition);
+  addTextPDFCXC(doc, `Facturas pendientes: ${facturasPendientes.length}`, margin, yPosition);
   yPosition += 8;
 
-  addText(
+  addTextPDFCXC(
+    doc,
     `Facturas vencidas: ${facturasVencidas.length} - $${formatCurrency(totalVencido)}`,
     margin,
     yPosition,
@@ -5543,19 +5543,19 @@ function _generarPDFEstadoCuenta() {
   );
   yPosition += 8;
 
-  addText(`Facturas pagadas: ${facturasPagadas.length}`, margin, yPosition, { color: [0, 128, 0] });
+  addTextPDFCXC(doc, `Facturas pagadas: ${facturasPagadas.length}`, margin, yPosition, { color: [0, 128, 0] });
   yPosition += 8;
 
   // Calcular porcentaje de cobranza
   const porcentajeCobranza = totalGeneral > 0 ? Math.round((totalPagado / totalGeneral) * 100) : 0;
-  addText(`Porcentaje de cobranza: ${porcentajeCobranza}%`, margin, yPosition, {
+  addTextPDFCXC(doc, `Porcentaje de cobranza: ${porcentajeCobranza}%`, margin, yPosition, {
     fontSize: 12,
     color: [0, 0, 139]
   });
   yPosition += 20;
 
   // Tabla de facturas
-  addText('DETALLE DE FACTURAS', margin, yPosition, { fontSize: 14, color: [0, 0, 139] });
+  addTextPDFCXC(doc, 'DETALLE DE FACTURAS', margin, yPosition, { fontSize: 14, color: [0, 0, 139] });
   yPosition += 10;
 
   // Encabezados de tabla - Ajustar posiciones para más columnas
@@ -5571,18 +5571,18 @@ function _generarPDFEstadoCuenta() {
     margin + 160
   ];
 
-  addText('Serie-Folio', colPositions[0], yPosition, { fontSize: 9 });
-  addText('Fecha Emisión', colPositions[1], yPosition, { fontSize: 9 });
-  addText('Fecha Venc.', colPositions[2], yPosition, { fontSize: 9 });
-  addText('Días Venc.', colPositions[3], yPosition, { fontSize: 9 });
-  addText('Monto Total', colPositions[4], yPosition, { fontSize: 9 });
-  addText('Monto Pagado', colPositions[5], yPosition, { fontSize: 9 });
-  addText('Monto Pend.', colPositions[6], yPosition, { fontSize: 9 });
-  addText('Estado', colPositions[7], yPosition, { fontSize: 9 });
-  addText('Referencia', colPositions[8], yPosition, { fontSize: 9 });
+  addTextPDFCXC(doc, 'Serie-Folio', colPositions[0], yPosition, { fontSize: 9 });
+  addTextPDFCXC(doc, 'Fecha Emisión', colPositions[1], yPosition, { fontSize: 9 });
+  addTextPDFCXC(doc, 'Fecha Venc.', colPositions[2], yPosition, { fontSize: 9 });
+  addTextPDFCXC(doc, 'Días Venc.', colPositions[3], yPosition, { fontSize: 9 });
+  addTextPDFCXC(doc, 'Monto Total', colPositions[4], yPosition, { fontSize: 9 });
+  addTextPDFCXC(doc, 'Monto Pagado', colPositions[5], yPosition, { fontSize: 9 });
+  addTextPDFCXC(doc, 'Monto Pend.', colPositions[6], yPosition, { fontSize: 9 });
+  addTextPDFCXC(doc, 'Estado', colPositions[7], yPosition, { fontSize: 9 });
+  addTextPDFCXC(doc, 'Referencia', colPositions[8], yPosition, { fontSize: 9 });
 
   yPosition += 5;
-  addLine(margin, yPosition, pageWidth - margin, yPosition);
+  addLinePDFCXC(doc, margin, yPosition, pageWidth - margin, yPosition);
   yPosition += 10;
 
   // Filas de facturas
@@ -5620,38 +5620,39 @@ function _generarPDFEstadoCuenta() {
       estadoColor = 255;
     }
 
-    addText(serieFolio, colPositions[0], yPosition, { fontSize: 8 });
-    addText(fechaEmision, colPositions[1], yPosition, { fontSize: 8 });
-    addText(fechaVenc, colPositions[2], yPosition, { fontSize: 8 });
-    addText(diasVenc, colPositions[3], yPosition, {
+    addTextPDFCXC(doc, serieFolio, colPositions[0], yPosition, { fontSize: 8 });
+    addTextPDFCXC(doc, fechaEmision, colPositions[1], yPosition, { fontSize: 8 });
+    addTextPDFCXC(doc, fechaVenc, colPositions[2], yPosition, { fontSize: 8 });
+    addTextPDFCXC(doc, diasVenc, colPositions[3], yPosition, {
       fontSize: 8,
       color: factura.estado === 'vencido' ? 220 : 0
     });
-    addText(montoTotalStr, colPositions[4], yPosition, { fontSize: 8 });
-    addText(montoPagadoStr, colPositions[5], yPosition, { fontSize: 8, color: [0, 128, 0] });
-    addText(montoPendienteStr, colPositions[6], yPosition, {
+    addTextPDFCXC(doc, montoTotalStr, colPositions[4], yPosition, { fontSize: 8 });
+    addTextPDFCXC(doc, montoPagadoStr, colPositions[5], yPosition, { fontSize: 8, color: [0, 128, 0] });
+    addTextPDFCXC(doc, montoPendienteStr, colPositions[6], yPosition, {
       fontSize: 8,
       color: montoPendiente > 0 ? [220, 20, 60] : [0, 128, 0]
     });
-    addText(estado, colPositions[7], yPosition, { fontSize: 8, color: estadoColor });
-    addText(referencia, colPositions[8], yPosition, { fontSize: 8 });
+    addTextPDFCXC(doc, estado, colPositions[7], yPosition, { fontSize: 8, color: estadoColor });
+    addTextPDFCXC(doc, referencia, colPositions[8], yPosition, { fontSize: 8 });
 
     yPosition += 8;
   });
 
   // Pie de página
   yPosition += 20;
-  addLine(margin, yPosition, pageWidth - margin, yPosition);
+  addLinePDFCXC(doc, margin, yPosition, pageWidth - margin, yPosition);
   yPosition += 10;
 
-  addText(
+  addTextPDFCXC(
+    doc,
     'Este estado de cuenta es generado automáticamente por el sistema ERP.',
     margin,
     yPosition,
     { fontSize: 8, color: [128, 128, 128] }
   );
   yPosition += 5;
-  addText('Para aclaraciones, contactar al departamento de cobranza.', margin, yPosition, {
+  addTextPDFCXC(doc, 'Para aclaraciones, contactar al departamento de cobranza.', margin, yPosition, {
     fontSize: 8,
     color: [128, 128, 128]
   });

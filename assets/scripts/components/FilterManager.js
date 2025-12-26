@@ -22,7 +22,7 @@ class FilterManager {
       onFilter: options.onFilter || null,
       onClear: options.onClear || null,
       autoApply: options.autoApply !== false, // Aplicar filtros automáticamente al cambiar
-      debounceTime: options.debounceTime || 300, // Tiempo de espera para aplicar filtros (ms)
+      debounceTime: options.debounceTime || 300, // Tiempo de espera para aplicar filtros (ms) - Default: 300ms
       ...options
     };
 
@@ -77,83 +77,115 @@ class FilterManager {
    */
   _renderFilter(filter) {
     const colSize = filter.colSize || 'col-md-2';
-    let inputHTML = '';
-
-    switch (filter.type) {
-      case 'text':
-        inputHTML = `
-          <input type="text" 
-                 class="form-control form-control-sm" 
-                 id="filter_${filter.id}" 
-                 placeholder="${filter.placeholder || filter.label || ''}"
-                 ${filter.onKeyup ? `onkeyup="${filter.onKeyup}"` : ''}>
-        `;
-        break;
-
-      case 'date':
-        inputHTML = `
-          <input type="date" 
-                 class="form-control form-control-sm" 
-                 id="filter_${filter.id}"
-                 ${filter.onChange ? `onchange="${filter.onChange}"` : ''}>
-        `;
-        break;
-
-      case 'select': {
-        const options = filter.options || [];
-        inputHTML = `
-          <select class="form-select form-select-sm" 
-                  id="filter_${filter.id}"
-                  ${filter.onChange ? `onchange="${filter.onChange}"` : ''}>
-            <option value="">${filter.placeholder || 'Todos'}</option>
-            ${options
-    .map(opt => {
-      const value = typeof opt === 'object' ? opt.value : opt;
-      const label = typeof opt === 'object' ? opt.label : opt;
-      return `<option value="${value}">${label}</option>`;
-    })
-    .join('')}
-          </select>
-        `;
-        break;
-      }
-
-      case 'number':
-        inputHTML = `
-          <input type="number" 
-                 class="form-control form-control-sm" 
-                 id="filter_${filter.id}" 
-                 placeholder="${filter.placeholder || filter.label || ''}"
-                 ${filter.min !== undefined ? `min="${filter.min}"` : ''}
-                 ${filter.max !== undefined ? `max="${filter.max}"` : ''}
-                 ${filter.step !== undefined ? `step="${filter.step}"` : ''}
-                 ${filter.onKeyup ? `onkeyup="${filter.onKeyup}"` : ''}>
-        `;
-        break;
-
-      case 'month':
-        inputHTML = `
-          <input type="month" 
-                 class="form-control form-control-sm" 
-                 id="filter_${filter.id}"
-                 ${filter.onChange ? `onchange="${filter.onChange}"` : ''}>
-        `;
-        break;
-
-      default:
-        inputHTML = `
-          <input type="text" 
-                 class="form-control form-control-sm" 
-                 id="filter_${filter.id}" 
-                 placeholder="${filter.placeholder || filter.label || ''}">
-        `;
-    }
+    const inputHTML = this._renderFilterInput(filter);
 
     return `
       <div class="${colSize}">
         <label for="filter_${filter.id}" class="form-label small">${filter.label || filter.id}</label>
         ${inputHTML}
       </div>
+    `;
+  }
+
+  /**
+   * Renderiza el input HTML según el tipo de filtro
+   * @private
+   */
+  _renderFilterInput(filter) {
+    switch (filter.type) {
+      case 'text':
+        return this._renderTextFilter(filter);
+      case 'date':
+        return this._renderDateFilter(filter);
+      case 'select':
+        return this._renderSelectFilter(filter);
+      case 'number':
+        return this._renderNumberFilter(filter);
+      case 'month':
+        return this._renderMonthFilter(filter);
+      default:
+        return this._renderTextFilter(filter);
+    }
+  }
+
+  /**
+   * Renderiza un filtro de tipo texto
+   * @private
+   */
+  _renderTextFilter(filter) {
+    return `
+      <input type="text" 
+             class="form-control form-control-sm" 
+             id="filter_${filter.id}" 
+             placeholder="${filter.placeholder || filter.label || ''}"
+             ${filter.onKeyup ? `onkeyup="${filter.onKeyup}"` : ''}>
+    `;
+  }
+
+  /**
+   * Renderiza un filtro de tipo fecha
+   * @private
+   */
+  _renderDateFilter(filter) {
+    return `
+      <input type="date" 
+             class="form-control form-control-sm" 
+             id="filter_${filter.id}"
+             ${filter.onChange ? `onchange="${filter.onChange}"` : ''}>
+    `;
+  }
+
+  /**
+   * Renderiza un filtro de tipo select
+   * @private
+   */
+  _renderSelectFilter(filter) {
+    const options = filter.options || [];
+    const optionsHTML = options
+      .map(opt => {
+        const value = typeof opt === 'object' ? opt.value : opt;
+        const label = typeof opt === 'object' ? opt.label : opt;
+        return `<option value="${value}">${label}</option>`;
+      })
+      .join('');
+
+    return `
+      <select class="form-select form-select-sm" 
+              id="filter_${filter.id}"
+              ${filter.onChange ? `onchange="${filter.onChange}"` : ''}>
+        <option value="">${filter.placeholder || 'Todos'}</option>
+        ${optionsHTML}
+      </select>
+    `;
+  }
+
+  /**
+   * Renderiza un filtro de tipo número
+   * @private
+   */
+  _renderNumberFilter(filter) {
+    return `
+      <input type="number" 
+             class="form-control form-control-sm" 
+             id="filter_${filter.id}" 
+             placeholder="${filter.placeholder || filter.label || ''}"
+             ${filter.min !== undefined ? `min="${filter.min}"` : ''}
+             ${filter.max !== undefined ? `max="${filter.max}"` : ''}
+             ${filter.step !== undefined ? `step="${filter.step}"` : ''}
+             ${filter.onKeyup ? `onkeyup="${filter.onKeyup}"` : ''}>
+    `;
+  }
+
+  /**
+   * Renderiza un filtro de tipo mes
+   * @private
+   */
+  _renderMonthFilter(filter) {
+    return `
+      <input type="month" 
+             class="form-control form-control-sm" 
+             id="filter_${filter.id}"
+             ${filter.onChange ? `onchange="${filter.onChange}"` : ''}>
     `;
   }
 

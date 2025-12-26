@@ -234,7 +234,7 @@ const ERPUtils = {
    * @param {string} title - Título del modal
    * @returns {Promise<boolean>} true si se confirmó
    */
-  async confirm(message, title = 'Confirmar') {
+  confirm(message, title = 'Confirmar') {
     return new Promise(resolve => {
       const modal = new ERPModal({
         id: 'confirmModal',

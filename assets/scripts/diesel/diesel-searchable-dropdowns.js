@@ -1579,7 +1579,7 @@
           cargarOperadoresEnCacheDiesel().then(() => {
             // Llamar a la función usando el nombre completo para evitar problemas de scope
             if (typeof _mostrarDropdownOperadoresDieselConIDs === 'function') {
-              _mostrarDropdownOperadoresDieselConIDs(tipo, inputId, dropdownId, hiddenId);
+            _mostrarDropdownOperadoresDieselConIDs(tipo, inputId, dropdownId, hiddenId);
             } else {
               // Fallback a la función original si la versión con IDs no está disponible
               mostrarDropdownOperadoresDiesel(tipo);

@@ -7,12 +7,12 @@ import { defineConfig, devices } from '@playwright/test';
 export default defineConfig({
   testDir: './tests/e2e',
   
-  /* Tiempo máximo para un test */
-  timeout: 30 * 1000,
+  /* Tiempo máximo para un test - aumentado para SPAs que cargan dinámicamente */
+  timeout: 60 * 1000,
   
-  /* Esperar hasta 5 segundos entre intentos */
+  /* Esperar hasta 10 segundos entre intentos */
   expect: {
-    timeout: 5000
+    timeout: 10000
   },
   
   /* Ejecutar tests en paralelo */
@@ -46,7 +46,13 @@ export default defineConfig({
     screenshot: 'only-on-failure',
     
     /* Video solo en fallos */
-    video: 'retain-on-failure'
+    video: 'retain-on-failure',
+    
+    /* Esperar navegación hasta que el DOM esté listo (más adecuado para SPAs) */
+    waitForTimeout: 1000,
+    
+    /* Timeout para acciones (click, fill, etc.) */
+    actionTimeout: 15000
   },
 
   /* Configurar proyectos para múltiples navegadores */

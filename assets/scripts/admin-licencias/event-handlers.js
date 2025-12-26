@@ -91,7 +91,8 @@
   }
 
   // También inicializar después de un delay para asegurar que otros scripts se hayan cargado
-  setTimeout(initAdminLicenciasEventHandlers, 200);
+  const INIT_DELAY_MS = 200; // Delay in milliseconds to ensure other scripts are loaded
+  setTimeout(initAdminLicenciasEventHandlers, INIT_DELAY_MS);
 
   console.log('✅ Módulo de event handlers de admin-licencias cargado');
 })();

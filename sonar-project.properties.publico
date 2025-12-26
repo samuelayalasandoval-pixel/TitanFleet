@@ -1,0 +1,31 @@
+# SonarCloud Configuration for TitanFleet ERP (REPOSITORIO PÚBLICO)
+# https://sonarcloud.io
+# 
+# NOTA: Esta configuración es para cuando el repositorio es PÚBLICO
+# Copia este contenido a sonar-project.properties cuando hagas el repo público
+
+# Project identification
+sonar.projectKey=TitanFleet
+sonar.organization=samuelayalasandoval-pixel
+sonar.projectName=TitanFleet ERP
+
+# Source code location - Analizar TODO cuando es público (líneas ilimitadas)
+sonar.sources=assets/scripts
+sonar.sourceEncoding=UTF-8
+
+# Exclusions - Solo excluir lo esencial (repositorio público tiene líneas ilimitadas)
+sonar.exclusions=**/node_modules/**,**/dist/**,**/build/**,**/*.min.js,**/vendor/**,**/lib/**,**/test*.js,**/*.test.js,**/*.spec.js,**/tests/**,**/docs/**,**/backend-example/**,**/*.html,**/pages/**,**/scripts/**,**/*.config.js,**/vitest.config.js,**/playwright.config.js,**/*.map.js,**/components/**,**/layouts/**,**/*.bat,**/*.ps1,**/*.py,**/*.sh
+
+# Test exclusions
+sonar.test.exclusions=**/node_modules/**,**/dist/**,**/build/**
+
+# JavaScript/TypeScript settings
+sonar.javascript.lcov.reportPaths=coverage/lcov.info
+sonar.javascript.eslint.configPath=.eslintrc.json
+
+# Language
+sonar.language=js
+
+# Additional settings
+sonar.host.url=https://sonarcloud.io
+

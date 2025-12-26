@@ -90,26 +90,24 @@
     const embalajeNo = document.getElementById('embalajeNo');
     const descripcionEmbalaje = document.getElementById('descripcionEmbalaje');
 
-    // Función para mostrar/ocultar descripción
-    function toggleDescripcionEmbalaje() {
+      // Función para mostrar/ocultar descripción
+      function toggleDescripcionEmbalaje() {
       if (embalajeSi && embalajeSi.checked) {
         if (descripcionEmbalaje) {
           descripcionEmbalaje.style.display = 'block';
         }
-      } else {
+        } else {
         if (descripcionEmbalaje) {
           descripcionEmbalaje.style.display = 'none';
         }
-        // Limpiar el campo cuando se oculta
-        const campoDescripcion = document.getElementById('descripcion');
-        if (campoDescripcion) {
-          campoDescripcion.value = '';
+          // Limpiar el campo cuando se oculta
+          const campoDescripcion = document.getElementById('descripcion');
+          if (campoDescripcion) {
+            campoDescripcion.value = '';
+          }
         }
       }
-    }
-
     if (embalajeSi && embalajeNo && descripcionEmbalaje) {
-
       embalajeSi.addEventListener('change', toggleDescripcionEmbalaje);
       embalajeNo.addEventListener('change', toggleDescripcionEmbalaje);
     }

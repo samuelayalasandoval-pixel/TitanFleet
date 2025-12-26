@@ -980,6 +980,8 @@ class DemoDataLoader {
     return;
 
     // CÓDIGO ELIMINADO: Todo el código que generaba datos de ejemplo automáticamente ha sido eliminado
+    // Este código nunca se ejecutará debido al return anterior
+    /* eslint-disable-next-line no-unreachable */
     if (this.isDemoMode) {
       // Verificar si se limpiaron los datos intencionalmente
       const datosLimpiados = localStorage.getItem('configuracion_limpiada_intencionalmente');
