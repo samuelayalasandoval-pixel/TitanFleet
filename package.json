@@ -26,6 +26,7 @@
     "test:e2e:install": "playwright install --with-deps",
     "test:all": "npm run test && npm run test:e2e",
     "evaluate": "node scripts/evaluar-proyecto.js",
+    "verify:prod": "node VERIFICAR_CONFIGURACION_PRODUCCION.js",
     "deploy": "npm run build && firebase deploy --only hosting",
     "deploy:hosting": "npm run build && firebase deploy --only hosting",
     "deploy:firestore": "firebase deploy --only firestore:rules",

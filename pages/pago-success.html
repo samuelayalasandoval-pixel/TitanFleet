@@ -650,6 +650,7 @@
                     precio = payment.precio;
                   } else {
                     const planPrices = {
+                      prueba: { mensual: 10, anual: 10 }, // Plan de prueba
                       basico: { mensual: 1999, anual: 21989 },
                       estandar: { mensual: 4999, anual: 54989 },
                       premium: { mensual: 8999, anual: 98989 },
@@ -851,6 +852,7 @@
           } else {
             // Si no hay precio, calcular desde los metadatos del plan
             const planPrices = {
+              prueba: { mensual: 10, anual: 10 }, // Plan de prueba
               basico: { mensual: 1999, anual: 21989 },
               estandar: { mensual: 4999, anual: 54989 },
               premium: { mensual: 8999, anual: 98989 },
@@ -863,15 +865,17 @@
               payment.metadata?.paymentPeriod?.toLowerCase() ||
               'mensual';
             const planKey =
-              planLevel.includes('básico') || planLevel.includes('basico')
-                ? 'basico'
-                : planLevel.includes('estándar') || planLevel.includes('estandar')
-                  ? 'estandar'
-                  : planLevel.includes('premium')
-                    ? 'premium'
-                    : planLevel.includes('enterprise')
-                      ? 'enterprise'
-                      : 'basico';
+              planLevel.includes('prueba')
+                ? 'prueba'
+                : planLevel.includes('básico') || planLevel.includes('basico')
+                  ? 'basico'
+                  : planLevel.includes('estándar') || planLevel.includes('estandar')
+                    ? 'estandar'
+                    : planLevel.includes('premium')
+                      ? 'premium'
+                      : planLevel.includes('enterprise')
+                        ? 'enterprise'
+                        : 'basico';
             const periodKey = paymentPeriod.includes('anual') ? 'anual' : 'mensual';
             precio = planPrices[planKey]?.[periodKey] || 0;
           }
@@ -1040,6 +1044,7 @@
           // Si el precio es 0, intentar calcularlo desde el plan
           if (precio === 0 || !precio) {
             const planPrices = {
+              prueba: { mensual: 10, anual: 10 }, // Plan de prueba
               basico: { mensual: 1999, anual: 21989 },
               estandar: { mensual: 4999, anual: 54989 },
               premium: { mensual: 8999, anual: 98989 },
@@ -1049,15 +1054,17 @@
             const periodoText = (data.periodo || '').toLowerCase();
 
             const planKey =
-              planText.includes('básico') || planText.includes('basico')
-                ? 'basico'
-                : planText.includes('estándar') || planText.includes('estandar')
-                  ? 'estandar'
-                  : planText.includes('premium')
-                    ? 'premium'
-                    : planText.includes('enterprise')
-                      ? 'enterprise'
-                      : 'basico';
+              planText.includes('prueba')
+                ? 'prueba'
+                : planText.includes('básico') || planText.includes('basico')
+                  ? 'basico'
+                  : planText.includes('estándar') || planText.includes('estandar')
+                    ? 'estandar'
+                    : planText.includes('premium')
+                      ? 'premium'
+                      : planText.includes('enterprise')
+                        ? 'enterprise'
+                        : 'basico';
             const periodKey = periodoText.includes('anual') ? 'anual' : 'mensual';
             precio = planPrices[planKey]?.[periodKey] || 0;
           }

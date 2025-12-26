@@ -1133,6 +1133,7 @@ window.selectPlanForUpdate = function(planLevel) {
     const selectedPlanNameDisplay = document.getElementById('selectedPlanNameDisplay');
     
     const planNames = {
+        'prueba': 'Plan de Prueba',
         'basico': 'Plan Básico',
         'estandar': 'Plan Estándar',
         'premium': 'Plan Premium',
@@ -1140,6 +1141,7 @@ window.selectPlanForUpdate = function(planLevel) {
     };
     
     const planPrices = {
+        'prueba': { mensual: 10, anual: 10 }, // Plan de prueba
         'basico': { mensual: 1999, anual: 21989 },
         'estandar': { mensual: 4999, anual: 54989 },
         'premium': { mensual: 8999, anual: 98989 },

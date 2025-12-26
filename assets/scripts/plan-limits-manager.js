@@ -8,6 +8,7 @@ class PlanLimitsManager {
   constructor() {
     // Límites mensuales de registros por plan
     this.planLimits = {
+      prueba: 10, // Plan de prueba - solo 10 registros
       basico: 100,
       estandar: 500,
       premium: 2000,
@@ -16,6 +17,7 @@ class PlanLimitsManager {
 
     // Límites anuales de registros por plan (no se multiplican, son valores específicos)
     this.planLimitsAnual = {
+      prueba: 10, // Plan de prueba - solo 10 registros
       basico: 1200,
       estandar: 600,
       premium: 24000,
@@ -23,6 +25,7 @@ class PlanLimitsManager {
     };
 
     this.planPrices = {
+      prueba: { mensual: 10, anual: 10 }, // Plan de prueba - $10 MXN
       basico: { mensual: 1999, anual: 21989 },
       estandar: { mensual: 4999, anual: 54989 },
       premium: { mensual: 8999, anual: 98989 },
@@ -33,6 +36,7 @@ class PlanLimitsManager {
     this.firstPurchaseDiscount = 20; // 20%
 
     this.planNames = {
+      prueba: 'Prueba',
       basico: 'Básico',
       estandar: 'Estándar',
       premium: 'Premium',

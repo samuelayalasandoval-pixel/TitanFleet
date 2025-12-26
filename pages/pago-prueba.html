@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Plan de Prueba - TitanFleet</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <style>
+      body {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+      }
+      .card {
+        max-width: 500px;
+        border-radius: 16px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <div class="card-body p-5 text-center">
+        <h2 class="mb-4">
+          <i class="fas fa-flask text-primary me-2"></i>Plan de Prueba
+        </h2>
+        <p class="text-muted mb-4">
+          Este plan es para probar el webhook con un pago pequeño de $10 MXN
+        </p>
+        
+        <div class="alert alert-info mb-4">
+          <strong>Plan:</strong> Plan de Prueba<br>
+          <strong>Precio:</strong> $10 MXN<br>
+          <strong>Período:</strong> Mensual
+        </div>
+
+        <button class="btn btn-primary btn-lg w-100" onclick="irAPago()">
+          <i class="fas fa-credit-card me-2"></i>Continuar al Pago
+        </button>
+
+        <div class="mt-4">
+          <small class="text-muted">
+            ⚠️ En modo LIVE, necesitarás usar una tarjeta real
+          </small>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      function irAPago() {
+        // Configurar datos del plan de prueba
+        const paymentData = {
+          plan: 'Plan de Prueba',
+          planLevel: 'prueba',
+          periodo: 'Mensual',
+          paymentPeriod: 'mensual',
+          precio: 10,
+          cliente: {
+            nombre: 'Prueba Webhook',
+            email: 'prueba@ejemplo.com',
+            telefono: '5551234567',
+            empresa: 'Empresa de Prueba'
+          },
+          solicitudId: `PRUEBA-${Date.now()}`
+        };
+
+        // Guardar en sessionStorage
+        sessionStorage.setItem('titanfleet_payment_data', JSON.stringify(paymentData));
+
+        // Redirigir a página de pago
+        window.location.href = 'pago.html';
+      }
+    </script>
+  </body>
+</html>
+

@@ -21,18 +21,18 @@ window.STRIPE_CONFIG = {
   // Para desarrollo: usa pk_test_...
   // Para producción: usa pk_live_...
   publishableKey:
-    'pk_test_51SejR9JaRzbzvXVdSOJCppC51WxwB6szvoxSrUqs0fJ6H02Ky3aec0XKL4Nz28MKT9SyevEc8SYcz1bYxT5gDcvM00EMlb7RYY', // ⚠️ REEMPLAZA CON TU CLAVE REAL
+    'pk_live_51SejQsR7ZTArWef2jDkzqLJ5QNtbB0LGKDiIeYmmfCGIWVzRyb5iEhrwjl3mbayr5v0W7eOW8NmVwHj09OzJVW5V002f6eFRxV', // ✅ Clave LIVE configurada para producción
 
   // URL de tu backend para crear sesiones de checkout
   // En desarrollo local: 'http://localhost:3000'
   // En producción: 'https://tu-dominio.com'
-  backendUrl: 'http://localhost:3000', // ⚠️ CAMBIAR EN PRODUCCIÓN
+  backendUrl: 'https://titanfleet-production.up.railway.app', // ✅ URL de Railway configurada
 
   // Moneda por defecto
   currency: 'mxn', // 'mxn' para pesos mexicanos, 'usd' para dólares
 
   // Modo: 'test' para pruebas, 'live' para producción
-  mode: 'test' // ⚠️ CAMBIAR A 'live' EN PRODUCCIÓN
+  mode: 'live' // ✅ Modo LIVE configurado para producción
 };
 
 // Función para verificar si Stripe está configurado

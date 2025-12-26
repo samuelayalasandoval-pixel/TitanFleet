@@ -68,6 +68,14 @@
    * Solo mensual y anual (sin trimestral)
    */
   const planData = {
+    prueba: {
+      nombre: 'Plan de Prueba',
+      registros: 'Para pruebas de webhook',
+      precioMensual: 10,
+      precioAnual: 10, // Mismo precio para pruebas
+      almacenamiento: '1 GB (solo para pruebas)',
+      descuentoInicial: null
+    },
     basico: {
       nombre: 'Plan Básico',
       registros: 'Hasta 100 registros/mes',
