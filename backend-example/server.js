@@ -32,6 +32,51 @@ const PORT = process.env.PORT || 3000;
 
 // Middleware
 app.use(cors());
+
+// IMPORTANTE: El webhook debe estar ANTES de express.json()
+// porque Stripe necesita el body RAW (sin parsear) para verificar la firma
+/**
+ * Webhook para recibir eventos de Stripe (opcional pero recomendado)
+ * 
+ * Este endpoint DEBE estar antes de express.json() para recibir el body RAW
+ */
+app.post('/api/stripe-webhook', express.raw({ type: 'application/json' }), async (req, res) => {
+  const sig = req.headers['stripe-signature'];
+  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+
+  let event;
+
+  try {
+    event = stripe.webhooks.constructEvent(req.body, sig, webhookSecret);
+  } catch (err) {
+    console.error('❌ Error verificando webhook:', err.message);
+    return res.status(400).send(`Webhook Error: ${err.message}`);
+  }
+
+  // Manejar eventos
+  switch (event.type) {
+    case 'checkout.session.completed':
+      const session = event.data.object;
+      console.log('✅ Pago completado:', session.id);
+      console.log('📧 Email del cliente:', session.customer_email);
+      console.log('💰 Monto total:', session.amount_total / 100, session.currency.toUpperCase());
+      // Aquí puedes generar la licencia automáticamente
+      // y enviar el correo al cliente
+      break;
+    
+    case 'payment_intent.succeeded':
+      const paymentIntent = event.data.object;
+      console.log('✅ Pago exitoso:', paymentIntent.id);
+      break;
+    
+    default:
+      console.log(`ℹ️ Evento no manejado: ${event.type}`);
+  }
+
+  res.json({ received: true });
+});
+
+// Ahora sí, aplicar express.json() para los demás endpoints
 app.use(express.json());
 
 /**
@@ -388,42 +433,6 @@ app.get('/api/verify-payment', async (req, res) => {
   }
 });
 
-/**
- * Webhook para recibir eventos de Stripe (opcional pero recomendado)
- */
-app.post('/api/stripe-webhook', express.raw({ type: 'application/json' }), async (req, res) => {
-  const sig = req.headers['stripe-signature'];
-  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
-
-  let event;
-
-  try {
-    event = stripe.webhooks.constructEvent(req.body, sig, webhookSecret);
-  } catch (err) {
-    console.error('Error verificando webhook:', err.message);
-    return res.status(400).send(`Webhook Error: ${err.message}`);
-  }
-
-  // Manejar eventos
-  switch (event.type) {
-    case 'checkout.session.completed':
-      const session = event.data.object;
-      console.log('✅ Pago completado:', session.id);
-      // Aquí puedes generar la licencia automáticamente
-      // y enviar el correo al cliente
-      break;
-    
-    case 'payment_intent.succeeded':
-      const paymentIntent = event.data.object;
-      console.log('✅ Pago exitoso:', paymentIntent.id);
-      break;
-    
-    default:
-      console.log(`Evento no manejado: ${event.type}`);
-  }
-
-  res.json({ received: true });
-});
 
 // Verificar configuración antes de iniciar
 if (!process.env.STRIPE_SECRET_KEY) {
